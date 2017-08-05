@@ -52,6 +52,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f22a646180a84cb47af9ecde0acd05a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  homeRoom: {fileID: 0}
+  avatarPrefab: {fileID: 0}
+  gameMaxPlayers: 8
+  gameName: 
+  gameAddress: 
+  gamePort: 0
+  gamePlayerCount: 0
+  gameOwnerPlayerObj: {fileID: 0}
 --- !u!114 &114882387226330384
 MonoBehaviour:
   m_ObjectHideFlags: 1

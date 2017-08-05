@@ -31,6 +31,14 @@ public partial class DC_Director
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
+        GameObject playerO = conn.playerControllers[0].gameObject;
+        DC_Player player = playerO.GetComponent<DC_Player>();
+        
+        game.RemPlayer(player);
 
+        if(player.avatar)
+            NetworkServer.Destroy(player.avatar);
+
+        NetworkServer.Destroy(playerO);
     }
 }

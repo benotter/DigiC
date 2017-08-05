@@ -2,15 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_HomeRoom : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
+public class DC_HomeRoom : MonoBehaviour 
+{
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

@@ -6,14 +6,24 @@ using UnityEngine.Networking;
 public partial class DC_Game : NetworkBehaviour 
 {
     public DC_HomeRoom homeRoom;
+    public DC_GameRoom gameRoom;
 
     [Space(10)]
 
-    [SyncVar]
-    public int gameMaxPlayers = 8;
+    public GameObject avatarPrefab;
+
+    [Space(10)]
+
+    public HashSet<GameObject> players = new HashSet<GameObject>();
+
+    [Space(10)]
+    
 
     [SyncVar]
 	public string gameName = "";
+
+    [SyncVar]
+    public int gameMaxPlayers = 8;
 
     [SyncVar]
     public string gameAddress = "";
@@ -26,5 +36,15 @@ public partial class DC_Game : NetworkBehaviour
 
     [SyncVar]
     public GameObject gameOwnerPlayerObj;
-    
+
+    [SyncVar]
+    public int gameMinMapSize = 50;
+
+    [SyncVar]
+    public int gameMaxMapSize = 100;
+
+    void Start()
+    {
+
+    }
 }

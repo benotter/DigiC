@@ -11,6 +11,7 @@ public partial class DC_Game
     {
         
     }
+    
     public void AddPlayer(DC_Player player)
     {
         player.serverGameObject = gameObject;
@@ -18,10 +19,23 @@ public partial class DC_Game
 
         if(player.connectionToClient == gameOwner.connection)
             gameOwnerPlayerObj = player.gameObject;
+
+        RpcPlayerJoined(player.gameObject);
+    }
+
+    public void RemPlayer(DC_Player player)
+    {
+        RpcPlayerLeft(player.gameObject);
     }
 
     public void RequestAvatar(DC_Player player)
     {
-        
+        if(!player.avatar)
+        {
+            GameObject avatar = Instantiate(avatarPrefab);
+            NetworkServer.SpawnWithClientAuthority(player.gameObject, avatar);
+
+            player.avatar = avatar;
+        }
     }
 }
