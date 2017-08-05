@@ -23,17 +23,19 @@ public partial class DC_Director : NetworkManager
 
 		if(hostC != null)
 		{
-			game.gameName = gameName;
-			game.gameMaxPlayers = maxPlayers;
 			game.gamePort = networkPort;
 			game.gameAddress = networkAddress;
 
+			game.gameName = gameName;
+			game.gameMaxPlayers = maxPlayers;
+			
 			game.gameOwner = hostC;
 		}
 	}
 
 	public void JoinGame(string address, int port)
 	{
-		
+		networkPort = port;
+		networkAddress = address;
 	}
 }
