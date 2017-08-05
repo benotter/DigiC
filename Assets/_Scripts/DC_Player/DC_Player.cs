@@ -6,15 +6,15 @@ using UnityEngine.Networking;
 public partial class DC_Player : NetworkBehaviour
 {
 	[SyncVar]
+	public GameObject serverGameObject = null;
+
+	[SyncVar]
 	public string playerName = "";
 
 	[Space(10)]
 
 	[SyncVar]
 	public GameObject avatar = null;
-
-	[SyncVar]
-	public GameObject serverGameObject = null;
 
 	void Start () 
 	{

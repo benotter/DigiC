@@ -5,5 +5,11 @@ using UnityEngine.Networking;
 
 public partial class DC_Player 
 {
-    public NetworkConnection clientConn;
+    public DC_Game serverGame;
+
+    [Command]
+    public void CmdRequestAvatar()
+    {
+        serverGame.RequestAvatar(this);
+    }
 }
