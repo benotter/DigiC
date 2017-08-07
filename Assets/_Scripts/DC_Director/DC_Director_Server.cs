@@ -27,6 +27,7 @@ public partial class DC_Director
 
         NetworkServer.AddPlayerForConnection(conn, playerO, playerControllerId);
         game.AddPlayer(player);
+        game.RpcSetupGameRoom();
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)

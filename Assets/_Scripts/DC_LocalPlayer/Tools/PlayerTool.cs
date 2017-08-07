@@ -13,6 +13,12 @@ public class PlayerTool : ToolBase
 
 	[Space(10)]
 
+	public bool overrideTriggerDown = false;
+	public float triggerDownMin = 0.15f;
+	private float lastTriggerDownMin = 0.15f;
+
+	[Space(10)]
+
 	public SubToolBase subTool;
 
 	private float triggerDownTime = 0f;
@@ -30,6 +36,16 @@ public class PlayerTool : ToolBase
 			subTool.StopUse(this);
 		
 		subTool = tool;
+
+		if(tool && !overrideTriggerDown)
+		{
+			lastTriggerDownMin = triggerDownMin;
+			triggerDownMin = tool.triggerDownMin;
+		}
+		else if(!overrideTriggerDown) 
+		{
+			triggerDownMin = lastTriggerDownMin;
+		}		
 	}
 
 	void Update () 
@@ -37,9 +53,11 @@ public class PlayerTool : ToolBase
 		if(!subTool)
 			return;
 		
-		if(!subTool.inUse && trigger > 0.15f && triggerDownTime <= 0)
+		if(!subTool.inUse && trigger >= triggerDownMin && triggerDownTime <= 0)
 			subTool.StartUse(this);
-		else if(gripButton && subTool.dropable && gripDownTime <= 0)
+		else if(subTool.noHold && trigger < triggerDownMin)
+			subTool.StopUse(this);
+		else if(!subTool.noHold && gripButton && subTool.dropable && gripDownTime <= 0)
 			subTool.StopUse(this);
 
 		if(subTool)
@@ -48,13 +66,13 @@ public class PlayerTool : ToolBase
 		if(gripButton)
 			gripDownTime += Time.deltaTime;
 		
-		if(trigger > 0.15f)
+		if(trigger >= triggerDownMin)
 			triggerDownTime += Time.deltaTime;
 
 		if(!gripButton && gripDownTime > 0)
 			gripDownTime = 0;
 		
-		if(trigger <= 0.15f && triggerDownTime > 0)
+		if(trigger < triggerDownMin && triggerDownTime > 0)
 			triggerDownTime = 0;
 	}
 

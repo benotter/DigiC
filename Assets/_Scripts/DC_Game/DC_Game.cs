@@ -6,7 +6,11 @@ using UnityEngine.Networking;
 public partial class DC_Game : NetworkBehaviour 
 {
     public DC_HomeRoom homeRoom;
-    public DC_GameRoom gameRoom;
+    // public DC_GameRoom gameRoom;
+
+    [Space(10)]
+
+    public GameObject remotePlayer;
 
     [Space(10)]
 
@@ -38,13 +42,12 @@ public partial class DC_Game : NetworkBehaviour
     public GameObject gameOwnerPlayerObj;
 
     [SyncVar]
-    public int gameMinMapSize = 50;
-
-    [SyncVar]
-    public int gameMaxMapSize = 100;
+    public int gameGridSize = 20;
 
     void Start()
     {
 
     }
+
+
 }

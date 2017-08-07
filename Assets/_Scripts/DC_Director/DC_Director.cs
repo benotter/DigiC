@@ -7,6 +7,10 @@ public partial class DC_Director : NetworkManager
 {
 	public DC_Game game;
 
+	[Space(10)]
+
+	public DC_GameGrid gameGrid;
+
 	void Start()
 	{
 

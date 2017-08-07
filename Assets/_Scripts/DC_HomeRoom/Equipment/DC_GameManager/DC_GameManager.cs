@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_GameManager : MonoBehaviour {
+public class DC_GameManager : MonoBehaviour 
+{
 
-	// Use this for initialization
 	void Start () {
 		
 	}
 	
-	// Update is called once per frame
+	
 	void Update () {
 		
 	}

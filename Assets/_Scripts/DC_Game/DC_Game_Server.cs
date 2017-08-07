@@ -12,6 +12,17 @@ public partial class DC_Game
         
     }
     
+    public void RequestAvatar(DC_Player player)
+    {
+        if(!player.avatar)
+        {
+            GameObject avatar = Instantiate(avatarPrefab);
+            NetworkServer.SpawnWithClientAuthority(player.gameObject, avatar);
+
+            player.RpcSetAvatar(avatar);
+        }
+    }
+
     public void AddPlayer(DC_Player player)
     {
         player.serverGameObject = gameObject;
@@ -26,16 +37,5 @@ public partial class DC_Game
     public void RemPlayer(DC_Player player)
     {
         RpcPlayerLeft(player.gameObject);
-    }
-
-    public void RequestAvatar(DC_Player player)
-    {
-        if(!player.avatar)
-        {
-            GameObject avatar = Instantiate(avatarPrefab);
-            NetworkServer.SpawnWithClientAuthority(player.gameObject, avatar);
-
-            player.avatar = avatar;
-        }
     }
 }

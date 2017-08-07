@@ -6,5 +6,8 @@ using UnityEngine.Networking;
 public partial class DC_Avatar : NetworkBehaviour 
 {
 
-	
+	void ServerUpdate()
+    {
+
+    }
 }

@@ -4,11 +4,17 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public partial class DC_Game
-{
+{   
+    private bool setupGameRoomSinceLastRound = false;
+    
     [ClientRpc]
-    public void RpcSetupRooms()
+    public void RpcSetupGameRoom()
     {
-        gameRoom.SetRoomSize(gameMinMapSize);
+        if(!setupGameRoomSinceLastRound)
+        {
+            setupGameRoomSinceLastRound = true;
+            // gameRoom.SetupGameRoom();
+        }
     }
     
     [ClientRpc]
@@ -24,4 +30,5 @@ public partial class DC_Game
         if(players.Contains(player))
             players.Remove(player);
     }
+
 }

@@ -34,7 +34,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1497273469723836}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -53,13 +53,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homeRoom: {fileID: 0}
-  avatarPrefab: {fileID: 0}
-  gameMaxPlayers: 8
+  gameRoom: {fileID: 0}
+  remotePlayer: {fileID: 0}
+  avatarPrefab: {fileID: 1936016119532734, guid: 0e6361cc41afa2342a3b95c877713504,
+    type: 2}
   gameName: 
+  gameMaxPlayers: 8
   gameAddress: 
   gamePort: 0
   gamePlayerCount: 0
   gameOwnerPlayerObj: {fileID: 0}
+  gameGridSize: 20
 --- !u!114 &114882387226330384
 MonoBehaviour:
   m_ObjectHideFlags: 1

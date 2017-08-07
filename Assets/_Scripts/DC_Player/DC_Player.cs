@@ -5,6 +5,13 @@ using UnityEngine.Networking;
 
 public partial class DC_Player : NetworkBehaviour
 {
+	public GameObject gameGrid;
+
+	[Space(10)]
+	public DC_LocalPlayer localPlayer;
+	
+	[Space(10)]
+
 	[SyncVar]
 	public GameObject serverGameObject = null;
 
@@ -15,6 +22,14 @@ public partial class DC_Player : NetworkBehaviour
 
 	[SyncVar]
 	public GameObject avatar = null;
+
+	[Space(10)]
+
+	[SyncVar]
+	public int gameGridX = 0;
+
+	[SyncVar]
+	public int gameGridY = 0;
 
 	void Start () 
 	{

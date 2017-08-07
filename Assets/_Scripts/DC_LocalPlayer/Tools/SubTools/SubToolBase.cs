@@ -9,9 +9,21 @@ public partial class SubToolBase : MonoBehaviour
 
 
 	[Space(10)]
+
 	public bool dropable = true;
+	public bool noHold = false;
 
 	[Space(10)]
+	public bool snapBack = true;
+	public bool smoothSnapBack = true;
+	public float snapBackSpeed = 0.2f;
+
+	[Space(10)]
+
+	public float triggerDownMin = 0.15f;
+
+	[Space(10)]
+
 	public bool inUse = false;
 
 	[Space(10)]
@@ -24,10 +36,17 @@ public partial class SubToolBase : MonoBehaviour
 
 	private Renderer rend;
 	private Color originalColor;
+
+	private bool snappingBack = false;
+	private float snappingBackTime = 0f;
 }
 
 public partial class SubToolBase 
 {
+	void Update()
+	{
+		UpdateSnapping();
+	}
 	public void StartUse(PlayerTool pTool)
 	{
 		if(inUse)
@@ -35,10 +54,21 @@ public partial class SubToolBase
 
 		inUse = true;
 
-		originalPos = gameObject.transform.localPosition;
-		originalRot = gameObject.transform.localRotation;
-		originalPar = gameObject.transform.parent;
+		if(!snappingBack)
+		{
+			originalPos = gameObject.transform.localPosition;
+			originalRot = gameObject.transform.localRotation;
+			originalPar = gameObject.transform.parent;
+		}
+		else
+		{
+			
+			snappingBack = false;
+			snappingBackTime = 0f;
+		}
 
+		Debug.Log("Starting Tool Use");
+		
 		transform.parent = pTool.transform;
 
 		transform.localPosition = positionOffset;
@@ -52,15 +82,45 @@ public partial class SubToolBase
 		if(!inUse)
 			return;
 
+		inUse = false;
+
 		transform.parent = originalPar;
 
-		transform.localPosition = originalPos;
-		transform.localRotation = originalRot;
+		if(snapBack && !smoothSnapBack)
+		{
+			transform.localPosition = originalPos;
+			transform.localRotation = originalRot;
+		}
 
-		inUse = false;
+		if (snapBack && smoothSnapBack)
+		{
+			snappingBack = true;
+			Debug.Log("Stop Use");
+		}
 
 		SetHighlight(false);
 		pTool.SetSubtool(null);
+	}
+
+	public void UpdateSnapping()
+	{
+		if(snappingBack)
+		{
+			Debug.Log("Snapping!");
+			if(snappingBackTime < snapBackSpeed)
+			{
+				snappingBackTime += Time.deltaTime;
+
+				float prog = snappingBackTime / snapBackSpeed;
+				transform.localPosition = Vector3.Lerp(transform.localPosition, originalPos, prog);
+				transform.localRotation = Quaternion.Lerp(transform.localRotation, originalRot, prog);
+			}
+			else
+			{
+				snappingBack = false;
+				snappingBackTime = 0f;
+			}
+		}
 	}
 
 	public void SetHighlight(bool light = true)
