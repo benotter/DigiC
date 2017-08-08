@@ -53,9 +53,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   homeRoom: {fileID: 0}
-  gameRoom: {fileID: 0}
   remotePlayer: {fileID: 0}
   avatarPrefab: {fileID: 1936016119532734, guid: 0e6361cc41afa2342a3b95c877713504,
+    type: 2}
+  avatarSpawnPrefab: {fileID: 1264740442302076, guid: 5eef555523f3a4948bbc407f5614a800,
     type: 2}
   gameName: 
   gameMaxPlayers: 8

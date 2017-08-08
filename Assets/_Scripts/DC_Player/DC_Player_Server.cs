@@ -22,9 +22,14 @@ public partial class DC_Player
     [Command]
     public void CmdSetGridPosition(int x, int y)
     {
+        if(avatarSpawn)
+        {
+            var aS = avatarSpawn.GetComponent<DC_Avatar_Spawn>();
+            if(aS && aS.lockedIn)
+                return;
+        }
+        
         if(!gameGrid.CheckPosition(x, y))
             gameGrid.SetPosition(this.gameObject, x, y);
     }
-
-    
 }

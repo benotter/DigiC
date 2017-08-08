@@ -110,8 +110,6 @@ public partial class SubToolBase
 			snappingBack = false;
 			snappingBackTime = 0f;
 		}
-
-		Debug.Log("Starting Tool Use");
 		
 		transform.parent = pTool.transform;
 
@@ -140,10 +138,7 @@ public partial class SubToolBase
 		}
 
 		if (snapBack && smoothSnapBack)
-		{
 			snappingBack = true;
-			Debug.Log("Stop Use");
-		}
 
 		SetHighlight(false);
 		pTool.SetSubtool(null);
@@ -156,7 +151,6 @@ public partial class SubToolBase
 	{
 		if(snappingBack)
 		{
-			Debug.Log("Snapping!");
 			if(snappingBackTime < snapBackSpeed)
 			{
 				snappingBackTime += Time.deltaTime;

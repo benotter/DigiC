@@ -3,25 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[System.Serializable]
-public struct GameGridCell 
-{
-	public GameObject player;
-	public Vector3 cellPos;
-	public int x;
-	public int y;
-	public GameGridCell SetPos(int x, int y)
-	{
-		this.x = x;
-		this.y = y;
-
-		return this;
-	}
-}
-
-[System.Serializable]
-public class SyncListGridCell : SyncListStruct<GameGridCell>{}
-
 public partial class DC_GameGrid : NetworkBehaviour
 {
 	[System.Serializable]
@@ -56,12 +37,12 @@ public partial class DC_GameGrid
 		if(!go)
 			return (cells[GetPosInt(x, y)].player != null);
 		else
-			return (cells[GetPosInt(x, y)].player == go);
+			return (cells[GetPosInt(x, y)].player == go || cells[GetPosInt(x, y)].player == null);
 	}
 
 	public bool SetPosition(GameObject playerO, int x, int y)
 	{
-		if(CheckPosition(x, y, playerO))
+		if(!CheckPosition(x, y, playerO))
 			return false;
 		
 		int pos = GetPosInt(x, y);
@@ -96,6 +77,8 @@ public partial class DC_GameGrid
 
 		playerO.transform.position = cell.cellPos;
 
+		RpcWasGridUpdate();
+
 		return true;
 	}
 
@@ -125,3 +108,22 @@ public partial class DC_GameGrid
         dynaRoom.length = gridCellSize * 3;
     }
 }
+
+[System.Serializable]
+public struct GameGridCell 
+{
+	public GameObject player;
+	public Vector3 cellPos;
+	public int x;
+	public int y;
+	public GameGridCell SetPos(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+
+		return this;
+	}
+}
+
+[System.Serializable]
+public class SyncListGridCell : SyncListStruct<GameGridCell>{}

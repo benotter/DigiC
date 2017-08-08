@@ -30,5 +30,7 @@ public class DC_GridSelector : MonoBehaviour
 	{
 		if(homeRoom.remotePlayer)
 			homeRoom.remotePlayer.CmdSetGridPosition(x, y);
+
+		UpdateButtonStat();
 	}
 }

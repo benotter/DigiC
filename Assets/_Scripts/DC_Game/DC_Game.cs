@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public partial class DC_Game : NetworkBehaviour 
 {
     public DC_HomeRoom homeRoom;
-    // public DC_GameRoom gameRoom;
+    public DC_GameGrid gameGrid;
 
     [Space(10)]
 
@@ -43,12 +43,25 @@ public partial class DC_Game : NetworkBehaviour
     public GameObject gameOwnerPlayerObj;
 
     [SyncVar]
-    public int gameGridSize = 20;
+    public float gameGridSize = 20;
 
     void Start()
     {
 
     }
+}
 
+public partial class DC_Game 
+{
+    public void SetGameSize(float size)
+    {
+        gameGridSize = size;
+        gameGrid.gridCellSize = size;
 
+        
+        gameGrid.UpdateCellPositions();
+        
+        gameGrid.UpdateGameGrid();
+        gameGrid.RpcUpdateGameGrid();
+    }
 }

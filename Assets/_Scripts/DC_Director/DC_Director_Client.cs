@@ -12,6 +12,9 @@ public partial class DC_Director
         if(ClientScene.AddPlayer(0))
         {
             GameObject playerObj = ClientScene.localPlayers[0].gameObject;
+            
+            game.remotePlayer = playerObj;
+
             DC_Player player = playerObj.GetComponent<DC_Player>();
             if(player)
             {

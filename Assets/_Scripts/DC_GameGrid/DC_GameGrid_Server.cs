@@ -22,8 +22,6 @@ public partial class DC_GameGrid
         // WHO LOVES SOOO MUCH WASTED MEMORY REWRITES>?
         UpdateCellPositions();
         UpdateGameGrid();
-
-        Debug.Log("Server Cells: " + cells.Count);
     }
 
     public void UpdateCellPositions()

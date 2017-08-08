@@ -7,15 +7,22 @@ public partial class DC_GameGrid
 {
 	public DynaRoom dynaRoom;
 
+    public DC_GridSelector gridSelector;
+
     public override void OnStartClient()
     {
         UpdateGameGrid();
-        Debug.Log("Client Cells: " + cells.Count);
     }
 
     [ClientRpc]
     public void RpcUpdateGameGrid()
     {
         UpdateGameGrid();
+    }
+
+    [ClientRpc]
+    public void RpcWasGridUpdate()
+    {
+        gridSelector.UpdateButtonStat();
     }
 }

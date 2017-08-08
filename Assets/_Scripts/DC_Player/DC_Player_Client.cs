@@ -18,6 +18,10 @@ public partial class DC_Player
         var avaS = aS.GetComponent<DC_Avatar_Spawn>();
         if(avaS)
             avaS.SetPlayer(gameObject);
+
+        var p = transform.position;
+        aS.transform.position = new Vector3(p.x, gameGrid.transform.position.y + 1f, p.z);
+        avaS.Lock();
     }
 
     [ClientRpc]

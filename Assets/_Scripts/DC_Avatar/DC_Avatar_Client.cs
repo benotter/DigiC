@@ -18,6 +18,11 @@ public partial class DC_Avatar
 
     public DC_LocalPlayer localPlayer;
 
+    public override void OnStartClient()
+    {
+        GetComponent<Collider>().enabled = false;
+    }
+
     public override void OnStartAuthority()
     {
         avatarCam.enabled = true;
@@ -26,8 +31,6 @@ public partial class DC_Avatar
 
         muzzle.transform.GetChild(0).gameObject.layer = layer;
         chest.transform.GetChild(0).gameObject.layer = layer;
-
-        GetComponent<Collider>().enabled = false;
     }
     public override void OnStopAuthority()
     {
