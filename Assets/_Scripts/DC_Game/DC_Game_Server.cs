@@ -11,15 +11,31 @@ public partial class DC_Game
     {
         
     }
+
+    public void RequestAvatarSpawn(DC_Player player)
+    {
+        if(!player.avatarSpawn)
+        {
+            GameObject avatarSpawn = Instantiate(avatarSpawnPrefab);
+            NetworkServer.SpawnWithClientAuthority(avatarSpawn, player.gameObject);
+
+            player.RpcSetAvatarSpawn(avatarSpawn);
+        }
+    }
     
     public void RequestAvatar(DC_Player player)
     {
-        if(!player.avatar)
+        if(!player.avatar) // && player.avatarSpawn)
         {
-            GameObject avatar = Instantiate(avatarPrefab);
-            NetworkServer.SpawnWithClientAuthority(player.gameObject, avatar);
+            // var aS = player.avatarSpawn.GetComponent<DC_Avatar_Spawn>().lockedIn;
 
-            player.RpcSetAvatar(avatar);
+            if(true) // aS)
+            {
+                GameObject avatar = Instantiate(avatarPrefab);
+                NetworkServer.SpawnWithClientAuthority(avatar, player.gameObject);
+
+                player.RpcSetAvatar(avatar);
+            }
         }
     }
 

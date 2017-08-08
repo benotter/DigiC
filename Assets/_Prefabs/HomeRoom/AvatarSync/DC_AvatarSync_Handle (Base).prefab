@@ -37,7 +37,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1718961242556050}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.5, y: -0.5, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -107,11 +107,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd73abc98e4e9c04d8bf7e370347f722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  positionOffset: {x: 0, y: 0, z: 0}
-  rotationOffset: {x: 0, y: 0, z: 0}
+  positionOffset: {x: 0, y: -0.03, z: -0.05}
+  rotationOffset: {x: 65, y: 0, z: 0}
+  toolEnabled: 1
+  isButton: 0
   dropable: 1
+  noHold: 0
+  snapBack: 1
+  smoothSnapBack: 1
+  snapBackSpeed: 0.2
+  triggerDownMin: 0.15
   inUse: 0
   highlightColor: {r: 1, g: 0, b: 0, a: 1}
+  buttonClickColor: {r: 0, g: 0, b: 1, a: 1}
   trigger: 0
   touchX: 0
   touchY: 0
@@ -119,3 +127,6 @@ MonoBehaviour:
   touchClick: 0
   menuButton: 0
   gripButton: 0
+  twin: {fileID: 0}
+  avatarSync: {fileID: 0}
+  firstToStart: 0

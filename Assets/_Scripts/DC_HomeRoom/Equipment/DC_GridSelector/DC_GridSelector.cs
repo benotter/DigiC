@@ -29,6 +29,6 @@ public class DC_GridSelector : MonoBehaviour
 	public void SetPlayerPositionOnGrid(int x, int y)
 	{
 		if(homeRoom.remotePlayer)
-			homeRoom.remotePlayer.RequestSetPosition(x, y);
+			homeRoom.remotePlayer.CmdSetGridPosition(x, y);
 	}
 }

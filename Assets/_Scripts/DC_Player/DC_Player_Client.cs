@@ -7,8 +7,17 @@ public partial class DC_Player
 {
     public override void OnStartLocalPlayer()
     {
-        
 
+
+    }
+    
+    [ClientRpc]
+    public void RpcSetAvatarSpawn(GameObject aS)
+    {
+        avatarSpawn = aS;
+        var avaS = aS.GetComponent<DC_Avatar_Spawn>();
+        if(avaS)
+            avaS.SetPlayer(gameObject);
     }
 
     [ClientRpc]

@@ -191,12 +191,15 @@ public partial class SubToolBase
 			Color curC = rend.material.color;
 			
 			if(curC != buttonClickColor && curC != highlightColor)
-				originalColor = rend.material.color;
+				originalColor = curC;
 			
 			rend.material.color = c;
 		}
-		else if(rend.material.color != originalColor)
+		else if(!light && rend.material.color != originalColor && originalColor != null && originalColor != Color.clear)
+		{
 			rend.material.color = originalColor;
+		}
+			
 	}
 }
 
@@ -259,7 +262,7 @@ public partial class SubToolBase
 
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();
 		
-		if(!pTool)
+		if(!pTool || pTool.subTool != this)
 			return;
 
 		SetHighlight(false);

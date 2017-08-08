@@ -5,7 +5,14 @@ using UnityEngine;
 public partial class DC_AvatarSync : MonoBehaviour 
 {
 	public DC_LocalPlayer localPlayer;
+	public GameObject hmdTriggerObj;
+
+	[Space(10)]
 	public DC_Avatar avatar;
+
+	[Space(10)]
+
+	public float relinkDistance = 0.3f;
 
 	[Space(10)]
 	public GameObject model;
@@ -30,6 +37,8 @@ public partial class DC_AvatarSync : MonoBehaviour
 	void Update () 
 	{
 		LinkUpdate();
+		if(linkReset && Vector3.Distance(localPlayer.HMD.transform.position, transform.position) >= relinkDistance)
+			linkReset = false;
 	}
 }
 
@@ -45,16 +54,17 @@ public partial class DC_AvatarSync
 	private Vector3 originalPos;
 	private Quaternion originalRot;
 
+
 	public void LinkUpdate()
 	{
-		canLink = (avatar && (rightHandle.inUse && leftHandle.inUse));
+		canLink = (avatar && (rightHandle.inUse && leftHandle.inUse) && !linkReset);
 	}
 
 
 	public void SetAvatar(DC_Avatar a = null)
 	{
 		avatar = a;
-		screen.SetActive(!!a);
+		screenCover.SetActive(a == null);
 		
 		if(a)
 			a.SetLocalPlayer(localPlayer);
@@ -67,7 +77,9 @@ public partial class DC_AvatarSync
 			linked = true;
 			
 			avatar.StartLink();
+			
 			SwapPlayerAvatarCams();
+			AttackToHMD();
 		}
 	}
 
@@ -76,11 +88,13 @@ public partial class DC_AvatarSync
 		if(linked)
 		{
 			linked = false;
+			linkReset = true;
 
 			if(avatar)
 				avatar.StopLink();
 			
 			SwapPlayerAvatarCams();
+			DetachFromHMD();
 		}
 	}
 
@@ -99,5 +113,26 @@ public partial class DC_AvatarSync
 
 		playerCam.depth = avatarCam.depth;
 		avatarCam.depth = depth;
+	}
+
+	public void AttackToHMD()
+	{
+		transform.parent = localPlayer.HMD.transform;
+		transform.localPosition = Vector3.zero;
+		transform.localRotation = Quaternion.Euler(Vector3.zero);
+	}
+
+	public void DetachFromHMD()
+	{
+		transform.parent = originalPar;
+	}
+}
+
+public partial class DC_AvatarSync 
+{
+	void OnTriggerEnter(Collider col)
+	{
+		if(col.gameObject == hmdTriggerObj)
+			StartLink();
 	}
 }

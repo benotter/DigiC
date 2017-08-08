@@ -15,6 +15,7 @@ public partial class DC_Game : NetworkBehaviour
     [Space(10)]
 
     public GameObject avatarPrefab;
+    public GameObject avatarSpawnPrefab;
 
     [Space(10)]
 

@@ -170,3 +170,5 @@ MonoBehaviour:
   isNetworkActive: 0
   matchMaker: {fileID: 0}
   game: {fileID: 0}
+  homeRoom: {fileID: 0}
+  gameGrid: {fileID: 0}

@@ -18,18 +18,25 @@ public partial class DC_Avatar
 
     public DC_LocalPlayer localPlayer;
 
-    public override void OnStartClient() 
+    public override void OnStartAuthority()
     {
-        if(!isLocalPlayer)
-        {
-            if(avatarCam)
-                Destroy(avatarCam);
-        }
+        avatarCam.enabled = true;
+
+        var layer = LayerMask.NameToLayer("Avatar_Local");
+
+        muzzle.transform.GetChild(0).gameObject.layer = layer;
+        chest.transform.GetChild(0).gameObject.layer = layer;
+
+        GetComponent<Collider>().enabled = false;
+    }
+    public override void OnStopAuthority()
+    {
+        avatarCam.enabled = false;
     }
 
     void ClientUpdate()
     {
-        if(isLocalPlayer)
+        if(hasAuthority)
         {
             if(linked)
                 UpdateBody();

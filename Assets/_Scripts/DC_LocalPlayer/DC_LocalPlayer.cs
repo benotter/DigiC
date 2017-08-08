@@ -10,7 +10,7 @@ public class DC_LocalPlayer : MonoBehaviour
 
 	public Vector3 hmdPos 
 	{
-		get { return transform.InverseTransformDirection(HMD.transform.position); }
+		get { return transform.InverseTransformPoint(HMD.transform.position); }
 	}
 
 	public Quaternion hmdRot 
@@ -20,7 +20,7 @@ public class DC_LocalPlayer : MonoBehaviour
 
 	public Vector3 rightPos 
 	{
-		get { return transform.InverseTransformDirection(rightController.transform.position); }
+		get { return transform.InverseTransformPoint(rightController.transform.position); }
 	}
 
 	public Quaternion rightRot 
@@ -30,7 +30,7 @@ public class DC_LocalPlayer : MonoBehaviour
 
 	public Vector3 leftPos 
 	{
-		get { return transform.InverseTransformDirection(leftController.transform.position); }
+		get { return transform.InverseTransformPoint(leftController.transform.position); }
 	}
 
 	public Quaternion leftRot 

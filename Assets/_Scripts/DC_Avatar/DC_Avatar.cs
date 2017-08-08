@@ -6,10 +6,11 @@ using UnityEngine.Networking;
 public partial class DC_Avatar : NetworkBehaviour 
 {
     [SyncVar]
+    public GameObject player;
+    
+    [SyncVar]
     public bool linked = false;
 
-    
-    
 	void Update()
     {
         if(isClient)

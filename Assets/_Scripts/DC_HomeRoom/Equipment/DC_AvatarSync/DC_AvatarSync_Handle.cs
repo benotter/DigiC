@@ -30,9 +30,12 @@ public class DC_AvatarSync_Handle : SubToolBase
 
         UpdateMenuStat();
 
+        if(doubleMenuDown && doubleMenuDownTime == 0 && avatarSync.linked)
+            avatarSync.StopLink();
+
         if(avatarSync.linked && dropable)
             dropable = false;
-        else if(!dropable)
+        else if(!avatarSync.linked && !dropable)
             dropable = true;
     }
 

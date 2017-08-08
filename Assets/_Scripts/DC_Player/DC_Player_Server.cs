@@ -8,6 +8,12 @@ public partial class DC_Player
     public DC_Game serverGame;
 
     [Command]
+    public void CmdRequestAvatarSpawn()
+    {
+        serverGame.RequestAvatarSpawn(this);
+    }
+
+    [Command]
     public void CmdRequestAvatar()
     {
         serverGame.RequestAvatar(this);
@@ -20,8 +26,5 @@ public partial class DC_Player
             gameGrid.SetPosition(this.gameObject, x, y);
     }
 
-    public void RequestSetPosition(int x, int y)
-    {
-        CmdSetGridPosition(x, y);
-    }
+    
 }
