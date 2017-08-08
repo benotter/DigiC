@@ -23,7 +23,7 @@ public class DC_GridSelector : MonoBehaviour
 	public void UpdateButtonStat()
 	{
 		foreach(DC_GridSelector_Button button in buttons)
-			button.buttonEnabled = !gameGrid.CheckPosition(button.xPos, button.yPos);
+			button.SetToolEnabled(!gameGrid.CheckPosition(button.xPos, button.yPos));
 	}
 
 	public void SetPlayerPositionOnGrid(int x, int y)

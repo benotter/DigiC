@@ -5,6 +5,12 @@ using UnityEngine.Networking;
 
 public partial class DC_Player
 {
+    public override void OnStartLocalPlayer()
+    {
+        
+
+    }
+
     [ClientRpc]
     public void RpcSetAvatar(GameObject a)
     {

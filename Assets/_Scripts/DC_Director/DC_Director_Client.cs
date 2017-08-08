@@ -5,10 +5,6 @@ using UnityEngine.Networking;
 
 public partial class DC_Director 
 {
-    public override void OnStartClient(NetworkClient client)
-    {
-        
-    }
 
     public override void OnClientConnect(NetworkConnection conn)
     {
@@ -18,7 +14,11 @@ public partial class DC_Director
             GameObject playerObj = ClientScene.localPlayers[0].gameObject;
             DC_Player player = playerObj.GetComponent<DC_Player>();
             if(player)
+            {
+                player.homeRoom = homeRoom;
+                player.gameGrid = gameGrid;
                 game.homeRoom.SetRemotePlayer(player);
+            }
         }
     }
 

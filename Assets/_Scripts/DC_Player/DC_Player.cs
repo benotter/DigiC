@@ -6,8 +6,10 @@ using UnityEngine.Networking;
 public partial class DC_Player : NetworkBehaviour
 {
 	public DC_GameGrid gameGrid;
+	public DC_HomeRoom homeRoom;
 
 	[Space(10)]
+
 	public DC_LocalPlayer localPlayer;
 	
 	[Space(10)]
@@ -22,6 +24,9 @@ public partial class DC_Player : NetworkBehaviour
 
 	[SyncVar]
 	public GameObject avatar = null;
+	
+	[SyncVar]
+	public GameObject avatarSpawn = null;
 
 	[Space(10)]
 

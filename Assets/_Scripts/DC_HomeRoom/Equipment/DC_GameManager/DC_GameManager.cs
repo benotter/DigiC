@@ -4,13 +4,45 @@ using UnityEngine;
 
 public class DC_GameManager : MonoBehaviour 
 {
+	public DC_Director director;
 
-	void Start () {
+	public bool gameInstalled = false;
+
+	private bool newSphereRemoved = false;
+
+	public void OnTriggerStay(Collider col)
+	{
+		if(gameInstalled)
+			return;
+
+		DC_JoinGame_LightSphere joinGame = col.gameObject.GetComponent<DC_JoinGame_LightSphere>();
+		DC_NewGame_LightSphere newGame = col.gameObject.GetComponent<DC_NewGame_LightSphere>();
+
+		// Debug.Log("TEST!");
 		
+		if( (joinGame && joinGame.inUse) || (newGame && newGame.inUse) ) 
+			return;
+
+		if(joinGame)
+		{
+
+		}
+		else if(newGame)
+		{
+			newGame.Install(GetComponent<SphereCollider>().center);
+			gameInstalled = true;
+
+			director.StartGame("Test Game", 8);
+		}
 	}
-	
-	
-	void Update () {
+
+	public void RemoveNewSphere()
+	{
+
+	}
+
+	public void ReplaceNewSphere() 
+	{
 		
 	}
 }

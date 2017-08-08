@@ -9,6 +9,7 @@ public partial class DC_Director : NetworkManager
 
 	[Space(10)]
 
+	public DC_HomeRoom homeRoom;
 	public DC_GameGrid gameGrid;
 
 	void Start()

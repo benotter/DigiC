@@ -9,14 +9,16 @@ public partial class SubToolBase : MonoBehaviour
 
 
 	[Space(10)]
+	public bool toolEnabled = true;
+
+	[Space(10)]
 	
 	public bool isButton = false;
 	public bool dropable = true;
 	public bool noHold = false;
 
 	[Space(10)]
-
-	public bool buttonEnabled = true;
+	
 	public bool snapBack = true;
 	public bool smoothSnapBack = true;
 	public float snapBackSpeed = 0.2f;
@@ -34,9 +36,10 @@ public partial class SubToolBase : MonoBehaviour
 	public Color highlightColor = Color.red;
 	public Color buttonClickColor = Color.blue;
 
-	private Vector3 originalPos;
-	private Quaternion originalRot;
-	private Transform originalPar;
+	
+	protected Vector3 originalPos;
+	protected Quaternion originalRot;
+	protected Transform originalPar;
 
 	private Renderer rend;
 	private Color originalColor;
@@ -51,12 +54,22 @@ public partial class SubToolBase
 {
 	void Update()
 	{
-		UpdateSnapping();
+		if(smoothSnapBack)
+			UpdateSnapping();
 	}
 	
-	public void SetButtonEnabled(bool enale)
+	public void SetToolEnabled(bool en)
 	{
-		buttonEnabled = enabled;
+		toolEnabled = en;
+	}
+
+	public void SetOrigin(Vector3 oPos, Quaternion oRot, Transform oPar = null)
+	{
+		originalPos = oPos;
+		originalRot = oRot;
+
+		if(oPar)
+			originalPar = oPar;
 	}
 
 	public void OnPressHandler(bool down)
@@ -93,8 +106,7 @@ public partial class SubToolBase
 			originalPar = gameObject.transform.parent;
 		}
 		else
-		{
-			
+		{	
 			snappingBack = false;
 			snappingBackTime = 0f;
 		}
@@ -107,6 +119,9 @@ public partial class SubToolBase
 		transform.localRotation = Quaternion.Euler(rotationOffset);
 
 		SetHighlight(false);
+
+		var coll = GetComponent<Collider>();
+		coll.isTrigger = false;
 	}
 
 	public void StopUse(PlayerTool pTool)
@@ -132,6 +147,9 @@ public partial class SubToolBase
 
 		SetHighlight(false);
 		pTool.SetSubtool(null);
+
+		var coll = GetComponent<Collider>();
+		coll.isTrigger = true;
 	}
 
 	public void UpdateSnapping()
@@ -202,7 +220,7 @@ public partial class SubToolBase
 		if(inUse)
 			return;
 
-		if(isButton && !buttonEnabled)
+		if(!toolEnabled)
 			return;
 
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();
@@ -219,7 +237,7 @@ public partial class SubToolBase
 		if(inUse)
 			return;
 
-		if(isButton && !buttonEnabled)
+		if(!toolEnabled)
 			return;
 
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();
@@ -236,7 +254,7 @@ public partial class SubToolBase
 		if(inUse)
 			return;
 
-		if(isButton && !buttonEnabled)
+		if(!toolEnabled)
 			return;
 
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();

@@ -10,6 +10,7 @@ public partial class DC_GameGrid
     public override void OnStartClient()
     {
         UpdateGameGrid();
+        Debug.Log("Client Cells: " + cells.Count);
     }
 
     [ClientRpc]

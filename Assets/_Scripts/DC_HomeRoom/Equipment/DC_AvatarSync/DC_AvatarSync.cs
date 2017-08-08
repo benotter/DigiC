@@ -67,6 +67,7 @@ public partial class DC_AvatarSync
 			linked = true;
 			
 			avatar.StartLink();
+			SwapPlayerAvatarCams();
 		}
 	}
 
@@ -78,6 +79,25 @@ public partial class DC_AvatarSync
 
 			if(avatar)
 				avatar.StopLink();
+			
+			SwapPlayerAvatarCams();
 		}
+	}
+
+	public void SwapPlayerAvatarCams()
+	{
+		if(!avatar)
+		{
+			localPlayer.HMD.GetComponent<Camera>().depth = 0;
+			return;
+		}
+
+		var playerCam = localPlayer.HMD.GetComponent<Camera>();
+		var avatarCam = avatar.avatarCam;
+
+		float depth = playerCam.depth;
+
+		playerCam.depth = avatarCam.depth;
+		avatarCam.depth = depth;
 	}
 }
