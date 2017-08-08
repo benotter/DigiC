@@ -49,15 +49,23 @@ public class PlayerTool : ToolBase
 	}
 
 	void Update () 
-	{
-		if(!subTool)
-			return;
+	{		
+		if(subTool && !subTool.inUse && trigger >= triggerDownMin && triggerDownTime <= 0)
+		{
+			if(subTool.isButton)
+				subTool.OnPressHandler(true);
+			else
+				subTool.StartUse(this);				
+		}
+		else if(subTool && (subTool.noHold || subTool.isButton) && trigger < triggerDownMin)
+		{
+			if(subTool.isButton)
+				subTool.OnPressHandler(false);
 		
-		if(!subTool.inUse && trigger >= triggerDownMin && triggerDownTime <= 0)
-			subTool.StartUse(this);
-		else if(subTool.noHold && trigger < triggerDownMin)
-			subTool.StopUse(this);
-		else if(!subTool.noHold && gripButton && subTool.dropable && gripDownTime <= 0)
+			if(subTool.noHold)
+				subTool.StopUse(this);
+		}
+		else if(subTool && !subTool.noHold && gripButton && subTool.dropable && gripDownTime <= 0)
 			subTool.StopUse(this);
 
 		if(subTool)

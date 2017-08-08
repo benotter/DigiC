@@ -9,11 +9,14 @@ public partial class SubToolBase : MonoBehaviour
 
 
 	[Space(10)]
-
+	
+	public bool isButton = false;
 	public bool dropable = true;
 	public bool noHold = false;
 
 	[Space(10)]
+
+	public bool buttonEnabled = true;
 	public bool snapBack = true;
 	public bool smoothSnapBack = true;
 	public float snapBackSpeed = 0.2f;
@@ -29,6 +32,7 @@ public partial class SubToolBase : MonoBehaviour
 	[Space(10)]
 
 	public Color highlightColor = Color.red;
+	public Color buttonClickColor = Color.blue;
 
 	private Vector3 originalPos;
 	private Quaternion originalRot;
@@ -39,6 +43,8 @@ public partial class SubToolBase : MonoBehaviour
 
 	private bool snappingBack = false;
 	private float snappingBackTime = 0f;
+
+	private bool buttonDown = false;
 }
 
 public partial class SubToolBase 
@@ -47,6 +53,32 @@ public partial class SubToolBase
 	{
 		UpdateSnapping();
 	}
+	
+	public void SetButtonEnabled(bool enale)
+	{
+		buttonEnabled = enabled;
+	}
+
+	public void OnPressHandler(bool down)
+	{
+		if(down)
+		{
+			buttonDown = true;
+			OnPress();
+			SetHighlight(true);
+		}
+		else if(buttonDown)
+		{
+			buttonDown = false;
+			OnRelease();
+			SetHighlight(true);
+		}
+	}
+
+	public virtual void OnPress() {}
+
+	public virtual void OnRelease() {}
+
 	public void StartUse(PlayerTool pTool)
 	{
 		if(inUse)
@@ -131,10 +163,19 @@ public partial class SubToolBase
 		if(!rend)
 			return;
 
-		if(light && rend.material.color != highlightColor)
+		Color c = highlightColor;
+
+		if(isButton && buttonDown)
+			c = buttonClickColor;
+
+		if(light && rend.material.color != c)
 		{
-			originalColor = rend.material.color;
-			rend.material.color = highlightColor;
+			Color curC = rend.material.color;
+			
+			if(curC != buttonClickColor && curC != highlightColor)
+				originalColor = rend.material.color;
+			
+			rend.material.color = c;
 		}
 		else if(rend.material.color != originalColor)
 			rend.material.color = originalColor;
@@ -161,6 +202,9 @@ public partial class SubToolBase
 		if(inUse)
 			return;
 
+		if(isButton && !buttonEnabled)
+			return;
+
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();
 
 		if(!pTool || pTool.subTool != null)
@@ -175,9 +219,12 @@ public partial class SubToolBase
 		if(inUse)
 			return;
 
+		if(isButton && !buttonEnabled)
+			return;
+
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();
 
-		if(!pTool || (pTool.subTool && (pTool.subTool == this || pTool.subTool.inUse) ) )
+		if(!pTool || (pTool.subTool) )
 			return;
 
 		SetHighlight(true);
@@ -187,6 +234,9 @@ public partial class SubToolBase
 	void OnTriggerExit(Collider col)
 	{
 		if(inUse)
+			return;
+
+		if(isButton && !buttonEnabled)
 			return;
 
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();

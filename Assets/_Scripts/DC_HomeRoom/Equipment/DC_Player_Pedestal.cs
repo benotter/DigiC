@@ -7,10 +7,16 @@ public class DC_Player_Pedestal : MonoBehaviour
 	public GameObject point;
 
 	public Vector3 playerPoint;
+
+	public bool playerActive = false;
+
 	void Start () 
 	{
-		playerPoint = point.transform.position;
+		TogglePlayerActive();
+	}
 
-		Destroy(point);
+	public void TogglePlayerActive(bool yes = false)
+	{
+		point.SetActive(playerActive = yes);
 	}
 }

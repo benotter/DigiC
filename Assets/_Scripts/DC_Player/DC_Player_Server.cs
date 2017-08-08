@@ -12,4 +12,16 @@ public partial class DC_Player
     {
         serverGame.RequestAvatar(this);
     }
+
+    [Command]
+    public void CmdSetGridPosition(int x, int y)
+    {
+        if(!gameGrid.CheckPosition(x, y))
+            gameGrid.SetPosition(this.gameObject, x, y);
+    }
+
+    public void RequestSetPosition(int x, int y)
+    {
+        CmdSetGridPosition(x, y);
+    }
 }

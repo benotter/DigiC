@@ -19,10 +19,7 @@ public class DC_HomeRoom : MonoBehaviour
     {
         remotePlayer = player;
 
-        if(player)
-        {
-            player.gameObject.transform.parent = playerPedestal.transform;
-            player.gameObject.transform.localPosition = playerPedestal.GetComponent<DC_Player_Pedestal>().playerPoint;
-        }
+        remotePlayer.transform.position = transform.position;
+        transform.parent = remotePlayer.transform;
     }
 }

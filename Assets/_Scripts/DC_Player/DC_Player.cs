@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public partial class DC_Player : NetworkBehaviour
 {
-	public GameObject gameGrid;
+	public DC_GameGrid gameGrid;
 
 	[Space(10)]
 	public DC_LocalPlayer localPlayer;

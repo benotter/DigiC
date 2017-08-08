@@ -7,8 +7,14 @@ public partial class DC_GameGrid
 {
 	public DynaRoom dynaRoom;
 
-    public void GenerateGameGrid()
+    public override void OnStartClient()
     {
-        
+        UpdateGameGrid();
+    }
+
+    [ClientRpc]
+    public void RpcUpdateGameGrid()
+    {
+        UpdateGameGrid();
     }
 }
