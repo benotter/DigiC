@@ -37,15 +37,4 @@ public class DC_LocalPlayer : MonoBehaviour
 	{
 		get { return leftController.transform.rotation; }
 	}
-
-	void Start () 
-	{
-		
-	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-		
-	}
 }

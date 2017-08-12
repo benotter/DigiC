@@ -189,7 +189,7 @@ public partial class SubToolBase
 			
 			rend.material.color = c;
 		}
-		else if(!light && rend.material.color != originalColor && originalColor != null && originalColor != Color.clear)
+		else if(!light && rend.material.color != originalColor && originalColor != Color.clear)
 		{
 			rend.material.color = originalColor;
 		}
@@ -249,9 +249,6 @@ public partial class SubToolBase
 	void OnTriggerExit(Collider col)
 	{
 		if(inUse)
-			return;
-
-		if(!toolEnabled)
 			return;
 
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();

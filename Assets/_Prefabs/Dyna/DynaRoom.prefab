@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 65799724011968690}
   - component: {fileID: 23014405298662808}
   - component: {fileID: 54292075712065600}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: W_WALL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 65189701010623958}
   - component: {fileID: 23028603110473956}
   - component: {fileID: 54935494419033824}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: E_WALL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,7 +61,7 @@ GameObject:
   - component: {fileID: 65511644573040312}
   - component: {fileID: 23208341903439698}
   - component: {fileID: 54080381369841414}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: FLOOR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,7 +77,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4248756536780184}
   - component: {fileID: 114479783120665280}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DynaRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 65523130695097428}
   - component: {fileID: 23576553005914650}
   - component: {fileID: 54463615532530332}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: N_WALL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115,7 +115,7 @@ GameObject:
   - component: {fileID: 65049607867305472}
   - component: {fileID: 23644253699859496}
   - component: {fileID: 54572531248752194}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: ROOF
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 65804943804803114}
   - component: {fileID: 23032698726001100}
   - component: {fileID: 54079848160978220}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: S_WALL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,7 +160,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1324753631336870}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -180,8 +180,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1386236611887260}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 10}
-  m_LocalScale: {x: 21, y: 4, z: 1}
+  m_LocalPosition: {x: 0, y: 3, z: 10}
+  m_LocalScale: {x: 21, y: 8, z: 1}
   m_Children: []
   m_Father: {fileID: 4248756536780184}
   m_RootOrder: 0
@@ -193,8 +193,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1036491538381286}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 4, z: 19}
+  m_LocalPosition: {x: 10, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 8, z: 19}
   m_Children: []
   m_Father: {fileID: 4248756536780184}
   m_RootOrder: 3
@@ -206,8 +206,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1993436499285624}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
-  m_LocalScale: {x: 21, y: 4, z: 1}
+  m_LocalPosition: {x: 0, y: 3, z: -10}
+  m_LocalScale: {x: 21, y: 8, z: 1}
   m_Children: []
   m_Father: {fileID: 4248756536780184}
   m_RootOrder: 2
@@ -219,7 +219,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1415234272021362}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.5, z: 0}
+  m_LocalPosition: {x: 0, y: 7.5, z: 0}
   m_LocalScale: {x: 19, y: 1, z: 19}
   m_Children: []
   m_Father: {fileID: 4248756536780184}
@@ -232,8 +232,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1093113501903784}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 4, z: 19}
+  m_LocalPosition: {x: -10, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 8, z: 19}
   m_Children: []
   m_Father: {fileID: 4248756536780184}
   m_RootOrder: 1
@@ -648,7 +648,7 @@ MonoBehaviour:
   isSquare: 1
   width: 20
   length: 20
-  wallHeight: 3
+  wallHeight: 7
   wallThickness: 1
   hasRoof: 0
   roofHeight: 0

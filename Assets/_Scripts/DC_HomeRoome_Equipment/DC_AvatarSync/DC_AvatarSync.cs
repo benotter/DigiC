@@ -38,7 +38,7 @@ public partial class DC_AvatarSync : MonoBehaviour
 	{
 		LinkUpdate();
 		if(linkReset && Vector3.Distance(localPlayer.HMD.transform.position, transform.position) >= relinkDistance)
-			linkReset = false;
+			linkReset = false;		
 	}
 }
 
@@ -113,6 +113,41 @@ public partial class DC_AvatarSync
 
 		playerCam.depth = avatarCam.depth;
 		avatarCam.depth = depth;
+
+		var pAl = playerCam.GetComponentInChildren<AudioListener>();
+		var pEars = playerCam.GetComponentInChildren<SteamVR_Ears>();
+
+		var aAl = avatarCam.GetComponent<AudioListener>();
+		var aEars = avatarCam.GetComponent<SteamVR_Ears>();
+
+		if(playerCam.depth > avatarCam.depth)
+		{
+			if(aAl)
+				aAl.enabled = false;
+
+			if(aEars)
+				aEars.enabled = false;
+
+			if(pAl)
+				pAl.enabled = true;
+
+			if(pEars)
+				pEars.enabled = true;
+		}
+		else 
+		{
+			if(pAl)
+				pAl.enabled = false;
+
+			if(pEars)
+				pEars.enabled = false;
+			
+			if(aAl)
+				aAl.enabled = true;
+
+			if(aEars)
+				aEars.enabled = true;
+		}
 	}
 
 	public void AttackToHMD()

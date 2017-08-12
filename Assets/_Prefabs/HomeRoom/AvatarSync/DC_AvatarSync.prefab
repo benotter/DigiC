@@ -153,9 +153,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1374505790622132}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.35344833}
+  m_LocalScale: {x: 1, y: 1, z: 1.7241379}
   m_Children:
   - {fileID: 4269280078032042}
   - {fileID: 4410063276516868}
@@ -250,8 +250,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1207706662016010}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.357, z: 1.233}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 1.357, z: 1.028}
+  m_LocalScale: {x: 1, y: 1, z: 0.58}
   m_Children:
   - {fileID: 4514672260077736}
   - {fileID: 4227622968340262}
@@ -575,6 +575,7 @@ MonoBehaviour:
   localPlayer: {fileID: 0}
   hmdTriggerObj: {fileID: 0}
   avatar: {fileID: 0}
+  relinkDistance: 0.3
   model: {fileID: 1856446391941108}
   screen: {fileID: 1897473077508118}
   screenCover: {fileID: 1924888601926904}

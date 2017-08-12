@@ -11,15 +11,6 @@ public class DC_Avatar_Spawn : NetworkBehaviour
 	public bool lockedIn = false;
 
 	private DC_Player player;
-	void Start () 
-	{
-		
-	}
-	
-	void Update () 
-	{
-		
-	}
 
 	public void SetPlayer(GameObject p)
 	{

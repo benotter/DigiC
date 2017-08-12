@@ -34,8 +34,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4663581448764000}
+  - component: {fileID: 114751931070839468}
+  - component: {fileID: 81185593580659314}
   - component: {fileID: 20154779461201826}
-  - component: {fileID: 114593298702353124}
+  - component: {fileID: 114045416222610938}
   m_Layer: 0
   m_Name: AvatarCam (eye)
   m_TagString: Untagged
@@ -201,8 +203,9 @@ GameObject:
   - component: {fileID: 4136031663749528}
   - component: {fileID: 136444401120796696}
   - component: {fileID: 54895213696143236}
-  - component: {fileID: 114814032739173398}
   - component: {fileID: 114595821332969582}
+  - component: {fileID: 114814032739173398}
+  - component: {fileID: 114783184265201104}
   - component: {fileID: 114003204760152612}
   - component: {fileID: 114242530989766432}
   - component: {fileID: 114966533528757884}
@@ -637,6 +640,13 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!81 &81185593580659314
+AudioListener:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1072534979828482}
+  m_Enabled: 1
 --- !u!114 &114003204760152612
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -648,7 +658,7 @@ MonoBehaviour:
   m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TransformSyncMode: 1
+  m_TransformSyncMode: 3
   m_SendInterval: 0.1
   m_SyncRotationAxis: 7
   m_RotationSyncCompression: 0
@@ -658,6 +668,20 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114045416222610938
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1072534979828482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bca9ccf900ccc84c887d783321d27e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _head: {fileID: 4436252181281632}
+  _ears: {fileID: 0}
+  wireframe: 0
 --- !u!114 &114088990360564766
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -696,20 +720,6 @@ MonoBehaviour:
   m_MovementThreshold: 0.001
   m_InterpolateRotation: 0.5
   m_InterpolateMovement: 0.5
---- !u!114 &114593298702353124
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1072534979828482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bca9ccf900ccc84c887d783321d27e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _head: {fileID: 4436252181281632}
-  _ears: {fileID: 0}
-  wireframe: 0
 --- !u!114 &114595821332969582
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -774,6 +784,29 @@ MonoBehaviour:
   m_MovementThreshold: 0.001
   m_InterpolateRotation: 0.5
   m_InterpolateMovement: 0.5
+--- !u!114 &114751931070839468
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1072534979828482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49a86c1078ce4314b9c4224560e031b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vrcam: {fileID: 0}
+--- !u!114 &114783184265201104
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1936016119532734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b268b9633c468243a9458f2a679c481, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114814032739173398
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -787,6 +820,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   linked: 0
+  inMove: 0
   avatarCam: {fileID: 20154779461201826}
   muzzle: {fileID: 1232707009109900}
   chest: {fileID: 1133850917905156}
