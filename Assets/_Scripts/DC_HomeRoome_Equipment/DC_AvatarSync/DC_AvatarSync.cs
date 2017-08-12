@@ -39,6 +39,9 @@ public partial class DC_AvatarSync : MonoBehaviour
 		LinkUpdate();
 		if(linkReset && Vector3.Distance(localPlayer.HMD.transform.position, transform.position) >= relinkDistance)
 			linkReset = false;		
+
+		if(linked)
+			avatar.SyncAvatarTools(rightHandle, leftHandle);
 	}
 }
 
@@ -76,7 +79,7 @@ public partial class DC_AvatarSync
 		{
 			linked = true;
 			
-			avatar.StartLink();
+			avatar.CmdStartLink();
 			
 			SwapPlayerAvatarCams();
 			AttackToHMD();
@@ -91,7 +94,7 @@ public partial class DC_AvatarSync
 			linkReset = true;
 
 			if(avatar)
-				avatar.StopLink();
+				avatar.CmdStopLink();
 			
 			SwapPlayerAvatarCams();
 			DetachFromHMD();

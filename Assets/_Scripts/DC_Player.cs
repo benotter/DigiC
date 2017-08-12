@@ -104,8 +104,9 @@ public partial class DC_Player : NetworkBehaviour
         if(ava)
         {
             serverGame.homeRoom.avatarSync.SetAvatar(ava);
-            a.transform.position = avatarSpawn.transform.position + new Vector3(0f, 0f, 0f);
             ava.UpdateBody();
+            a.transform.position = avatarSpawn.transform.position;
+            
         }
     }
 }
