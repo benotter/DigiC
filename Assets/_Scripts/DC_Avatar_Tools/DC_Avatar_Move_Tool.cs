@@ -8,6 +8,9 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     public float maxMoveDistance = 1000f;
     public float cushionSize = 10f;
     public float deadZone = 0.5f;
+    
+    public float retractRate = 1f;
+    public float maxRetractRate = 20f;
 
     private bool seeking = false;
     private bool moving = false;
@@ -19,6 +22,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
     private Vector3 targetPoint = Vector3.zero;
 
+    private bool retracting = false;
 
     private GameObject laser;
     private MeshRenderer laserRend;
@@ -40,6 +44,14 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
             if(canMove && trigger == 1f && !moving)
                 moving = true;
+
+            
+
+            if(touch && touchClick && touchY < 0f)
+                movePointDistance -= retractRate * Time.deltaTime;
+
+            Debug.Log("TouchY: " + touchY);
+            Debug.Log("MoveDist: " + movePointDistance);
         }
         else
         {

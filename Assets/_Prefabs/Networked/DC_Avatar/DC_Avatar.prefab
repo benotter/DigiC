@@ -947,6 +947,8 @@ MonoBehaviour:
   maxMoveDistance: 60
   cushionSize: 5
   deadZone: 1
+  retractRate: 1
+  maxRetractRate: 20
 --- !u!114 &114814032739173398
 MonoBehaviour:
   m_ObjectHideFlags: 1
