@@ -6,6 +6,8 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 {
     public float maxMoveSpeed = 10f;
     public float maxMoveDistance = 1000f;
+    public float cushionSize = 10f;
+    public float deadZone = 0.5f;
 
     private bool seeking = false;
     private bool moving = false;
@@ -16,6 +18,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     private float movePointDistance = 0f;
 
     private Vector3 targetPoint = Vector3.zero;
+
 
     private GameObject laser;
     private MeshRenderer laserRend;
@@ -29,12 +32,13 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     {
         if(trigger > 0.15f)
         {
-            UpdateMovePoint();
+            if(!moving)
+                UpdateMovePoint();
 
-            if(!seeking)
+            if(canMove && !seeking)
                 seeking = true;
 
-            if(trigger == 1f && canMove && !moving)
+            if(canMove && trigger == 1f && !moving)
                 moving = true;
         }
         else
@@ -46,19 +50,39 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                 moving = false;
         }
 
+        if(seeking && !moving)
+        {
+            UpdateMovePoint();
+            UpdateLaser();
+        }
+
+        if(!seeking || moving)
+            if(laser && laser.activeSelf)
+                laser.SetActive(false);
+
         if(moving)
         {
+            UpdateTargetPoint();
 
+            if(!avatar.inMove)
+            {
+                avatar.CmdStartMove();
+                avatar.CmdSetMoveBeamPoint(movePoint);
+                avatar.CmdSetMoveBeamHand(hand == PlayerTool.Hand.Right);
+            }
+
+            avatar.MoveTo(targetPoint);
         }
-        else if(seeking)
+        else
         {
-
+            if(avatar.inMove)
+                avatar.CmdStopMove();
         }
     }
 
     void UpdateMovePoint()
     {
-        var ht = hand.transform;
+        var ht = paw.transform;
 
         Ray ray = new Ray(ht.position, ht.forward);
         RaycastHit hit;
@@ -76,7 +100,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
             if(movePointDistance != 0)
                 movePointDistance = 0f;
-                
+
             canMove = false;
         }
     }
@@ -85,17 +109,42 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     {
         if(!laser)
             CreateLaser();
+
+        if(!laser.activeSelf)
+            laser.SetActive(true);
+
+        var laserS = laser.transform.localScale;
+        laserS.z = movePointDistance;
+        laser.transform.localScale = laserS;
+
+        var laserP = laser.transform.localPosition;
+        laserP.z = movePointDistance / 2f;
+        laser.transform.localPosition = laserP;
     }
 
     void UpdateTargetPoint()
     {
+        var ht = paw.transform;
+        var at = avatar.transform;
 
+        var spacePoint = movePoint - (ht.forward * movePointDistance);
+        spacePoint -= ht.localPosition;
+
+        var dist = Vector3.Distance(spacePoint, at.position);
+
+        var h = spacePoint - at.position;
+        var d = h.magnitude;
+        var dir = h / d;
+
+        if(dist > cushionSize)
+            dist = cushionSize;
+        
+        targetPoint = dir * ( (dist / cushionSize) * maxMoveSpeed);
     }
 
     void CreateLaser()
     {
         var l = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        l.transform.localScale = new Vector3(0.01f, 0.01f, 0f);
 
         var rb = l.GetComponent<Rigidbody>();
         if(rb)
@@ -108,12 +157,23 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
         var mr = l.GetComponent<MeshRenderer>();
 
-        l.transform.parent = transform;
+        l.transform.localScale = new Vector3(0.05f, 0.05f, 0f);
+
+        l.transform.parent = paw.transform;
+
+        l.transform.localPosition = Vector3.zero;
+        l.transform.localEulerAngles = Vector3.zero;
+
         l.name = "Move Laser";
 
         laser = l;
         laserRend = mr;
 
         l.SetActive(false);
+    }
+
+    void GetLine()
+    {
+        
     }
 }

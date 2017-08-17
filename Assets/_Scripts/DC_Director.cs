@@ -19,8 +19,10 @@ public partial class DC_Director : NetworkManager
 
 	void Update()
 	{
-
+        
 	}
+
+    // Server-Side Callbacks
 
 	public override void OnStartHost() 
     {
@@ -34,55 +36,83 @@ public partial class DC_Director : NetworkManager
 
     public override void OnServerConnect(NetworkConnection conn)
     {
-
-    }
-
-    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
-    {
-        GameObject playerO = Instantiate(playerPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero));
-        DC_Player player = playerO.GetComponent<DC_Player>();
-
-        NetworkServer.AddPlayerForConnection(conn, playerO, playerControllerId);
-        game.AddPlayer(player);
-        game.RpcSetupGameRoom();
+        Debug.Log("Client Join From: " + conn.address);
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
+        Debug.Log("Client Left From: " + conn.address);
+
         GameObject playerO = conn.playerControllers[0].gameObject;
         DC_Player player = playerO.GetComponent<DC_Player>();
         
         game.RemPlayer(player);
 
-        if(player.avatar)
-            NetworkServer.Destroy(player.avatar);
+        if(player.avatarSpawnO)
+            NetworkServer.Destroy(player.avatarSpawnO);
 
-        NetworkServer.Destroy(playerO);
+        if(player.avatarO)
+            NetworkServer.Destroy(player.avatarO);
+
+        NetworkServer.DestroyPlayersForConnection(conn);
     }
+
+    public override void OnServerReady(NetworkConnection conn)
+    {
+        Debug.Log("Client Ready On: " + conn.address);
+
+        NetworkServer.SetClientReady(conn);
+    }
+
+    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+    {
+        Debug.Log("Client Adding Player On: " + conn.address);
+
+        GameObject playerO = Instantiate(playerPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero));
+
+        if( NetworkServer.AddPlayerForConnection(conn, playerO, playerControllerId) )
+        {
+            DC_Player player = playerO.GetComponent<DC_Player>();
+
+            player.RpcSetGame(game.gameObject);
+            game.RpcSetClientPlayer(playerO);
+
+            game.AddPlayer(player);
+        };
+    }
+    public override void OnServerRemovePlayer(NetworkConnection conn, PlayerController player)
+    {
+        Debug.Log("Client Removing Player On: " + conn.address);
+        base.OnServerRemovePlayer(conn, player);
+    }
+
+    // Client-Side Callbacks
 
 	public override void OnClientConnect(NetworkConnection conn)
     {
         ClientScene.Ready(conn);
-        if(ClientScene.AddPlayer(0))
-        {
-            GameObject playerObj = ClientScene.localPlayers[0].gameObject;
-            
-            game.remotePlayer = playerObj;
 
-            DC_Player player = playerObj.GetComponent<DC_Player>();
-            if(player)
-            {
-                player.homeRoom = homeRoom;
-                player.gameGrid = gameGrid;
-                game.homeRoom.SetRemotePlayer(player);
-            }
-        }
+        Debug.Log("Connected to " + conn.address);
+
+        ClientScene.AddPlayer(0);
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
     {
+        StopClient();
+    }
+
+    public override void OnClientError(NetworkConnection conn, int errorCode)
+    {
 
     }
+
+    public override void OnClientNotReady(NetworkConnection conn)
+    {
+
+    }
+
+    // Client Hooks for in-game UI
 
 	public void StartGame(string gameName, int maxPlayers = 8)
 	{
@@ -97,6 +127,8 @@ public partial class DC_Director : NetworkManager
 			game.gameMaxPlayers = maxPlayers;
 			
 			game.gameOwner = hostC;
+
+            Debug.Log("Host Client Successfully Started!");
 		}
 	}
 

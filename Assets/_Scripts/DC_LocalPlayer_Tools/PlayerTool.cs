@@ -6,6 +6,7 @@ public class PlayerTool : ToolBase
 {
 	public enum Hand
 	{
+		None,
 		Right,
 		Left
 	}

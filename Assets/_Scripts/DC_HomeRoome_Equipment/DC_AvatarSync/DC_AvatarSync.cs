@@ -68,9 +68,6 @@ public partial class DC_AvatarSync
 	{
 		avatar = a;
 		screenCover.SetActive(a == null);
-		
-		if(a)
-			a.SetLocalPlayer(localPlayer);
 	}
 
 	public void StartLink()
@@ -78,6 +75,17 @@ public partial class DC_AvatarSync
 		if(!linked && canLink)
 		{
 			linked = true;
+
+			if((rightHandle.hand == PlayerTool.Hand.Left || leftHandle.hand == PlayerTool.Hand.Right))
+			{
+				if(!avatar.controllersFlipped)
+					avatar.controllersFlipped = true;
+			}
+			else 
+			{
+				if(avatar.controllersFlipped)
+					avatar.controllersFlipped = false;
+			}
 			
 			avatar.CmdStartLink();
 			

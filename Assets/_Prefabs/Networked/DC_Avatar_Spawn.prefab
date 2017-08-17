@@ -19,8 +19,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4425938529425996}
-  - component: {fileID: 114454123060976712}
   - component: {fileID: 114151724366843404}
+  - component: {fileID: 114454123060976712}
   - component: {fileID: 114129626897888350}
   m_Layer: 0
   m_Name: DC_Avatar_Spawn

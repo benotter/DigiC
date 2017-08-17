@@ -86,6 +86,7 @@ MonoBehaviour:
   touchClick: 0
   menuButton: 0
   gripButton: 0
-  hand: 0
+  hand: 1
+  overrideTriggerDown: 0
   triggerDownMin: 0
   subTool: {fileID: 0}

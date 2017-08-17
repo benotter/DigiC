@@ -4,32 +4,67 @@ using UnityEngine;
 using UnityEngine.Networking;
 public class DC_Avatar_Spawn : NetworkBehaviour
 {
+	// Server Variables
+
 	[SyncVar]
 	public GameObject playerO;
 
 	[SyncVar]
 	public bool lockedIn = false;
 
+
+	// Private Client Variables
 	private DC_Player player;
 
 	public void SetPlayer(GameObject p)
 	{
-		playerO = p;
-		player = playerO.GetComponent<DC_Player>();
+		player = p.GetComponent<DC_Player>();
 	}
 
 	public void Lock()
 	{
-		lockedIn = true;
+		CmdLock();
 	}
 
 	public void Unlock()
 	{
+		CmdUnlock();
+	}
+
+	public void PositionAvatar(GameObject avatarO)
+	{
+		DC_Avatar avatar = avatarO.GetComponent<DC_Avatar>();
+		PositionAvatar(avatar);
+	}
+	public void PositionAvatar(DC_Avatar avatar)
+	{
+		avatar.RpcSetPosition(transform.position);
+	}
+
+	public void SetPosition(Vector3 pos)
+	{
+		transform.position = pos;
+	}
+
+	// Server-Side Commands
+
+	[Command]
+	public void CmdLock()
+	{
+		lockedIn = true;
+	}
+
+	[Command]
+	public void CmdUnlock()
+	{
 		lockedIn = false;
 	}
 
-	public void PositionAvatar(GameObject avatar)
+	// Client-Side Commands
+
+	[ClientRpc]
+	public void RpcSetPosition(Vector3 pos)
 	{
-		avatar.transform.position = transform.position;
+		SetPosition(pos);
 	}
 }

@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 
 public partial class DC_Player : NetworkBehaviour
 {
+    // Local Variables (Set for Each Clients Specific Instances)
 	public DC_GameGrid gameGrid;
 	public DC_HomeRoom homeRoom;
 
@@ -15,8 +16,17 @@ public partial class DC_Player : NetworkBehaviour
 	[Space(10)]
 
 	public DC_LocalPlayer localPlayer;
+
+    public GameObject remoteDisplay;
+
+    [Space(10)]
+
+    public DC_Avatar avatar; 
+    public DC_Avatar_Spawn avatarSpawn;
 	
 	[Space(10)]
+
+    // Remote Variables (Set on the Server, Synced to the Clients)
 
 	[SyncVar]
 	public GameObject serverGameObject = null;
@@ -27,10 +37,10 @@ public partial class DC_Player : NetworkBehaviour
 	[Space(10)]
 
 	[SyncVar]
-	public GameObject avatar = null;
+	public GameObject avatarO = null;
 	
 	[SyncVar]
-	public GameObject avatarSpawn = null;
+	public GameObject avatarSpawnO = null;
 
 	[Space(10)]
 
@@ -40,22 +50,59 @@ public partial class DC_Player : NetworkBehaviour
 	[SyncVar]
 	public int gameGridY = 0;
 
+    // Private Client-Side Variables
+
+    private bool posHomeRoomDirty = false;
+    private bool posAvatarSpawnDirty = false;
+
+
 	void Start () 
 	{
 		
 	}
+
+    public override void OnStartAuthority()
+    {
+        if(remoteDisplay)
+            remoteDisplay.SetActive(false);
+    }
 	
 	void Update () 
 	{
-		
+		if(isClient)
+            UpdateClient();
+        else if(isServer)
+            UpdateServer();
 	}
 
-	public override void OnStartLocalPlayer()
+    public void UpdateServer()
     {
 
-
     }
-    
+
+    public void UpdateClient()
+    {
+        if(hasAuthority)
+        {
+            if(posHomeRoomDirty && homeRoom)
+            {
+                homeRoom.SetPosition(transform.position);
+
+                posHomeRoomDirty = false;
+            }
+            
+            if(posAvatarSpawnDirty && avatarSpawn && gameGrid)
+            {
+                var p = transform.position;
+                avatarSpawn.SetPosition(new Vector3(p.x, gameGrid.transform.position.y + 0.3f, p.z));
+                avatarSpawn.Lock();
+
+                posAvatarSpawnDirty = false;
+            }
+        }
+    }
+
+    // Server-Side Commands (Run on Server's Instance of Object)
 
     [Command]
     public void CmdRequestAvatarSpawn()
@@ -72,9 +119,9 @@ public partial class DC_Player : NetworkBehaviour
     [Command]
     public void CmdSetGridPosition(int x, int y)
     {
-        if(avatarSpawn)
+        if(avatarSpawnO)
         {
-            var aS = avatarSpawn.GetComponent<DC_Avatar_Spawn>();
+            var aS = avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
             if(aS && aS.lockedIn)
                 return;
         }
@@ -83,30 +130,50 @@ public partial class DC_Player : NetworkBehaviour
             gameGrid.SetPosition(this.gameObject, x, y);
     }
 
+    // Client-Side Commands (Run on Client's Instance of Object)
+
+    [ClientRpc]
+    public void RpcSetGame(GameObject serverGameO)
+    {
+        if(hasAuthority)
+        {
+            DC_Game sGame = serverGameO.GetComponent<DC_Game>();
+
+            homeRoom = sGame.homeRoom;
+            gameGrid = sGame.gameGrid;
+            localPlayer = sGame.localPlayer;
+        }
+    }
+
     [ClientRpc]
     public void RpcSetAvatarSpawn(GameObject aS)
     {
-        avatarSpawn = aS;
         var avaS = aS.GetComponent<DC_Avatar_Spawn>();
-        if(avaS)
-            avaS.SetPlayer(gameObject);
 
-        var p = transform.position;
-        aS.transform.position = new Vector3(p.x, gameGrid.transform.position.y + 0.3f, p.z);
-        avaS.Lock();
+        avatarSpawn = avaS;
+        avaS.SetPlayer(gameObject);
+        posAvatarSpawnDirty = true;
     }
 
     [ClientRpc]
     public void RpcSetAvatar(GameObject a)
     {
-        avatar = a;
         var ava = a.GetComponent<DC_Avatar>();
-        if(ava)
-        {
-            serverGame.homeRoom.avatarSync.SetAvatar(ava);
-            ava.UpdateBody();
-            a.transform.position = avatarSpawn.transform.position;
-            
-        }
+
+        ava.SetLocalPlayer(localPlayer);
+
+        avatar = ava;
+        homeRoom.SetAvatar(ava);
+        
+        ava.UpdateBody();
+    }
+
+    [ClientRpc]
+    public void RpcSetPosition(Vector3 pos)
+    {
+        transform.position = pos;
+
+        if(hasAuthority)
+            posHomeRoomDirty = true;
     }
 }

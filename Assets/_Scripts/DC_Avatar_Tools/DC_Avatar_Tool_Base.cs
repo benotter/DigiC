@@ -5,22 +5,32 @@ using UnityEngine;
 public class DC_Avatar_Tool_Base : MonoBehaviour 
 {	
 	public DC_Avatar avatar;
-	public GameObject hand;
+	public GameObject paw;
 
+	public PlayerTool.Hand hand;
+
+	[HideInInspector]
 	public float trigger = 0f;
 
+	[HideInInspector]
 	public float touchX = 0f;
+	[HideInInspector]
 	public float touchY = 0f;
 
+	[HideInInspector]
 	public bool touch = false;
+	[HideInInspector]
 	public bool touchClick = false;
 
+	[HideInInspector]
 	public bool gripButton = false;
-
+	
+	[HideInInspector]
 	public bool cleared = true;
 
 	public void UpdateState(DC_AvatarSync_Handle handle)
 	{
+		hand = handle.hand;
 		trigger = handle.trigger;
 
 		touchX = handle.touchX;
@@ -36,6 +46,7 @@ public class DC_Avatar_Tool_Base : MonoBehaviour
 
 	public void ClearState()
 	{
+		hand = PlayerTool.Hand.None;
 		trigger = 0f;
 
 		touchX = 0f;

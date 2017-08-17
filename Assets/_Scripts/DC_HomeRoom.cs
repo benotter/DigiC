@@ -8,7 +8,18 @@ public class DC_HomeRoom : MonoBehaviour
 
     [Space(10)]
 
+    public DC_GameGrid gameGrid;
+    public DC_Director director;
+    public DC_Game serverGame;
+
+    [Space(10)]
+
     public DC_Player remotePlayer = null;
+
+    [Space(10)]
+
+    public DC_Avatar avatar;
+    public GameObject avatarGO;
 
     [Space(10)]
 
@@ -32,10 +43,31 @@ public class DC_HomeRoom : MonoBehaviour
 
         if(player)
         {
-            remotePlayer.transform.position = transform.position;
-            transform.parent = remotePlayer.transform;
+            player.homeRoom = this;
+
+            player.localPlayer = localPlayer;
+            
+            player.gameGrid = gameGrid;
+            player.serverGame = serverGame;
         }
 
         playerPedestal.TogglePlayerActive(!!player);
+    }
+
+    public void SetAvatar(DC_Avatar ava)
+    {
+        avatar = ava;
+
+        if(ava)
+        {
+            avatarGO = ava.gameObject;
+
+            avatarSync.SetAvatar(avatar);
+        }
+    }
+
+    public void SetPosition(Vector3 pos)
+    {
+        transform.position = pos;
     }
 }

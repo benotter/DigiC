@@ -58,7 +58,9 @@ public class DC_Avatar_Test_Tool : DC_Avatar_Tool_Base
 
         var mr = l.GetComponent<MeshRenderer>();
 
-        l.transform.parent = transform;
+        l.transform.parent = paw.transform;
+        l.transform.localEulerAngles = Vector3.zero;
+
         l.name = "Test Laser";
 
         laser = l;
@@ -70,22 +72,20 @@ public class DC_Avatar_Test_Tool : DC_Avatar_Tool_Base
     void UpdateLaser()
     {
         var lt = laser.transform;
-        var ht = hand.transform;
+        var ht = paw.transform;
 
         Ray ray = new Ray(ht.position, ht.forward);
         RaycastHit hit;
 
-        lt.localRotation = ht.rotation;
-
         if(Physics.Raycast(ray, out hit, maxLaserDistance))
         {
             lt.localScale = new Vector3(lt.localScale.x, lt.localScale.y, hit.distance);
-            lt.localPosition = ht.position + (ht.forward * (hit.distance / 2f));
+            lt.localPosition = new Vector3(0f, 0f, hit.distance / 2);
         }
         else
         {
             lt.localScale = new Vector3(lt.localScale.x, lt.localScale.y, maxLaserDistance);
-            lt.localPosition = ht.position + (ht.forward * (maxLaserDistance / 2f));
+            lt.localPosition = new Vector3(0f, 0f, maxLaserDistance / 2f);
         }
     }
 

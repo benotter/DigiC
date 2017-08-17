@@ -119,7 +119,7 @@ public partial class DC_GameGrid : NetworkBehaviour
 		cell.player = playerO;
 		cells[pos] = cell;
 
-		playerO.transform.position = cell.cellPos;
+		player.RpcSetPosition(cell.cellPos);
 
 		RpcWasGridUpdate();
 
@@ -145,6 +145,8 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 		cells[pos] = cell;
 	}
+
+	// Client-Side Commands (Run on Client's Instance)
 
     [ClientRpc]
     public void RpcUpdateGameGrid()

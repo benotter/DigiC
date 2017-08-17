@@ -36,6 +36,8 @@ public partial class SubToolBase : MonoBehaviour
 	public Color highlightColor = Color.red;
 	public Color buttonClickColor = Color.blue;
 
+	[HideInInspector]
+	public PlayerTool.Hand hand = PlayerTool.Hand.None;
 	
 	protected Vector3 originalPos;
 	protected Quaternion originalRot;
@@ -99,6 +101,8 @@ public partial class SubToolBase
 
 		inUse = true;
 
+		hand = pTool.hand;
+
 		if(!snappingBack)
 		{
 			originalPos = gameObject.transform.localPosition;
@@ -128,6 +132,8 @@ public partial class SubToolBase
 			return;
 
 		inUse = false;
+
+		hand = PlayerTool.Hand.None;
 
 		transform.parent = originalPar;
 
