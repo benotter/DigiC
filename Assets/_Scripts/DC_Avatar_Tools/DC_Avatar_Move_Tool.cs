@@ -27,6 +27,8 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     private GameObject laser;
     private MeshRenderer laserRend;
 
+    private float currentRetract = 0f;
+
     void Start()
     {
         
@@ -45,10 +47,22 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             if(canMove && trigger == 1f && !moving)
                 moving = true;
 
-            
-
             if(touch && touchClick && touchY < 0f)
-                movePointDistance -= retractRate * Time.deltaTime;
+            {
+                if(currentRetract < maxRetractRate)
+                    currentRetract += retractRate;
+            }
+            else if(currentRetract > 0)
+            {
+                currentRetract -= retractRate;
+                
+                if(currentRetract < 0)
+                    currentRetract = 0;
+            }
+
+            if(currentRetract > 0)
+                movePointDistance -= currentRetract * Time.deltaTime;
+                
 
             Debug.Log("TouchY: " + touchY);
             Debug.Log("MoveDist: " + movePointDistance);

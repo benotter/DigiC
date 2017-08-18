@@ -83,7 +83,7 @@ public partial class DC_AvatarSync
 			}
 			else 
 			{
-				if(avatar.controllersFlipped)
+				if((rightHandle.hand == PlayerTool.Hand.Right || leftHandle.hand == PlayerTool.Hand.Left) && avatar.controllersFlipped)
 					avatar.controllersFlipped = false;
 			}
 			

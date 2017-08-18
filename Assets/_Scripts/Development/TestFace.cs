@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class TestFace : MonoBehaviour 
 {
+	public Texture image;
+
 	public int width = 50;
 	public int height = 50;
 
@@ -17,6 +19,8 @@ public class TestFace : MonoBehaviour
 
 	private MeshFilter meshF;
 	private MeshRenderer meshR;
+
+	private Texture lastImage;
 
 	private Mesh mesh;
 
@@ -82,17 +86,6 @@ public class TestFace : MonoBehaviour
 		mesh.UploadMeshData(false);
 
 		Debug.Log("Verts: " + mesh.vertexCount);
-
-		Debug.Log("Sq0: " + mesh.vertices[1].x);
-		Debug.Log("Sq0: " + mesh.vertices[1].y);
-		Debug.Log("Sq0: " + mesh.vertices[1].z);
-
-		Debug.Log("Sq1: " + mesh.vertices[4].x);
-		Debug.Log("Sq1: " + mesh.vertices[4].y);
-		Debug.Log("Sq1: " + mesh.vertices[4].z);
-
-
-		Debug.Log("Tri0: " + mesh.triangles[0]);
 	}
 
 	void AddFace(int oX, int oY, ref Vector3[] verts, ref Vector2[] uvs, ref int[] tris, ref int vertC, ref int trisC)
@@ -125,14 +118,16 @@ public class TestFace : MonoBehaviour
 		verts[t3] = v3;
 		verts[t4] = v4;
 
-		float sX = oX / (float) (width);
-		float sY = oY / (float) (height);
-		float sYU = 1f / (float) height;
+		float sX = (oX) / (float) (width);
+		float sY = (oY) / (float) (height);
 
-		uvs[t1] = new Vector2(sX + xUnit, sY + sYU);
-		uvs[t2] = new Vector2(sX + xUnit, sY);
-		uvs[t3] = new Vector2(sX, sY);
-		uvs[t4] = new Vector2(sX, sY + sYU);
+		float xT = xUnit * ( 0.5f);
+		float yT = (1f / (float) height) * (0.5f);
+
+		uvs[t1] = new Vector2( sX + xT, sY + yT );
+		uvs[t2] = new Vector2(sX + xT, sY + yT);
+		uvs[t3] = new Vector2(sX + xT, sY + yT);
+		uvs[t4] = new Vector2(sX + xT, sY + yT);
 
 		tris[trisC + 0] = t1;
 		tris[trisC + 1] = t3;

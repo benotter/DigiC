@@ -32,7 +32,7 @@ public class DC_GameManager : MonoBehaviour
 			newGame.Install(GetComponent<SphereCollider>().center);
 			gameInstalled = true;
 
-			director.StartGame("Test Game", 8);
+			director.StartGame();
 		}
 	}
 

@@ -106,7 +106,6 @@ public partial class DC_Avatar : NetworkBehaviour
     {
         lineR = GetComponent<LineRenderer>();
         moveB = new DC_Avatar_MoveBeam(moveBeamRemoteRes);
-
     }
 
     public override void OnStartAuthority()
@@ -401,7 +400,9 @@ public class DC_Avatar_MoveBeam
         Vector3.zero,
         Vector3.zero,
         Vector3.zero,
-        Vector3.zero
+        Vector3.zero,
+        Vector3.zero,
+        Vector3.zero,
     };
 
     public DC_Avatar_MoveBeam(int resolution = 2)
@@ -410,12 +411,20 @@ public class DC_Avatar_MoveBeam
         linePoints = new Vector3[resolution];
     }
 
+    // The Double-ups ensures sharp straight lines with the Bezier curves
     public void UpdateBeam(Vector3 startPos, Vector3 jut, Vector3 vel, Vector3 endPos)
     {
-        pN[0] = pN[1] = startPos;
+        pN[0] = startPos;
+        pN[1] = startPos;
+
         pN[2] = jut;
-        pN[3] = startPos + vel;
-        pN[4] = endPos;
+        pN[3] = jut;
+
+        pN[4] = startPos + vel;
+
+        pN[5] = endPos;
+        pN[6] = endPos;
+
     }
     public Vector3[] UpdateLinePoints()
     {

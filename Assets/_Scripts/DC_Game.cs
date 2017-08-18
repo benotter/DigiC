@@ -129,7 +129,7 @@ public partial class DC_Game : NetworkBehaviour
 
         player.playerName = player.connectionToClient.address;
 
-        if(gameOwner != null && player.gameObject == gameOwner.connection.playerControllers[0].gameObject)
+        if(player.connectionToClient.address == "localClient")
             gameOwnerPlayerObj = player.gameObject;
         
         RpcPlayerJoined(player.gameObject);

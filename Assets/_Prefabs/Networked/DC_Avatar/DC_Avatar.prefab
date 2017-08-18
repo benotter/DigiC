@@ -969,7 +969,7 @@ MonoBehaviour:
   rightPaw: {fileID: 1846576182006308}
   leftPaw: {fileID: 1815982558365908}
   moveBeamLocalRes: 20
-  moveBeamRemoteRes: 5
+  moveBeamRemoteRes: 10
   beamJut: 1
   playerO: {fileID: 0}
   gravity: 3

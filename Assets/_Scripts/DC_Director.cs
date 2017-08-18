@@ -12,6 +12,12 @@ public partial class DC_Director : NetworkManager
 	public DC_HomeRoom homeRoom;
 	public DC_GameGrid gameGrid;
 
+    [Space(10)]
+
+    public string gameName = "Test Game";
+    public int maxPlayers = 8;
+    
+
 	void Start()
 	{
 
@@ -31,7 +37,11 @@ public partial class DC_Director : NetworkManager
 
     public override void OnStartServer()
     {
+        game.gamePort = networkPort;
+        game.gameAddress = networkAddress;
 
+        game.gameName = gameName;
+        game.gameMaxPlayers = maxPlayers;
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -114,20 +124,13 @@ public partial class DC_Director : NetworkManager
 
     // Client Hooks for in-game UI
 
-	public void StartGame(string gameName, int maxPlayers = 8)
+	public void StartGame()
 	{
-		var hostC = StartHost(connectionConfig, maxPlayers);
+		var hostC = StartHost();
 
 		if(hostC != null)
 		{
-			game.gamePort = networkPort;
-			game.gameAddress = networkAddress;
-
-			game.gameName = gameName;
-			game.gameMaxPlayers = maxPlayers;
-			
 			game.gameOwner = hostC;
-
             Debug.Log("Host Client Successfully Started!");
 		}
 	}
