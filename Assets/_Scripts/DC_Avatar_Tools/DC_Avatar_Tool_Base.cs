@@ -9,6 +9,11 @@ public class DC_Avatar_Tool_Base : MonoBehaviour
 
 	public PlayerTool.Hand hand;
 
+	[Space(10)]
+
+	public bool blockChange = false;
+	
+
 	[HideInInspector]
 	public float trigger = 0f;
 

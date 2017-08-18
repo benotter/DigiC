@@ -24,6 +24,7 @@ public class DC_AvatarSync_Handle : SubToolBase
     void Update()
     {
         base.UpdateSnapping();
+        base.CheckHighlight();
         
         if(!inUse)
             return;

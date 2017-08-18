@@ -961,8 +961,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localPlayer: {fileID: 0}
-  rightTool: {fileID: 114792156309087534}
-  leftTool: {fileID: 114143675629519308}
+  rightTool: {fileID: 0}
+  leftTool: {fileID: 114792156309087534}
   avatarCam: {fileID: 20154779461201826}
   muzzle: {fileID: 1232707009109900}
   chest: {fileID: 1133850917905156}

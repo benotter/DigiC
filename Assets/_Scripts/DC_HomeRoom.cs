@@ -23,7 +23,6 @@ public class DC_HomeRoom : MonoBehaviour
 
     [Space(10)]
 
-    public Camera floorCam;
     
     [Space(10)]
 
@@ -34,7 +33,7 @@ public class DC_HomeRoom : MonoBehaviour
 
     void Start()
     {
-        floorCam.enabled = false;
+
     }
 
     public void SetRemotePlayer(DC_Player player = null)

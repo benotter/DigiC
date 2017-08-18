@@ -7,6 +7,8 @@ public partial class SubToolBase : MonoBehaviour
 	public Vector3 positionOffset = new Vector3();
 	public Vector3 rotationOffset = new Vector3();
 
+	public bool grabAsIs = false;
+
 
 	[Space(10)]
 	public bool toolEnabled = true;
@@ -34,7 +36,12 @@ public partial class SubToolBase : MonoBehaviour
 	[Space(10)]
 
 	public Color highlightColor = Color.red;
+
+	[Space(5)]
+
 	public Color buttonClickColor = Color.blue;
+	public Color buttonDisabledColor = Color.gray;
+
 
 	[HideInInspector]
 	public PlayerTool.Hand hand = PlayerTool.Hand.None;
@@ -50,6 +57,8 @@ public partial class SubToolBase : MonoBehaviour
 	private float snappingBackTime = 0f;
 
 	private bool buttonDown = false;
+
+	private bool hasHover = false;
 }
 
 public partial class SubToolBase 
@@ -58,6 +67,8 @@ public partial class SubToolBase
 	{
 		if(smoothSnapBack)
 			UpdateSnapping();
+
+		CheckHighlight();
 	}
 	
 	public void SetToolEnabled(bool en)
@@ -80,13 +91,11 @@ public partial class SubToolBase
 		{
 			buttonDown = true;
 			OnPress();
-			SetHighlight(true);
 		}
 		else if(buttonDown)
 		{
 			buttonDown = false;
 			OnRelease();
-			SetHighlight(true);
 		}
 	}
 
@@ -117,10 +126,11 @@ public partial class SubToolBase
 		
 		transform.parent = pTool.transform;
 
-		transform.localPosition = positionOffset;
-		transform.localRotation = Quaternion.Euler(rotationOffset);
-
-		SetHighlight(false);
+		if(!grabAsIs)
+		{
+			transform.localPosition = positionOffset;
+			transform.localRotation = Quaternion.Euler(rotationOffset);
+		}
 
 		var coll = GetComponent<Collider>();
 		coll.isTrigger = false;
@@ -146,7 +156,8 @@ public partial class SubToolBase
 		if (snapBack && smoothSnapBack)
 			snappingBack = true;
 
-		SetHighlight(false);
+		buttonDown = false;
+
 		pTool.SetSubtool(null);
 
 		var coll = GetComponent<Collider>();
@@ -173,29 +184,58 @@ public partial class SubToolBase
 		}
 	}
 
-	public void SetHighlight(bool light = true)
-	{
+	public void CheckHighlight()
+	{			
 		if(!rend)
 			rend = gameObject.GetComponent<MeshRenderer>();
 
 		if(!rend)
 			return;
+		
+		bool light = false;
 
 		Color c = highlightColor;
 
-		if(isButton && buttonDown)
-			c = buttonClickColor;
-
-		if(light && rend.material.color != c)
+		if(!isButton)
 		{
-			Color curC = rend.material.color;
-			
-			if(curC != buttonClickColor && curC != highlightColor)
+			if(hasHover)
+				light = true;
+
+			if(!toolEnabled || inUse)
+				light = false;
+		}
+
+		if(isButton)
+		{
+			if(hasHover)
+				light = true;
+
+			if(!toolEnabled)
+			{
+				light = true;
+				c = buttonDisabledColor;
+			}
+
+			if(buttonDown)
+			{
+				light = true;
+				c = buttonClickColor;
+			}
+		}
+
+		Color curC = rend.material.color;
+		if(light && curC != c)
+		{	
+			if( curC != highlightColor &&
+				curC != buttonClickColor && 
+				curC != buttonDisabledColor )
+			{
 				originalColor = curC;
+			}
 			
 			rend.material.color = c;
 		}
-		else if(!light && rend.material.color != originalColor && originalColor != Color.clear)
+		else if(!light && curC != originalColor && originalColor != Color.clear)
 		{
 			rend.material.color = originalColor;
 		}
@@ -231,8 +271,8 @@ public partial class SubToolBase
 		if(!pTool || pTool.subTool != null)
 			return;
 
-		SetHighlight(true);
 		pTool.SetSubtool(this);
+		hasHover = true;
 	}
 
 	void OnTriggerStay(Collider col)
@@ -248,8 +288,8 @@ public partial class SubToolBase
 		if(!pTool || (pTool.subTool) )
 			return;
 
-		SetHighlight(true);
 		pTool.SetSubtool(this);
+		hasHover = true;
 	}
 
 	void OnTriggerExit(Collider col)
@@ -257,12 +297,14 @@ public partial class SubToolBase
 		if(inUse)
 			return;
 
+		hasHover = false;
+		buttonDown = false;
+
 		PlayerTool pTool = col.gameObject.GetComponent<PlayerTool>();
 		
 		if(!pTool || pTool.subTool != this)
 			return;
 
-		SetHighlight(false);
 		pTool.SetSubtool(null);
 	}
 }

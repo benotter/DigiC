@@ -29,6 +29,8 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
     private float currentRetract = 0f;
 
+    private bool moveBlock = false;
+
     void Start()
     {
         
@@ -44,8 +46,13 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             if(canMove && !seeking)
                 seeking = true;
 
-            if(canMove && trigger == 1f && !moving)
+            if(trigger == 1f && !moving && canMove && !moveBlock)
                 moving = true;
+            else if(trigger == 1f && !moving && !canMove && !moveBlock)
+                moveBlock = true;
+
+            if(moveBlock && trigger < 0.97f)
+                moveBlock = false;
 
             if(touch && touchClick && touchY < 0f)
             {
@@ -55,15 +62,22 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             else if(currentRetract > 0)
             {
                 currentRetract -= retractRate;
-                
+
                 if(currentRetract < 0)
                     currentRetract = 0;
             }
 
             if(currentRetract > 0)
+            {
                 movePointDistance -= currentRetract * Time.deltaTime;
+                if(movePointDistance < 0)
+                {
+                    movePointDistance = 0f;
+                    moveBlock = true;
+                    moving = false;
+                }
+            }
                 
-
             Debug.Log("TouchY: " + touchY);
             Debug.Log("MoveDist: " + movePointDistance);
         }
