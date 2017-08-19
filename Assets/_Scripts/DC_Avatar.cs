@@ -32,6 +32,9 @@ public partial class DC_Avatar : NetworkBehaviour
 
     public float beamJut = 0.2f;
 
+    [Range(0f, 1f)]
+    public float velPoint = 0.75f;
+
 
     [Space(10)]
 
@@ -89,6 +92,9 @@ public partial class DC_Avatar : NetworkBehaviour
     private LineRenderer lineR;
     private DC_Avatar_MoveBeam moveB;
 
+    [HideInInspector]
+    public Vector3 moveBeamTarget;
+
     // Private Server-Side Variables
 
     [SyncVar]
@@ -135,6 +141,12 @@ public partial class DC_Avatar : NetworkBehaviour
     public void MoveTo(Vector3 worldPoint)
     {
         targetMove += worldPoint;
+    }
+
+    public void MoveTo(Vector3 worldPoint, Vector3 moveTarget)
+    {
+        moveBeamTarget = moveTarget;
+        MoveTo(worldPoint);
     }
 
     public void ResetVelocity()
@@ -196,10 +208,10 @@ public partial class DC_Avatar : NetworkBehaviour
             }
         }
 
-        UpdateMoveBeam();
-
         if(hasAuthority)
             UpdatePosition();
+
+        UpdateMoveBeam();
     }
 
     public void UpdateMoveBeam()
@@ -212,7 +224,15 @@ public partial class DC_Avatar : NetworkBehaviour
             var start = moveBeamRightH && !controllersFlipped ? 
                 rightPaw.transform : leftPaw.transform;
 
-            moveB.UpdateBeam(start.position, start.position + (start.forward * beamJut), moveVelocity, moveBeamPoint);
+
+            var st = start.position;
+            var jut = start.position + (start.forward * beamJut);
+
+            var vel = Vector3.Lerp(moveBeamTarget, moveBeamPoint, velPoint);
+
+            var end = moveBeamPoint;
+
+            moveB.UpdateBeam(st, jut, vel, end);
             lineR.positionCount = moveB.resolution;
             lineR.SetPositions(moveB.UpdateLinePoints());
         }
@@ -227,9 +247,23 @@ public partial class DC_Avatar : NetworkBehaviour
         if(!inMove && (lastColFlags & CollisionFlags.Below) == 0)
             currentVelocity.y -= gravity * Time.deltaTime;
 
-        lastColFlags = coll.Move(targetMove + currentVelocity * Time.deltaTime);
+        var move = targetMove + currentVelocity * Time.deltaTime;
 
-        currentVelocity -= (drag * currentVelocity) * Time.deltaTime;
+        if(Mathf.Abs(move.x) > terminalVelocity)
+            move.x = move.x > 0 ? terminalVelocity : -terminalVelocity;
+                    
+        if(Mathf.Abs(move.y) > terminalVelocity)
+            move.y = move.y > 0 ? terminalVelocity : -terminalVelocity;
+
+        if(Mathf.Abs(move.z) > terminalVelocity)
+            move.z = move.z > 0 ? terminalVelocity : -terminalVelocity;
+
+        lastColFlags = coll.Move(move);
+
+        if(lastColFlags == CollisionFlags.None)
+            currentVelocity -= (drag * currentVelocity) * Time.deltaTime;
+        else
+            ResetVelocity();
 
         targetMove = Vector3.zero;
     }
@@ -420,7 +454,7 @@ public class DC_Avatar_MoveBeam
         pN[2] = jut;
         pN[3] = jut;
 
-        pN[4] = startPos + vel;
+        pN[4] = vel;
 
         pN[5] = endPos;
         pN[6] = endPos;

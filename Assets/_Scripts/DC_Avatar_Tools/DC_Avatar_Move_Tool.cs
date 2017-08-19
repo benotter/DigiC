@@ -31,6 +31,8 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
     private bool moveBlock = false;
 
+    private Vector3 spacePoint;
+
     void Start()
     {
         
@@ -75,6 +77,8 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                     movePointDistance = 0f;
                     moveBlock = true;
                     moving = false;
+                    
+                    avatar.ResetVelocity();
                 }
             }
                 
@@ -111,7 +115,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                 avatar.CmdSetMoveBeamHand(hand == PlayerTool.Hand.Right);
             }
 
-            avatar.MoveTo(targetPoint);
+            avatar.MoveTo(targetPoint, spacePoint);
         }
         else
         {
@@ -167,7 +171,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
         var ht = paw.transform;
         var at = avatar.transform;
 
-        var spacePoint = movePoint - (ht.forward * movePointDistance);
+        spacePoint = movePoint - (ht.forward * movePointDistance);
         spacePoint -= ht.localPosition;
 
         var dist = Vector3.Distance(spacePoint, at.position);

@@ -31,6 +31,25 @@ public partial class SubToolBase : MonoBehaviour
 
 	[Space(10)]
 
+	public bool cubeLockzone = false;
+
+	public float cubeWidth = 0f;
+	public float cubeHeight = 0f;
+	public float cubeLength = 0f;
+
+
+	public bool lockX = false;
+	public float lockXMax = 0.3f;
+
+	public bool lockY = false;
+	public float lockYMax = 0.3f;
+
+	public bool lockZ = false;
+	public float lockZMax = 0.3f;
+
+
+	[Space(10)]
+
 	public bool inUse = false;
 
 	[Space(10)]
@@ -59,11 +78,27 @@ public partial class SubToolBase : MonoBehaviour
 	private bool buttonDown = false;
 
 	private bool hasHover = false;
+
+	private PlayerTool pTool;
+
+	private Vector3 grabOffesetPos;
+	private Vector3 grabOffsetRot;
+}
+
+public partial class SubToolBase 
+{
+	public virtual void OnPress() {}
+	public virtual void OnRelease() {}
 }
 
 public partial class SubToolBase 
 {
 	void Update()
+	{
+		UpdateSubTool();
+	}
+
+	protected void UpdateSubTool()
 	{
 		if(smoothSnapBack)
 			UpdateSnapping();
@@ -99,10 +134,6 @@ public partial class SubToolBase
 		}
 	}
 
-	public virtual void OnPress() {}
-
-	public virtual void OnRelease() {}
-
 	public void StartUse(PlayerTool pTool)
 	{
 		if(inUse)
@@ -117,6 +148,12 @@ public partial class SubToolBase
 			originalPos = gameObject.transform.localPosition;
 			originalRot = gameObject.transform.localRotation;
 			originalPar = gameObject.transform.parent;
+
+			if(grabAsIs)
+			{
+				grabOffesetPos = transform.position - pTool.transform.position;
+				grabOffsetRot = transform.eulerAngles - pTool.transform.eulerAngles;
+			}
 		}
 		else
 		{	
@@ -132,6 +169,8 @@ public partial class SubToolBase
 			transform.localRotation = Quaternion.Euler(rotationOffset);
 		}
 
+		this.pTool = pTool;
+
 		var coll = GetComponent<Collider>();
 		coll.isTrigger = false;
 	}
@@ -142,6 +181,8 @@ public partial class SubToolBase
 			return;
 
 		inUse = false;
+
+		
 
 		hand = PlayerTool.Hand.None;
 
@@ -160,11 +201,33 @@ public partial class SubToolBase
 
 		pTool.SetSubtool(null);
 
+		this.pTool = null;
+
 		var coll = GetComponent<Collider>();
 		coll.isTrigger = true;
 	}
 
-	public void UpdateSnapping()
+	void UpdatePosition()
+	{
+		Vector3 newPos = pTool.transform.position + positionOffset;
+		Quaternion newRot = Quaternion.Euler(pTool.transform.eulerAngles + rotationOffset);
+
+		if(grabAsIs)
+		{
+			newPos += grabOffesetPos;
+			newRot = Quaternion.Euler(newRot.eulerAngles + grabOffsetRot);
+		}
+
+		if(cubeLockzone)
+		{
+			
+		}
+
+		transform.position = newPos;
+		transform.rotation = newRot;
+	}
+
+	void UpdateSnapping()
 	{
 		if(snappingBack)
 		{

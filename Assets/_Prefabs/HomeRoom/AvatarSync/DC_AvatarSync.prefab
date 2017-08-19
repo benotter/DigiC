@@ -235,7 +235,7 @@ Transform:
   m_GameObject: {fileID: 1856446391941108}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5830041, y: 0.5830041, z: 0.5830041}
   m_Children:
   - {fileID: 4456831249731084}
   - {fileID: 4418538420935834}
@@ -491,8 +491,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.4523393, y: 0.43976974, z: 0.45841336}
-  m_Center: {x: 0, y: 0, z: 0.11038637}
+  m_Size: {x: 0.3, y: 0.28, z: 0.4}
+  m_Center: {x: 0, y: 0, z: 0.01}
 --- !u!114 &114281550403776982
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -506,6 +506,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positionOffset: {x: 0, y: -0.03, z: -0.05}
   rotationOffset: {x: 65, y: 0, z: 0}
+  grabAsIs: 0
   toolEnabled: 1
   isButton: 0
   dropable: 1
@@ -517,6 +518,8 @@ MonoBehaviour:
   inUse: 0
   highlightColor: {r: 1, g: 0, b: 0, a: 1}
   buttonClickColor: {r: 0, g: 0, b: 1, a: 1}
+  buttonDisabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  hand: 0
   trigger: 0
   touchX: 0
   touchY: 0
@@ -540,6 +543,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positionOffset: {x: 0, y: -0.03, z: -0.05}
   rotationOffset: {x: 65, y: 0, z: 0}
+  grabAsIs: 0
   toolEnabled: 1
   isButton: 0
   dropable: 1
@@ -551,6 +555,8 @@ MonoBehaviour:
   inUse: 0
   highlightColor: {r: 1, g: 0, b: 0, a: 1}
   buttonClickColor: {r: 0, g: 0, b: 1, a: 1}
+  buttonDisabledColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  hand: 0
   trigger: 0
   touchX: 0
   touchY: 0

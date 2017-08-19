@@ -817,6 +817,7 @@ MonoBehaviour:
   avatar: {fileID: 0}
   paw: {fileID: 0}
   hand: 0
+  blockChange: 0
   trigger: 0
   touchX: 0
   touchY: 0
@@ -936,6 +937,7 @@ MonoBehaviour:
   avatar: {fileID: 0}
   paw: {fileID: 0}
   hand: 0
+  blockChange: 0
   trigger: 0
   touchX: 0
   touchY: 0
@@ -970,16 +972,18 @@ MonoBehaviour:
   leftPaw: {fileID: 1815982558365908}
   moveBeamLocalRes: 20
   moveBeamRemoteRes: 10
-  beamJut: 1
+  beamJut: 2
+  velPoint: 0
   playerO: {fileID: 0}
-  gravity: 3
+  gravity: 9.7
   drag: 0.5
-  terminalVelocity: 10
+  terminalVelocity: 5
   linked: 0
   inMove: 0
   controllersFlipped: 0
   moveVelocity: {x: 0, y: 0, z: 0}
   currentVelocity: {x: 0, y: 0, z: 0}
+  moveBeamTarget: {x: 0, y: 0, z: 0}
 --- !u!114 &114966533528757884
 MonoBehaviour:
   m_ObjectHideFlags: 1
