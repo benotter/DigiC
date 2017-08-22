@@ -96,8 +96,6 @@ public partial class DC_Player : NetworkBehaviour
                 var p = transform.position;
                 avatarSpawn.SetPosition(new Vector3(p.x, gameGrid.transform.position.y + 0.3f, p.z));
                 avatarSpawn.Lock();
-
-                posAvatarSpawnDirty = false;
             }
         }
     }
@@ -130,6 +128,12 @@ public partial class DC_Player : NetworkBehaviour
             gameGrid.SetPosition(this.gameObject, x, y);
     }
 
+    [Command]
+    public void CmdSetPlayerName(string name)
+    {
+        playerName = name;
+    }
+
     // Client-Side Commands (Run on Client's Instance of Object)
 
     [ClientRpc]
@@ -151,8 +155,9 @@ public partial class DC_Player : NetworkBehaviour
         var avaS = aS.GetComponent<DC_Avatar_Spawn>();
 
         avatarSpawn = avaS;
+        
         avaS.SetPlayer(gameObject);
-        posAvatarSpawnDirty = true;
+        homeRoom.SetAvatarSpawn(avaS);
     }
 
     [ClientRpc]

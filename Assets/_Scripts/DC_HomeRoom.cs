@@ -21,8 +21,8 @@ public class DC_HomeRoom : MonoBehaviour
     public DC_Avatar avatar;
     public GameObject avatarGO;
 
-    [Space(10)]
-
+    public DC_Avatar_Spawn avatarSpawn;
+    public GameObject avatarSpawnGO;
     
     [Space(10)]
 
@@ -30,6 +30,8 @@ public class DC_HomeRoom : MonoBehaviour
     public DC_Player_Pedestal playerPedestal;
     public DC_AvatarSync avatarSync;
     public DC_GridSelector gridSelector;
+    public DC_SpawnSelector spawnSelector;
+
 
     void Start()
     {
@@ -63,6 +65,12 @@ public class DC_HomeRoom : MonoBehaviour
 
             avatarSync.SetAvatar(avatar);
         }
+    }
+
+    public void SetAvatarSpawn(DC_Avatar_Spawn avaS)
+    {
+        avatarSpawn = avaS;
+        avatarSpawnGO = avaS.gameObject;
     }
 
     public void SetPosition(Vector3 pos)
