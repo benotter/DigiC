@@ -10,16 +10,6 @@ public class DC_GridSelector : DC_HR_Equipment_Base
 	[Space(10)]
 	public DC_GridSelector_Button[] buttons = new DC_GridSelector_Button[9];
 
-	void Start () 
-	{
-		
-	}
-	
-	void Update () 
-	{
-		
-	}
-
 	public void UpdateButtonStat()
 	{
 		foreach(DC_GridSelector_Button button in buttons)

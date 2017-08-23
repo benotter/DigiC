@@ -53,10 +53,13 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     private LineRenderer lineR;
     private DC_Avatar_MoveBeam moveB;
 
+    void Start()
+    {
+        lineR = GetComponent<LineRenderer>();
+    }
 
     public override void ClientStart()
     {
-        lineR = GetComponent<LineRenderer>();
         moveB = new DC_Avatar_MoveBeam(moveBeamRemoteRes);
     }
 
@@ -89,7 +92,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             seeking = true;
 
             if(trigger == 1f && !moving && canMove && !moveBlock)
-                CmdStartMove();
+                moving = true;
             else if(trigger == 1f && !moving && !canMove && !moveBlock)
                 moveBlock = true;
 
@@ -117,14 +120,10 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                     movePointDistance = 0f;
                     moveBlock = true;
 
-                    CmdStopMove();
-
+                    moving = false;
                     avatar.ResetVelocity();
                 }
             }
-                
-            Debug.Log("TouchY: " + touchY);
-            Debug.Log("MoveDist: " + movePointDistance);
         }
         else
         {
@@ -132,7 +131,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                 seeking = false;
 
             if(moving)
-                CmdStopMove();
+                moving = false;
         }
 
         if(seeking && !moving)
@@ -150,9 +149,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             UpdateTargetPoint();
 
             if(!avatar.inMove)
-            {
                 avatar.CmdStartMove();
-            }
 
             avatar.MoveTo(targetPoint, spacePoint);
         }
@@ -285,21 +282,6 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
         laserRend = mr;
 
         l.SetActive(false);
-    }
-
-    public void CmdStartMove()
-    {
-        moving = true;
-    }
-
-    public void CmdStopMove()
-    {
-        moving = false;
-    }
-
-    public void CmdSetMovePoint(Vector3 point)
-    {
-        movePoint = point;
     }
 }
 

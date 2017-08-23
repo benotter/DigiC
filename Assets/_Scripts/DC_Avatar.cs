@@ -7,6 +7,8 @@ public partial class DC_Avatar : NetworkBehaviour
 {
     // Client-Side Variables
     public DC_LocalPlayer localPlayer;
+    
+    [Space(10)]
 
     public DC_Avatar_Tool_Base rightTool;
     public DC_Avatar_Tool_Base leftTool;
@@ -89,6 +91,7 @@ public partial class DC_Avatar : NetworkBehaviour
     private bool wasLinked = false;
     private CharacterController coll;
 
+
     private Vector3 targetMove = Vector3.zero;
     
     private Vector3 lastHmdPos = Vector3.zero;
@@ -101,15 +104,18 @@ public partial class DC_Avatar : NetworkBehaviour
 
     private CollisionFlags lastColFlags;
 
+
+    void Start()
+    {
+        SetupTools();
+    }
+
     public void SetupTools()
     {
         if(toolsSetup)
             return;
             
         Transform toolO = transform.Find("Tools");
-
-        if(!toolO)
-            return;
 
         toolList = new GameObject[toolO.childCount];
 
@@ -132,8 +138,6 @@ public partial class DC_Avatar : NetworkBehaviour
     {
         // coll = GetComponent<CharacterController>();
 
-        SetupTools();
-
         // foreach(GameObject toolO in toolList)
         // {
         //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
@@ -144,8 +148,6 @@ public partial class DC_Avatar : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        SetupTools();
-
         // foreach(GameObject toolO in toolList)
         // {
         //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
@@ -165,14 +167,11 @@ public partial class DC_Avatar : NetworkBehaviour
 
         coll = GetComponent<CharacterController>();
 
-        SetupTools();
+        if(rightTool)
+            CmdSetAvatarTool(rightTool.toolIndex, 0);
 
-        // foreach(GameObject toolO in toolList)
-        // {
-        //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
-        //     if(tool)
-        //         tool.AuthorityStart();
-        // }
+        if(leftTool)
+            CmdSetAvatarTool(leftTool.toolIndex, 1);
     }
 
     public override void OnStopAuthority()
@@ -403,23 +402,28 @@ public partial class DC_Avatar : NetworkBehaviour
     public void CmdSetAvatarTool(int toolIndex, int hand)
     {
         GameObject tool = toolList[toolIndex];
+        DC_Avatar_Tool_Base toolB = tool.GetComponent<DC_Avatar_Tool_Base>();
 
-        if(hand == 0)
+        if(toolB)
         {
-            if(rightToolO)
-                rightToolO.SetActive(false);
+            if(hand == 0)
+            {
+                if(rightToolO)
+                    rightToolO.SetActive(false);
 
-            rightToolO = tool;
+                rightToolO = tool;
+            }
+            else
+            {
+                if(leftToolO)
+                    leftToolO.SetActive(false);
+
+                leftToolO = tool;
+            }
+
+            RpcSetAvatarTool(toolIndex, hand);
+            toolB.ServerStart();
         }
-        else
-        {
-            if(leftToolO)
-                leftToolO.SetActive(false);
-
-            leftToolO = tool;
-        }
-
-        RpcSetAvatarTool(toolIndex, hand);
     }
 
     [Command]
@@ -470,6 +474,11 @@ public partial class DC_Avatar : NetworkBehaviour
             tool.hasAuthority = hasAuthority;
 
             tool.gameObject.SetActive(true);
+            
+            if(hasAuthority)
+                tool.AuthorityStart();
+            else
+                tool.ClientStart();
         }
     }
 

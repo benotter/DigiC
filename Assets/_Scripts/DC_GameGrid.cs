@@ -38,8 +38,8 @@ public partial class DC_GameGrid : NetworkBehaviour
         cells.Add(new GameGridCell().SetPos(3, 3)); // 8
 
         // WHO LOVES SOOO MUCH WASTED MEMORY REWRITES>?
+		UpdateGameGrid();
         UpdateCellPositions();
-        UpdateGameGrid();
     }
 
 	public void UpdateGameGrid()
