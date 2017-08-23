@@ -5,6 +5,27 @@ using UnityEngine.Networking;
 
 public partial class DC_Avatar : NetworkBehaviour 
 {
+    public enum HitPos
+    {
+        Muzzle,
+        Chest,
+        Paw
+    }
+
+    public enum HitType 
+    {
+        Armor,
+        Chord
+    }
+
+    public enum ChordPos 
+    {
+        None,
+        Top,
+        Right,
+        Left
+    }
+
     // Client-Side Variables
     public DC_LocalPlayer localPlayer;
 
@@ -33,9 +54,8 @@ public partial class DC_Avatar : NetworkBehaviour
 
     [Space(10)]
 
-    [HideInInspector] public bool inMove = false;
-
     // Server-Side Variables
+
     [SyncVar] public float gravity = 1f;
     [SyncVar] public float drag = 1f;
     [SyncVar] public float terminalVelocity = 10f;
@@ -52,6 +72,8 @@ public partial class DC_Avatar : NetworkBehaviour
     [Space(10)]
 
     [SyncVar] public bool linked = false;
+
+    [HideInInspector] public bool inMove = false;
 
 
     // Public Client-Side Variables
@@ -77,7 +99,15 @@ public partial class DC_Avatar : NetworkBehaviour
 
     void Start()
     {
-        
+        NetworkTransform netT = GetComponent<NetworkTransform>();
+
+        foreach(NetworkTransformChild childT in GetComponents<NetworkTransformChild>())
+        {
+            childT.sendInterval = netT.sendInterval;
+            childT.interpolateMovement = netT.interpolateMovement;
+            childT.interpolateRotation = netT.interpolateRotation;
+            childT.rotationSyncCompression = netT.rotationSyncCompression;
+        }
     }
 
     public override void OnStartServer()
@@ -111,6 +141,11 @@ public partial class DC_Avatar : NetworkBehaviour
     public override void OnStopAuthority()
     {
         avatarCam.enabled = false;
+    }
+
+    public override void OnNetworkDestroy() 
+    {
+
     }
 
 	void Update()
@@ -171,93 +206,43 @@ public partial class DC_Avatar : NetworkBehaviour
         }   
     }
 
-    public void UpdatePosition()
+    public void BoltStrike(HitPos bodyPos, DC_Bolt bolt)
     {
-        if(!inMove && (lastColFlags & CollisionFlags.Below) == 0)
-            currentVelocity.y -= gravity * Time.deltaTime;
-
-        var move = targetMove + currentVelocity * Time.deltaTime;
-
-        if(Mathf.Abs(move.x) > terminalVelocity)
-            move.x = move.x > 0 ? terminalVelocity : -terminalVelocity;
-                    
-        if(Mathf.Abs(move.y) > terminalVelocity)
-            move.y = move.y > 0 ? terminalVelocity : -terminalVelocity;
-
-        if(Mathf.Abs(move.z) > terminalVelocity)
-            move.z = move.z > 0 ? terminalVelocity : -terminalVelocity;
-
-        lastColFlags = coll.Move(move);
-
-        if(lastColFlags == CollisionFlags.None)
-            currentVelocity -= (drag * currentVelocity) * Time.deltaTime;
-        else
-            ResetVelocity();
-
-        targetMove = Vector3.zero;
-    }
-
-    public void UpdateBody()
-    {
-        var mT = muzzle.transform;
-        var cT = chest.transform;
-
-        var hmdP = localPlayer.hmdPos;
-           
-        mT.localPosition = new Vector3(0f, hmdP.y, 0f);
-        mT.localRotation = localPlayer.hmdRot;
-
-        cT.localPosition = mT.localPosition;
-        
-        bool right = true, 
-             left = false;
-
-        if(controllersFlipped)
+        switch(bodyPos)
         {
-            right = !right;
-            left = !left;
+            case HitPos.Chest:
+            break;
+
+            case HitPos.Muzzle:
+            break;
+
+            case HitPos.Paw:
+            break;
         }
-
-        UpdatePaw(rightPaw.transform, right);
-        UpdatePaw(leftPaw.transform, left);
-
-        var acP = avatarCam.transform.parent;
-        var aP = avatarCam.transform.localPosition;
-
-        var newAP = -aP;
-        newAP.y = 0;
-
-        acP.localPosition = newAP;
     }
 
-    public void UpdatePaw(Transform p, bool rightH = true)
+    public void ChordStrike(HitPos bodyPos, ChordPos pos = ChordPos.None)
     {
-        var hmdP = localPlayer.hmdPos;
-
-        Vector3 pos = rightH ? localPlayer.rightPos : localPlayer.leftPos;
-        Quaternion rot = rightH ? localPlayer.rightRot : localPlayer.leftRot;
-
-        p.localPosition = new Vector3(pos.x - hmdP.x, pos.y, pos.z - hmdP.z);
-        p.localRotation = rot;
-    }
-
-    void UpdateCharacterController()
-    {
-        var hmdP = localPlayer.hmdPos;
-        if(lastHmdPos != hmdP)
+        switch(bodyPos)
         {
-            var mP = muzzle.transform.localPosition;
+            case HitPos.Chest:
+            break;
 
-            coll.height = mP.y;
-            coll.center = new Vector3(0f, mP.y / 2f, 0f);
+            case HitPos.Muzzle:
+            break;
 
-            var move = hmdP - lastHmdPos;
-            move.y = 0f;
+            case HitPos.Paw:
+            break;
+        }
+    }
 
-            lastHmdPos = hmdP;
+    public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
+    {
+        if(rightTool)
+            rightTool.UpdateState(rightHandle);
 
-            MoveTo(move);
-        }    
+        if(leftTool)
+            leftTool.UpdateState(leftHandle);
     }
 
     public void StartMove()
@@ -290,24 +275,12 @@ public partial class DC_Avatar : NetworkBehaviour
         localPlayer = p;
     }
 
-    public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
-    {
-        if(rightTool)
-            rightTool.UpdateState(rightHandle);
-
-        if(leftTool)
-            leftTool.UpdateState(leftHandle);
-    }
-
-
-
     // Server-Side Commands    
     [Command] public void CmdStartLink()
     {
         linked = true;
         wasLinked = true;
     }
-
     
     [Command] public void CmdStopLink()
     {

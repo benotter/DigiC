@@ -162,7 +162,7 @@ public partial class DC_Game : NetworkBehaviour
 
     public void AddPlayer(DC_Player player)
     {
-        player.serverGameObject = gameObject;
+        player.serverGameO = gameObject;
         player.serverGame = this;
 
         player.gameGrid = gameGrid;

@@ -13,55 +13,48 @@ public partial class DC_Player : NetworkBehaviour
 	public DC_GameGrid gameGrid;
 	public DC_HomeRoom homeRoom;
 
+    
+
 	[Space(10)]
 
-	public DC_Game serverGame;
+	
 
 	[Space(10)]
 
 	public DC_LocalPlayer localPlayer;
-
     public GameObject remoteDisplay;
 
     [Space(10)]
 
+    public DC_Game serverGame;
     public DC_Avatar avatar; 
     public DC_Avatar_Spawn avatarSpawn;
-	
+
 	[Space(10)]
 
     // Remote Variables (Set on the Server, Synced to the Clients)
 
-	[SyncVar]
-	public GameObject serverGameObject = null;
+    [SyncVar] public string playerName = "";
+    
+    [Space(10)]
 
-	[SyncVar]
-	public string playerName = "";
-
-	[Space(10)]
-
-	[SyncVar]
-	public GameObject avatarO = null;
-	
-	[SyncVar]
-	public GameObject avatarSpawnO = null;
-
-	[Space(10)]
-
-	[SyncVar]
-	public int gameGridX = 0;
-
-	[SyncVar]
-	public int gameGridY = 0;
+    [SyncVar] public int gameGridX = 0;
+	[SyncVar] public int gameGridY = 0;
 
     [Space(10)]
 
-    [SyncVar]
-    public int currentScore = 0;
+    [SyncVar] public int currentScore = 0;
 
-    [SyncVar]
-    public DC_Game.Team currentTeam = DC_Game.Team.None;
+    // Basically equilivent to 'Deaths' in any other game
+    [SyncVar] public int chordStrucked = 0;
+    [SyncVar] public DC_Game.Team currentTeam = DC_Game.Team.None;
 
+	[Space(10)]
+    
+    [SyncVar] public GameObject serverGameO = null;
+	[SyncVar] public GameObject avatarO = null;
+	[SyncVar] public GameObject avatarSpawnO = null;
+    
 
     // Private Client-Side Variables
     
