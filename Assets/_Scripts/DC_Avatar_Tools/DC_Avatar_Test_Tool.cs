@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_Avatar_Test_Tool : DC_Avatar_Tool_Base 
+public class DC_Avatar_Test_Tool : DC_Avatar_Tool 
 {
     public Color laserOne = Color.blue;
     public Color laserTwo = Color.red;
@@ -58,7 +58,7 @@ public class DC_Avatar_Test_Tool : DC_Avatar_Tool_Base
 
         var mr = l.GetComponent<MeshRenderer>();
 
-        l.transform.parent = paw.transform;
+        l.transform.parent = transform;
         l.transform.localEulerAngles = Vector3.zero;
 
         l.name = "Test Laser";
@@ -72,7 +72,7 @@ public class DC_Avatar_Test_Tool : DC_Avatar_Tool_Base
     void UpdateLaser()
     {
         var lt = laser.transform;
-        var ht = paw.transform;
+        var ht = transform;
 
         Ray ray = new Ray(ht.position, ht.forward);
         RaycastHit hit;

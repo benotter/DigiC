@@ -7,12 +7,14 @@ public partial class DC_Avatar : NetworkBehaviour
 {
     // Client-Side Variables
     public DC_LocalPlayer localPlayer;
-    
+
     [Space(10)]
 
-    public DC_Avatar_Tool_Base rightTool;
-    public DC_Avatar_Tool_Base leftTool;
+    public int rightStartToolIndex = -1;
+    public int leftStartToolIndex = -1;
 
+    public GameObject[] toolList = new GameObject[0];
+    
     [Space(10)]
 
     public Camera avatarCam;
@@ -26,80 +28,48 @@ public partial class DC_Avatar : NetworkBehaviour
 
     [Space(10)]
 
-    public int moveBeamLocalRes = 15;
-    public int moveBeamRemoteRes = 5;
+    public DC_Avatar_Tool rightTool;
+    public DC_Avatar_Tool leftTool;
 
     [Space(10)]
 
-    public float beamJut = 0.2f;
-
-    [Range(0f, 1f)]
-    public float velPoint = 0.75f;
-
-
-    [Space(10)]
-
-    public GameObject[] toolList = new GameObject[0];
-    public bool toolsSetup = false;
-
-    [Space(10)]
+    [HideInInspector] public bool inMove = false;
 
     // Server-Side Variables
-
-    [SyncVar]
-    public GameObject playerO;
-
+    [SyncVar] public float gravity = 1f;
+    [SyncVar] public float drag = 1f;
+    [SyncVar] public float terminalVelocity = 10f;
 
     [Space(10)]
 
-    [SyncVar]
-    public GameObject rightToolO;
+    [SyncVar] public GameObject playerO;
 
-    [SyncVar]
-    public GameObject leftToolO;
+    [Space(10)]
+
+    [SyncVar] public GameObject rightToolO;
+    [SyncVar] public GameObject leftToolO;
     
-
     [Space(10)]
 
-    [SyncVar]
-    public float gravity = 1f;
-
-    [SyncVar]
-    public float drag = 1f;
-
-    [SyncVar]
-    public float terminalVelocity = 10f;
-
-
-    [Space(10)]
-
-
-    [SyncVar]
-    public bool linked = false;
-
-    [SyncVar]
-    public bool inMove = false;
+    [SyncVar] public bool linked = false;
 
 
     // Public Client-Side Variables
 
-    [HideInInspector]
-    public bool controllersFlipped = false;
+    [HideInInspector] public bool controllersFlipped = false;
     
     // Private Client-Side Variables
 
-    private bool wasLinked = false;
     private CharacterController coll;
 
-
+    private bool wasLinked = false;
+    
     private Vector3 targetMove = Vector3.zero;
     
     private Vector3 lastHmdPos = Vector3.zero;
-
     private Vector3 lastPos = Vector3.zero;
 
     public Vector3 moveVelocity = Vector3.zero;
-
     public Vector3 currentVelocity = Vector3.zero;
 
     private CollisionFlags lastColFlags;
@@ -107,53 +77,17 @@ public partial class DC_Avatar : NetworkBehaviour
 
     void Start()
     {
-        SetupTools();
-    }
-
-    public void SetupTools()
-    {
-        if(toolsSetup)
-            return;
-            
-        Transform toolO = transform.Find("Tools");
-
-        toolList = new GameObject[toolO.childCount];
-
-        int toolC = 0;
-
-        foreach(Transform toolT in toolO)
-        {
-            var tool = toolT.gameObject.GetComponent<DC_Avatar_Tool_Base>();
-            if(tool)
-            {
-                tool.toolIndex = toolC;
-                toolList[toolC++] = tool.gameObject;
-            }
-        }
-
-        toolsSetup = true;
+        
     }
 
     public override void OnStartServer()
     {
         // coll = GetComponent<CharacterController>();
-
-        // foreach(GameObject toolO in toolList)
-        // {
-        //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
-        //     if(tool)
-        //         tool.ServerStart();
-        // }
     }
 
     public override void OnStartClient()
     {
-        // foreach(GameObject toolO in toolList)
-        // {
-        //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
-        //     if(tool)
-        //         tool.ClientStart();
-        // }
+
     }
 
     public override void OnStartAuthority()
@@ -167,11 +101,11 @@ public partial class DC_Avatar : NetworkBehaviour
 
         coll = GetComponent<CharacterController>();
 
-        if(rightTool)
-            CmdSetAvatarTool(rightTool.toolIndex, 0);
+        if(rightStartToolIndex > -1)
+            CmdRequestTool(rightStartToolIndex, 0);
 
-        if(leftTool)
-            CmdSetAvatarTool(leftTool.toolIndex, 1);
+        if(leftStartToolIndex > -1)
+            CmdRequestTool(leftStartToolIndex, 1);
     }
 
     public override void OnStopAuthority()
@@ -191,11 +125,6 @@ public partial class DC_Avatar : NetworkBehaviour
     {
         // UpdateCharacterController();
 
-        if(rightTool)
-            rightTool.ServerUpdate();
-
-        if(leftTool)
-            leftTool.ServerUpdate();
     }
 
     void ClientUpdate()
@@ -240,12 +169,6 @@ public partial class DC_Avatar : NetworkBehaviour
 
             UpdatePosition();
         }   
-
-        if(rightTool)
-            rightTool.ClientUpdate();
-
-        if(leftTool)
-            leftTool.ClientUpdate();
     }
 
     public void UpdatePosition()
@@ -337,6 +260,16 @@ public partial class DC_Avatar : NetworkBehaviour
         }    
     }
 
+    public void StartMove()
+    {
+        inMove = true;
+    }
+
+    public void StopMove()
+    {
+        inMove = false;
+    }
+
     public void MoveTo(Vector3 worldPoint)
     {
         targetMove += worldPoint;
@@ -357,11 +290,6 @@ public partial class DC_Avatar : NetworkBehaviour
         localPlayer = p;
     }
 
-    public void SetAvatarTool(DC_Avatar_Tool_Base tool = null, int hand = 0)
-    {
-        
-    }
-
     public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
     {
         if(rightTool)
@@ -371,124 +299,88 @@ public partial class DC_Avatar : NetworkBehaviour
             leftTool.UpdateState(leftHandle);
     }
 
-    // Server-Side Commands
 
-    [Command]
-    public void CmdStartMove()
-    {
-        inMove = true;
-    }
 
-    [Command]
-    public void CmdStopMove()
-    {
-        inMove = false;
-    }
-
-    [Command]
-    public void CmdStartLink()
+    // Server-Side Commands    
+    [Command] public void CmdStartLink()
     {
         linked = true;
         wasLinked = true;
     }
 
-    [Command]
-    public void CmdStopLink()
+    
+    [Command] public void CmdStopLink()
     {
         linked = false;
     }
 
-    [Command]
-    public void CmdSetAvatarTool(int toolIndex, int hand)
+    [Command] public void CmdRequestTool(int toolIndex, int hand)
     {
-        GameObject tool = toolList[toolIndex];
-        DC_Avatar_Tool_Base toolB = tool.GetComponent<DC_Avatar_Tool_Base>();
+        if(toolIndex >= toolList.Length)
+            return;
 
-        if(toolB)
+        GameObject toolB = toolList[toolIndex];
+
+        GameObject toolO = Instantiate(toolB);
+        
+        if(NetworkServer.SpawnWithClientAuthority(toolO, playerO))
         {
+            DC_Avatar_Tool tool = toolO.GetComponent<DC_Avatar_Tool>();
+
+            tool.avatarO = gameObject;
+            tool.playerO = playerO;
+
             if(hand == 0)
             {
                 if(rightToolO)
-                    rightToolO.SetActive(false);
+                    Network.Destroy(rightToolO);
 
-                rightToolO = tool;
+                rightToolO = toolO;
             }
             else
             {
                 if(leftToolO)
-                    leftToolO.SetActive(false);
+                    Network.Destroy(leftToolO);
 
-                leftToolO = tool;
+                leftToolO = toolO;
             }
 
-            RpcSetAvatarTool(toolIndex, hand);
-            toolB.ServerStart();
+            tool.RpcSetAvatar(gameObject);
+            RpcSetAvatarTool(toolO, hand);
         }
-    }
-
-    [Command]
-    public void CmdSetToolAuthority()
-    {
-        // foreach(Transform child in transform.Find("Tools"))
-        //     NetworkServer.SpawnWithClientAuthority(child.gameObject, playerO);
     }
 
     // Client-Side Commands
 
-    [ClientRpc]
-    public void RpcSetPosition(Vector3 pos)
+    [ClientRpc] public void RpcSetPosition(Vector3 pos)
     {
         transform.position = pos;
     }
 
-    [ClientRpc]
-    public void RpcSetAvatarTool(int toolIndex, int hand)
+    [ClientRpc] public void RpcSetAvatarTool(GameObject toolO, int hand)
     {
-        GameObject toolO = toolList[toolIndex];
-        DC_Avatar_Tool_Base tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
-
-        GameObject handO;
-
-        if(hand == 0)
-        {
-            if(rightTool)
-                rightTool.gameObject.SetActive(false);
-        
-            rightTool = tool;
-            handO = rightPaw;
-        }
-        else
-        {
-            if(leftTool)
-                leftTool.gameObject.SetActive(false);
-
-            leftTool = tool;
-            handO = leftPaw;
-        }
-
+        DC_Avatar_Tool tool = toolO.GetComponent<DC_Avatar_Tool>();
         if(tool)
         {
-            tool.avatar = this;
-            tool.paw = handO;
+            Transform h = hand == 0 ? rightPaw.transform : leftPaw.transform;
 
-            tool.hasAuthority = hasAuthority;
+            toolO.transform.parent = h;
+            toolO.transform.localEulerAngles = Vector3.zero;
+            toolO.transform.localPosition = Vector3.zero;
 
-            tool.gameObject.SetActive(true);
-            
-            if(hasAuthority)
-                tool.AuthorityStart();
+            if(hand == 0)
+                rightTool = tool;
             else
-                tool.ClientStart();
+                leftTool = tool;
         }
     }
 
-    [ClientRpc]
-    public void RpcClearTool(int hand)
+    [ClientRpc] public void RpcClearTool(int hand)
     {
         if(hand == 0)
             rightToolO = null;
         else
-            rightToolO = null;
+            leftToolO = null;
     }
 }
 

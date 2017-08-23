@@ -5,18 +5,18 @@ using UnityEngine.Networking;
 
 public partial class DC_GameGrid : NetworkBehaviour
 {
+	// Client-Side Variables
 	public DynaRoom dynaRoom;
 	public DC_GridSelector gridSelector;
 
+	// Server-Side Variables
+	[SyncVar] public GridSize gridSize = GridSize.One;
+	[SyncVar] public float gridCellSize = 20;
+	[HideInInspector] public SyncListGridCell cells = new SyncListGridCell();
 
-	[SyncVar]
-	public GridSize gridSize = GridSize.One;
+	// Private Client-Side Variables
 
-	[SyncVar]
-	public float gridCellSize = 20;
-
-	[HideInInspector]
-	public SyncListGridCell cells = new SyncListGridCell();
+	// Private Server-Side Variables
 
 	public override void OnStartClient()
     {
@@ -38,8 +38,8 @@ public partial class DC_GameGrid : NetworkBehaviour
         cells.Add(new GameGridCell().SetPos(3, 3)); // 8
 
         // WHO LOVES SOOO MUCH WASTED MEMORY REWRITES>?
-		UpdateGameGrid();
         UpdateCellPositions();
+		UpdateGameGrid();
     }
 
 	public void UpdateGameGrid()
@@ -65,7 +65,11 @@ public partial class DC_GameGrid : NetworkBehaviour
             newCell.cellPos = new Vector3( y - offset, 0f, -(x - offset ));
 
             cells[i] = newCell;
+
+			cells.Dirty(i);
         }
+
+		RpcWasGridUpdate();
     }
 
 	public int GetPosInt(int x, int y)
@@ -109,6 +113,8 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 				oldCell.player = null;
 				cells[oldPos] = oldCell;
+
+				cells.Dirty(oldPos);
 			}			
 		}
 
@@ -118,6 +124,8 @@ public partial class DC_GameGrid : NetworkBehaviour
 		GameGridCell cell = cells[pos];
 		cell.player = playerO;
 		cells[pos] = cell;
+
+		cells.Dirty(pos);
 
 		player.RpcUpdatePosition(cell.cellPos);
 
@@ -143,7 +151,9 @@ public partial class DC_GameGrid : NetworkBehaviour
 		else
 			cell.player = null;
 
-		cells[pos] = cell;
+		cells.Dirty(pos);
+
+		RpcWasGridUpdate();
 	}
 
 	// Client-Side Commands (Run on Client's Instance)

@@ -82,10 +82,9 @@ public partial class DC_Game : NetworkBehaviour
         gameGridSize = size;
         gameGrid.gridCellSize = size;
 
-        
-        gameGrid.UpdateCellPositions();
-        
         gameGrid.UpdateGameGrid();
+        gameGrid.UpdateCellPositions();
+
         gameGrid.RpcUpdateGameGrid();
     }
 

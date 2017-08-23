@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1208198207106888}
+  m_IsPrefabParent: 1
+--- !u!1 &1208198207106888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4318615637580154}
+  - component: {fileID: 114942157145338380}
+  - component: {fileID: 114884720700846140}
+  m_Layer: 0
+  m_Name: DC_Avatar_Test_Tool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4318615637580154
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208198207106888}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114884720700846140
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208198207106888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89dfde06e94390b4bab49741b5974dac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerMinPull: 0.15
+  triggerMinClick: 1
+  player: {fileID: 0}
+  avatar: {fileID: 0}
+  cleared: 1
+  trigger: 0
+  touchX: 0
+  touchY: 0
+  touch: 0
+  touchClick: 0
+  gripButton: 0
+  playerO: {fileID: 0}
+  avatarO: {fileID: 0}
+  hand: 0
+  triggerPull: 0
+  triggerClick: 0
+  laserOne: {r: 0, g: 0, b: 1, a: 1}
+  laserTwo: {r: 1, g: 0, b: 0, a: 1}
+  maxLaserDistance: 1000
+--- !u!114 &114942157145338380
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208198207106888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 137
+    i1: 218
+    i2: 250
+    i3: 106
+    i4: 4
+    i5: 116
+    i6: 121
+    i7: 116
+    i8: 42
+    i9: 18
+    i10: 145
+    i11: 75
+    i12: 250
+    i13: 32
+    i14: 120
+    i15: 87
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 1

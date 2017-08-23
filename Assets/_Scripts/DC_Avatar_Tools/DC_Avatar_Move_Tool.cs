@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base 
+[RequireComponent(typeof(LineRenderer))]
+public class DC_Avatar_Move_Tool : DC_Avatar_Tool
 {
+    // Client-Side Variables
     public LayerMask hitLayers;
 
     [Space(10)]
@@ -27,15 +30,23 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
     public float beamJut = 0.2f;
 
-    [Range(0f, 1f)]
-    public float velPoint = 0.75f;
+    [Range(0f, 1f)] public float velPoint = 0.75f;
 
     [Space(10)]
 
     public Color canMoveColor = Color.green;
     public Color cannotMoveColor = Color.red;
 
-    private bool moving = false;
+    [Space(10)]
+
+    // Server-Side Variables
+
+    [SyncVar] public bool moving = false;
+
+    [SyncVar] public Vector3 movePoint = Vector3.zero;
+
+
+    // Private Client-Side Variables
     private bool canMove = false;
     private bool seeking = false;
     private bool retracting = false;
@@ -44,7 +55,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     private float movePointDistance = 0f;
     private float currentRetract = 0f;
 
-    public Vector3 movePoint = Vector3.zero;
+    private Vector3 localMovePoint = Vector3.zero;
     private Vector3 targetPoint = Vector3.zero;
     private Vector3 spacePoint;
 
@@ -53,33 +64,71 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
     private LineRenderer lineR;
     private DC_Avatar_MoveBeam moveB;
 
+    // Private Server-Side Variables
+
+
     void Start()
     {
         lineR = GetComponent<LineRenderer>();
     }
 
-    public override void ClientStart()
+    public override void OnStartClient()
     {
         moveB = new DC_Avatar_MoveBeam(moveBeamRemoteRes);
     }
 
-    public override void AuthorityStart()
+    public override void OnStartAuthority()
     {
         moveB = new DC_Avatar_MoveBeam(moveBeamLocalRes);
     }
 
-    public override void ServerUpdate()
+    void Update() 
+    {
+        if(isClient)
+            ClientUpdate();
+        else if(isServer)
+            ServerUpdate();
+
+    }
+
+    public void ServerUpdate()
     {
 
     }
 
-    public override void ClientUpdate()
+    public void ClientUpdate()
     {
         if(hasAuthority)
             UpdateMovement();
 
         if(moving)
             UpdateMoveBeam();
+        else if(lineR.enabled)
+            lineR.enabled = false;
+    }
+
+    public void UpdateMoveBeam()
+    {
+        if(!lineR.enabled)
+            lineR.enabled = true;
+
+        var start = transform;
+
+        var st = start.position;
+        var jut = start.position + (start.forward * beamJut);
+
+        var spaceP = spacePoint;
+
+        if(spaceP == Vector3.zero)
+            spaceP = transform.position;
+
+        var vel = Vector3.Lerp(spaceP, movePoint, velPoint);
+
+        var end = movePoint;
+
+        moveB.UpdateBeam(st, jut, vel, end);
+        lineR.positionCount = moveB.resolution;
+        lineR.SetPositions(moveB.UpdateLinePoints());
     }
 
     void UpdateMovement()
@@ -89,12 +138,20 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             if(!moving)
                 UpdateMovePoint();
 
-            seeking = true;
+            if(!moving && !seeking)
+                seeking = true;
 
-            if(trigger == 1f && !moving && canMove && !moveBlock)
-                moving = true;
-            else if(trigger == 1f && !moving && !canMove && !moveBlock)
-                moveBlock = true;
+            if(trigger == 1f && !moving && !moveBlock) 
+            {
+                if(canMove)
+                {
+                    CmdSetMovePoint(localMovePoint);
+                    CmdStartMove();
+                }
+                    
+                else
+                    moveBlock = true;
+            }
 
             if(moveBlock && trigger < 0.97f)
                 moveBlock = false;
@@ -111,19 +168,6 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                 if(currentRetract < 0)
                     currentRetract = 0;
             }
-
-            if(currentRetract > 0)
-            {
-                movePointDistance -= currentRetract * Time.deltaTime;
-                if(movePointDistance < 0)
-                {
-                    movePointDistance = 0f;
-                    moveBlock = true;
-
-                    moving = false;
-                    avatar.ResetVelocity();
-                }
-            }
         }
         else
         {
@@ -131,7 +175,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
                 seeking = false;
 
             if(moving)
-                moving = false;
+                CmdStopMove();
         }
 
         if(seeking && !moving)
@@ -148,38 +192,48 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
         {
             UpdateTargetPoint();
 
+            if(currentRetract > 0)
+            {
+                movePointDistance -= currentRetract * Time.deltaTime;
+                if(movePointDistance < 0)
+                {
+                    movePointDistance = 0f;
+                    moveBlock = true;
+
+                    avatar.StopMove();
+                    avatar.ResetVelocity();
+                }
+            }
+
             if(!avatar.inMove)
-                avatar.CmdStartMove();
+                avatar.StartMove();
 
             avatar.MoveTo(targetPoint, spacePoint);
         }
         else
         {
-            if(lineR.enabled)
-                lineR.enabled = false;
-
             if(avatar.inMove)
-                avatar.CmdStopMove();
+                avatar.StopMove();
         }
     }
 
     void UpdateMovePoint()
     {
-        var ht = paw.transform;
+        var ht = transform;
 
         Ray ray = new Ray(ht.position, ht.forward);
         RaycastHit hit;
 
         if(Physics.Raycast(ray, out hit, maxMoveDistance, hitLayers))
         {
-            movePoint = hit.point;
+            localMovePoint = hit.point;
             movePointDistance = hit.distance;
             canMove = true;
         }
         else
         {
-            if(movePoint != Vector3.zero)
-                movePoint = Vector3.zero;
+            if(localMovePoint != Vector3.zero)
+                localMovePoint = Vector3.zero;
 
             if(movePointDistance != 0)
                 movePointDistance = 0f;
@@ -190,7 +244,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
     void UpdateTargetPoint()
     {
-        var ht = paw.transform;
+        var ht = transform;
         var at = avatar.transform;
 
         spacePoint = movePoint - (ht.forward * movePointDistance);
@@ -206,25 +260,6 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
             dist = cushionSize;
         
         targetPoint = dir * ( (dist / cushionSize) * maxMoveSpeed);
-    }
-
-    public void UpdateMoveBeam()
-    {
-        if(!lineR.enabled)
-            lineR.enabled = true;
-
-        var start = paw.transform;
-
-        var st = start.position;
-        var jut = start.position + (start.forward * beamJut);
-
-        var vel = Vector3.Lerp(spacePoint, movePoint, velPoint);
-
-        var end = movePoint;
-
-        moveB.UpdateBeam(st, jut, vel, end);
-        lineR.positionCount = moveB.resolution;
-        lineR.SetPositions(moveB.UpdateLinePoints());
     }
 
     void UpdateLaser()
@@ -271,7 +306,7 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
         l.transform.localScale = new Vector3(0.05f, 0.05f, 0f);
 
-        l.transform.parent = paw.transform;
+        l.transform.parent = transform;
 
         l.transform.localPosition = Vector3.zero;
         l.transform.localEulerAngles = Vector3.zero;
@@ -283,6 +318,25 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool_Base
 
         l.SetActive(false);
     }
+
+    // Server-Side Commands
+
+    [Command] public void CmdSetMovePoint(Vector3 pos)
+    {
+        movePoint = pos;
+    }
+
+    [Command] public void CmdStartMove()
+    {
+        moving = true;
+    }
+
+    [Command] public void CmdStopMove()
+    {
+        moving = false;
+    }
+
+    // Client-Side Commands
 }
 
 [System.Serializable]
