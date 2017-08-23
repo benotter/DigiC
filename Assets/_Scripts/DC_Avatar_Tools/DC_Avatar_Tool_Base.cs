@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_Avatar_Tool_Base : MonoBehaviour 
+public class DC_Avatar_Tool_Base : MonoBehaviour
 {	
+	public int toolIndex = 0;
+	
 	public DC_Avatar avatar;
 	public GameObject paw;
+
+	[Space(10)]
 
 	public PlayerTool.Hand hand;
 
@@ -32,6 +36,9 @@ public class DC_Avatar_Tool_Base : MonoBehaviour
 	
 	[HideInInspector]
 	public bool cleared = true;
+
+	[HideInInspector]
+	public bool hasAuthority = false;
 
 	public void UpdateState(DC_AvatarSync_Handle handle)
 	{
@@ -64,4 +71,13 @@ public class DC_Avatar_Tool_Base : MonoBehaviour
 
 		cleared = true;
 	}
+
+	public virtual void ClientStart() {}
+
+	public virtual void AuthorityStart() {}
+	public virtual void ServerStart() {}
+
+	public virtual void ToolUpdate() {}
+	public virtual void ClientUpdate() {}
+	public virtual void ServerUpdate() {}	
 }

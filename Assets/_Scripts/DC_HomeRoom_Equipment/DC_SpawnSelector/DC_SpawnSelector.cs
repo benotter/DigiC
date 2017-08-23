@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_SpawnSelector : MonoBehaviour 
+public class DC_SpawnSelector : DC_HR_Equipment_Base 
 {
 	public DC_HomeRoom homeRoom;
 	public DC_GameGrid gameGrid;
@@ -12,7 +12,12 @@ public class DC_SpawnSelector : MonoBehaviour
 	public DC_SpawnSelector_Handle handle;
 	public DC_SpawnSelector_Marker marker;
 
-	private DC_Avatar_Spawn avatarSpawn;
+	[Space(10)]
+
+	public float padding = 2;
+
+	[HideInInspector]
+	public DC_Avatar_Spawn avatarSpawn;
 
 	private Vector3 spawnPoint = Vector3.zero;
 
@@ -20,8 +25,14 @@ public class DC_SpawnSelector : MonoBehaviour
 	{
 		if(!marker.lockedIn)
 		{
+			float halfSize = gameGrid.gridCellSize / 2;
+				  
 			var p = homeRoom.transform.position;
-			spawnPoint = new Vector3(p.x, gameGrid.transform.position.y + 0.3f, p.z);
+
+			float newX = p.x + ( (halfSize - padding) * marker.xPos );
+			float newZ = p.z + ( (halfSize - padding) * marker.zPos );
+
+			spawnPoint = new Vector3(newX, gameGrid.transform.position.y + 0.3f, newZ);
 
 			if(avatarSpawn)
 				avatarSpawn.SetPosition(spawnPoint);
@@ -48,16 +59,16 @@ public class DC_SpawnSelector : MonoBehaviour
 	{
 		avatarSpawn = avaS;
 
-		if(avaS)
-		{
-			handle.toolEnabled = true;
-		}
-		else 
+		if(!avaS)
 		{
 			if(handle.inUse)
 				handle.StopUse(handle.pTool);
 
 			handle.toolEnabled = false;
+		}
+		else 
+		{
+			handle.toolEnabled = true;
 		}
 	}
 }

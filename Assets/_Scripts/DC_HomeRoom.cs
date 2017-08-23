@@ -53,28 +53,58 @@ public class DC_HomeRoom : MonoBehaviour
         }
 
         playerPedestal.TogglePlayerActive(!!player);
+
+        (gameManager as DC_HR_Equipment_Base).OnJoinGame();
+        (playerPedestal as DC_HR_Equipment_Base).OnJoinGame();
+        (avatarSync as DC_HR_Equipment_Base).OnJoinGame();
+        (gridSelector as DC_HR_Equipment_Base).OnJoinGame();
+        (spawnSelector as DC_HR_Equipment_Base).OnJoinGame();
     }
 
-    public void SetAvatar(DC_Avatar ava)
+    public void SetAvatar(DC_Avatar ava = null)
     {
         avatar = ava;
+        avatarSync.SetAvatar(ava);
 
         if(ava)
-        {
             avatarGO = ava.gameObject;
-
-            avatarSync.SetAvatar(avatar);
-        }
+        else
+            avatarGO = null;
     }
 
-    public void SetAvatarSpawn(DC_Avatar_Spawn avaS)
+    public void SetAvatarSpawn(DC_Avatar_Spawn avaS = null)
     {
         avatarSpawn = avaS;
-        avatarSpawnGO = avaS.gameObject;
+        spawnSelector.SetAvatarSpawn(avaS);
+
+        if(avaS)
+            avatarSpawnGO = avaS.gameObject;
+        else
+            avatarSpawnGO = null;        
     }
 
     public void SetPosition(Vector3 pos)
     {
         transform.position = pos;
+    }
+
+    public void GameStart()
+    {
+
+    }
+
+    public void GameEnd()
+    {
+
+    }
+
+    public void RoundStart()
+    {
+
+    }
+
+    public void RoundEnd()
+    {
+        
     }
 }

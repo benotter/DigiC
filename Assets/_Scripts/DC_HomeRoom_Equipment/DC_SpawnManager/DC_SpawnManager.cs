@@ -2,19 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_SpawnManager : MonoBehaviour 
+public class DC_SpawnManager : DC_HR_Equipment_Base 
 {
-	public DC_SpawnManager_SpawnAvatar spawnAvatar;
-	public DC_SpawnManager_LockSpawn lockSpawn;
 
-	void Start () 
-	{
-		
-	}
-	
-	
-	void Update () 
-	{
-		
-	}
 }

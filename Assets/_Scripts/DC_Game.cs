@@ -5,7 +5,14 @@ using UnityEngine.Networking;
 
 public partial class DC_Game : NetworkBehaviour 
 {
-
+    public enum Team 
+    {
+        None,
+        RedTeam,
+        BlueTeam,
+        CPUTeam,
+        OtterCo,
+    }
     // Client Variables
 
     public DC_HomeRoom homeRoom;
@@ -54,6 +61,12 @@ public partial class DC_Game : NetworkBehaviour
     [SyncVar]
     public float gameGridSize = 20;
 
+    [SyncVar]
+    public DC_Game_Round currentRound;
+
+    [SyncVar]
+    public DC_Game_ScoreCard scoreCard;
+
 
     // Private Client Variables
     private bool setupGameRoomSinceLastRound = false;
@@ -74,6 +87,23 @@ public partial class DC_Game : NetworkBehaviour
         
         gameGrid.UpdateGameGrid();
         gameGrid.RpcUpdateGameGrid();
+    }
+
+    public void RequestPoints(DC_Player player, DC_Game_ScoreCard.PointType type)
+    {
+        int scoreAdd = 0;
+        switch(type)
+        {
+            case DC_Game_ScoreCard.PointType.Chord:
+                scoreAdd = scoreCard.chord;
+            break;
+
+            case DC_Game_ScoreCard.PointType.Goal:
+                scoreAdd = scoreCard.goal;
+            break;
+        }
+
+        player.currentScore += scoreAdd;
     }
 
     public void RequestAvatarSpawn(DC_Player player)
@@ -106,7 +136,18 @@ public partial class DC_Game : NetworkBehaviour
             if(aS && aS.lockedIn)
             {
                 GameObject avatarO = Instantiate(avatarPrefab);
+
+                if(!avatarO || !player || !player.gameObject)
+                {
+                    Debug.Log("Fucked up Spawn!");
+                    return;
+                }
+                    
                 NetworkServer.SpawnWithClientAuthority(avatarO, player.gameObject);
+
+                if(!avatarO)
+                    return;
+                    
                 DC_Avatar avatar = avatarO.GetComponent<DC_Avatar>();
 
                 avatar.playerO = player.gameObject;
@@ -197,4 +238,39 @@ public partial class DC_Game : NetworkBehaviour
             homeRoom.SetRemotePlayer(remotePlayer);
         }
     }
+}
+
+[System.Serializable]
+public struct DC_Game_Round
+{
+    public enum GameType
+    {
+        FFA, // Free-For-All
+        TVT, // Team-VS-Team
+        TVC // Team-VS-Computer
+    }
+
+    public float startTime;
+    public float duration;
+
+    public float timeLeft;
+
+    public int redScore;
+    public int blueScore;
+
+    public GameObject topPlayer;
+    public int topPlayerScore;
+}
+
+[System.Serializable]
+public class DC_Game_ScoreCard 
+{
+    public enum PointType
+    {
+        Goal,
+        Chord,
+    }
+
+    public int goal = 150;
+    public int chord = 25;
 }

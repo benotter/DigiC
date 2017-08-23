@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_Player_Pedestal : MonoBehaviour 
+public class DC_Player_Pedestal : DC_HR_Equipment_Base 
 {
 	public GameObject point;
 
@@ -18,5 +18,16 @@ public class DC_Player_Pedestal : MonoBehaviour
 	public void TogglePlayerActive(bool yes = false)
 	{
 		point.SetActive(playerActive = yes);
+	}
+	
+
+	public override void OnJoinGame()
+	{
+		TogglePlayerActive(true);
+	}
+
+	public override void OnLeaveGame()
+	{
+		TogglePlayerActive(false);
 	}
 }

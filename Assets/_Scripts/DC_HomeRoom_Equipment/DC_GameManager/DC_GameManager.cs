@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_GameManager : MonoBehaviour 
+public class DC_GameManager : DC_HR_Equipment_Base 
 {
 	public DC_Director director;
 

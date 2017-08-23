@@ -15,10 +15,12 @@ public class DC_SpawnSelector_Handle : SubToolBase
 
 	private bool used = false;
 
+	private bool avatarRequested = false;
+
 	void Start()
 	{
-		startY = transform.position.y;
-		startRot = transform.rotation;
+		startY = transform.localPosition.y;
+		startRot = transform.localRotation;
 	}
 
 	void Update()
@@ -27,6 +29,15 @@ public class DC_SpawnSelector_Handle : SubToolBase
 
 		if(inUse && !used)
 			used = true;
+
+		if(inUse && spawnSelector.homeRoom.remotePlayer && !spawnSelector.avatarSpawn && !avatarRequested)
+		{
+			avatarRequested = true;
+			spawnSelector.homeRoom.remotePlayer.CmdRequestAvatarSpawn();
+		}
+
+		if(avatarRequested && spawnSelector.avatarSpawn)
+			avatarRequested = false;
 
 		if(!inUse && used)
 		{
@@ -46,7 +57,5 @@ public class DC_SpawnSelector_Handle : SubToolBase
 
 		if(touchClick && !marker.lockedIn)
 			marker.Lock();
-		else if(!touchClick && marker.lockedIn)
-			marker.UnLock();
 	}
 }

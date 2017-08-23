@@ -6,6 +6,10 @@ using UnityEngine.Networking;
 public partial class DC_Player : NetworkBehaviour
 {
     // Local Variables (Set for Each Clients Specific Instances)
+
+    public bool aLocalPlayer = false;
+
+    [Space(10)]
 	public DC_GameGrid gameGrid;
 	public DC_HomeRoom homeRoom;
 
@@ -50,12 +54,17 @@ public partial class DC_Player : NetworkBehaviour
 	[SyncVar]
 	public int gameGridY = 0;
 
+    [Space(10)]
+
+    [SyncVar]
+    public int currentScore = 0;
+
+    [SyncVar]
+    public DC_Game.Team currentTeam = DC_Game.Team.None;
+
+
     // Private Client-Side Variables
-
-    private bool posHomeRoomDirty = false;
-    private bool posAvatarSpawnDirty = false;
-
-
+    
 	void Start () 
 	{
 		
@@ -64,7 +73,9 @@ public partial class DC_Player : NetworkBehaviour
     public override void OnStartAuthority()
     {
         if(remoteDisplay)
-            remoteDisplay.SetActive(false);
+            remoteDisplay.GetComponent<MeshRenderer>().enabled = false;
+
+        aLocalPlayer = true;
     }
 	
 	void Update () 
@@ -82,25 +93,27 @@ public partial class DC_Player : NetworkBehaviour
 
     public void UpdateClient()
     {
-        if(hasAuthority)
-        {
-            if(posHomeRoomDirty && homeRoom)
-            {
-                homeRoom.SetPosition(transform.position);
 
-                posHomeRoomDirty = false;
-            }
-            
-            if(posAvatarSpawnDirty && avatarSpawn && gameGrid)
-            {
-                var p = transform.position;
-                avatarSpawn.SetPosition(new Vector3(p.x, gameGrid.transform.position.y + 0.3f, p.z));
-                avatarSpawn.Lock();
-            }
-        }
     }
 
     // Server-Side Commands (Run on Server's Instance of Object)
+    [Command]
+    public void CmdSetPlayerName(string name)
+    {
+        playerName = name;
+    }
+
+    [Command]
+    public void CmdRequestChord()
+    {
+        serverGame.RequestPoints(this, DC_Game_ScoreCard.PointType.Chord);
+    }
+
+    [Command]
+    public void CmdRequestGoal()
+    {
+        serverGame.RequestPoints(this, DC_Game_ScoreCard.PointType.Goal);
+    }
 
     [Command]
     public void CmdRequestAvatarSpawn()
@@ -128,23 +141,19 @@ public partial class DC_Player : NetworkBehaviour
             gameGrid.SetPosition(this.gameObject, x, y);
     }
 
-    [Command]
-    public void CmdSetPlayerName(string name)
-    {
-        playerName = name;
-    }
-
     // Client-Side Commands (Run on Client's Instance of Object)
 
     [ClientRpc]
     public void RpcSetGame(GameObject serverGameO)
     {
+        DC_Game sGame = serverGameO.GetComponent<DC_Game>();
+
+        gameGrid = sGame.gameGrid;
+        serverGame = sGame;
+
         if(hasAuthority)
         {
-            DC_Game sGame = serverGameO.GetComponent<DC_Game>();
-
-            homeRoom = sGame.homeRoom;
-            gameGrid = sGame.gameGrid;
+            homeRoom = sGame.homeRoom;    
             localPlayer = sGame.localPlayer;
         }
     }
@@ -153,32 +162,37 @@ public partial class DC_Player : NetworkBehaviour
     public void RpcSetAvatarSpawn(GameObject aS)
     {
         var avaS = aS.GetComponent<DC_Avatar_Spawn>();
-
         avatarSpawn = avaS;
-        
-        avaS.SetPlayer(gameObject);
-        homeRoom.SetAvatarSpawn(avaS);
+    
+        if(hasAuthority)
+        {
+            avaS.SetPlayer(gameObject);
+            homeRoom.SetAvatarSpawn(avaS);
+        }
     }
 
     [ClientRpc]
     public void RpcSetAvatar(GameObject a)
     {
         var ava = a.GetComponent<DC_Avatar>();
-
-        ava.SetLocalPlayer(localPlayer);
-
         avatar = ava;
-        homeRoom.SetAvatar(ava);
-        
-        ava.UpdateBody();
+
+        if(hasAuthority)
+        {
+            ava.SetLocalPlayer(localPlayer);
+            homeRoom.SetAvatar(ava);
+            ava.UpdateBody();
+        }
     }
 
     [ClientRpc]
-    public void RpcSetPosition(Vector3 pos)
+    public void RpcUpdatePosition(Vector3 pos)
     {
         transform.position = pos;
 
         if(hasAuthority)
-            posHomeRoomDirty = true;
+        {
+            homeRoom.SetPosition(transform.position);
+        }
     }
 }

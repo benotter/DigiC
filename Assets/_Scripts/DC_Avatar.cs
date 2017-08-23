@@ -11,7 +11,6 @@ public partial class DC_Avatar : NetworkBehaviour
     public DC_Avatar_Tool_Base rightTool;
     public DC_Avatar_Tool_Base leftTool;
 
-
     [Space(10)]
 
     public Camera avatarCam;
@@ -38,13 +37,27 @@ public partial class DC_Avatar : NetworkBehaviour
 
     [Space(10)]
 
+    public GameObject[] toolList = new GameObject[0];
+    public bool toolsSetup = false;
+
+    [Space(10)]
+
     // Server-Side Variables
 
     [SyncVar]
     public GameObject playerO;
 
+
     [Space(10)]
 
+    [SyncVar]
+    public GameObject rightToolO;
+
+    [SyncVar]
+    public GameObject leftToolO;
+    
+
+    [Space(10)]
 
     [SyncVar]
     public float gravity = 1f;
@@ -88,36 +101,61 @@ public partial class DC_Avatar : NetworkBehaviour
 
     private CollisionFlags lastColFlags;
 
+    public void SetupTools()
+    {
+        if(toolsSetup)
+            return;
+            
+        Transform toolO = transform.Find("Tools");
 
-    private LineRenderer lineR;
-    private DC_Avatar_MoveBeam moveB;
+        if(!toolO)
+            return;
 
-    [HideInInspector]
-    public Vector3 moveBeamTarget;
+        toolList = new GameObject[toolO.childCount];
 
-    // Private Server-Side Variables
+        int toolC = 0;
 
-    [SyncVar]
-    private Vector3 moveBeamPoint = Vector3.zero;
+        foreach(Transform toolT in toolO)
+        {
+            var tool = toolT.gameObject.GetComponent<DC_Avatar_Tool_Base>();
+            if(tool)
+            {
+                tool.toolIndex = toolC;
+                toolList[toolC++] = tool.gameObject;
+            }
+        }
 
-    [SyncVar]
-    private bool moveBeamRightH = true;
+        toolsSetup = true;
+    }
 
     public override void OnStartServer()
     {
         // coll = GetComponent<CharacterController>();
+
+        SetupTools();
+
+        // foreach(GameObject toolO in toolList)
+        // {
+        //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
+        //     if(tool)
+        //         tool.ServerStart();
+        // }
     }
 
     public override void OnStartClient()
     {
-        lineR = GetComponent<LineRenderer>();
-        moveB = new DC_Avatar_MoveBeam(moveBeamRemoteRes);
+        SetupTools();
+
+        // foreach(GameObject toolO in toolList)
+        // {
+        //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
+        //     if(tool)
+        //         tool.ClientStart();
+        // }
     }
 
     public override void OnStartAuthority()
     {
-        moveB = new DC_Avatar_MoveBeam(moveBeamLocalRes);
-
         avatarCam.enabled = true;
 
         var layer = LayerMask.NameToLayer("Avatar_Local");
@@ -127,31 +165,19 @@ public partial class DC_Avatar : NetworkBehaviour
 
         coll = GetComponent<CharacterController>();
 
-        if(rightTool)
-            SetAvatarTool(rightTool, 0);
-        
-        if(leftTool)
-            SetAvatarTool(leftTool, 1);
+        SetupTools();
+
+        // foreach(GameObject toolO in toolList)
+        // {
+        //     var tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
+        //     if(tool)
+        //         tool.AuthorityStart();
+        // }
     }
+
     public override void OnStopAuthority()
     {
         avatarCam.enabled = false;
-    }
-
-    public void MoveTo(Vector3 worldPoint)
-    {
-        targetMove += worldPoint;
-    }
-
-    public void MoveTo(Vector3 worldPoint, Vector3 moveTarget)
-    {
-        moveBeamTarget = moveTarget;
-        MoveTo(worldPoint);
-    }
-
-    public void ResetVelocity()
-    {
-        currentVelocity = Vector3.zero;
     }
 
 	void Update()
@@ -165,6 +191,12 @@ public partial class DC_Avatar : NetworkBehaviour
     void ServerUpdate()
     {
         // UpdateCharacterController();
+
+        if(rightTool)
+            rightTool.ServerUpdate();
+
+        if(leftTool)
+            leftTool.ServerUpdate();
     }
 
     void ClientUpdate()
@@ -206,42 +238,17 @@ public partial class DC_Avatar : NetworkBehaviour
                     moveVelocity = Vector3.zero;
                 }
             }
-        }
 
-        if(hasAuthority)
             UpdatePosition();
+        }   
 
-        UpdateMoveBeam();
+        if(rightTool)
+            rightTool.ClientUpdate();
+
+        if(leftTool)
+            leftTool.ClientUpdate();
     }
 
-    public void UpdateMoveBeam()
-    {
-        if(inMove)
-        {
-            if(!lineR.enabled)
-                lineR.enabled = true;
-
-            var start = moveBeamRightH && !controllersFlipped ? 
-                rightPaw.transform : leftPaw.transform;
-
-
-            var st = start.position;
-            var jut = start.position + (start.forward * beamJut);
-
-            var vel = Vector3.Lerp(moveBeamTarget, moveBeamPoint, velPoint);
-
-            var end = moveBeamPoint;
-
-            moveB.UpdateBeam(st, jut, vel, end);
-            lineR.positionCount = moveB.resolution;
-            lineR.SetPositions(moveB.UpdateLinePoints());
-        }
-        else
-        {
-            if(lineR.enabled)
-                lineR.enabled = false;
-        }
-    }
     public void UpdatePosition()
     {
         if(!inMove && (lastColFlags & CollisionFlags.Below) == 0)
@@ -331,6 +338,21 @@ public partial class DC_Avatar : NetworkBehaviour
         }    
     }
 
+    public void MoveTo(Vector3 worldPoint)
+    {
+        targetMove += worldPoint;
+    }
+
+    public void MoveTo(Vector3 worldPoint, Vector3 moveTarget)
+    {
+        MoveTo(worldPoint);
+    }
+
+    public void ResetVelocity()
+    {
+        currentVelocity = Vector3.zero;
+    }
+
     public void SetLocalPlayer(DC_LocalPlayer p = null)
     {
         localPlayer = p;
@@ -338,31 +360,7 @@ public partial class DC_Avatar : NetworkBehaviour
 
     public void SetAvatarTool(DC_Avatar_Tool_Base tool = null, int hand = 0)
     {
-        GameObject handO;
-        if(hand == 0)
-        {
-            if(rightTool)
-                rightTool.gameObject.SetActive(false);
-                
-            rightTool = tool;
-            handO = rightPaw;
-        }
-        else
-        {
-            if(leftTool)
-                leftTool.gameObject.SetActive(false);
-
-            leftTool = tool;
-            handO = leftPaw;
-        }
         
-        if(tool && tool.avatar != this)
-        {
-            tool.avatar = this;
-            tool.paw = handO;
-
-            tool.gameObject.SetActive(true);
-        }
     }
 
     public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
@@ -402,15 +400,33 @@ public partial class DC_Avatar : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSetMoveBeamPoint(Vector3 point)
+    public void CmdSetAvatarTool(int toolIndex, int hand)
     {
-        moveBeamPoint = point;
+        GameObject tool = toolList[toolIndex];
+
+        if(hand == 0)
+        {
+            if(rightToolO)
+                rightToolO.SetActive(false);
+
+            rightToolO = tool;
+        }
+        else
+        {
+            if(leftToolO)
+                leftToolO.SetActive(false);
+
+            leftToolO = tool;
+        }
+
+        RpcSetAvatarTool(toolIndex, hand);
     }
 
     [Command]
-    public void CmdSetMoveBeamHand(bool right)
+    public void CmdSetToolAuthority()
     {
-        moveBeamRightH = right;
+        // foreach(Transform child in transform.Find("Tools"))
+        //     NetworkServer.SpawnWithClientAuthority(child.gameObject, playerO);
     }
 
     // Client-Side Commands
@@ -420,75 +436,50 @@ public partial class DC_Avatar : NetworkBehaviour
     {
         transform.position = pos;
     }
+
+    [ClientRpc]
+    public void RpcSetAvatarTool(int toolIndex, int hand)
+    {
+        GameObject toolO = toolList[toolIndex];
+        DC_Avatar_Tool_Base tool = toolO.GetComponent<DC_Avatar_Tool_Base>();
+
+        GameObject handO;
+
+        if(hand == 0)
+        {
+            if(rightTool)
+                rightTool.gameObject.SetActive(false);
+        
+            rightTool = tool;
+            handO = rightPaw;
+        }
+        else
+        {
+            if(leftTool)
+                leftTool.gameObject.SetActive(false);
+
+            leftTool = tool;
+            handO = leftPaw;
+        }
+
+        if(tool)
+        {
+            tool.avatar = this;
+            tool.paw = handO;
+
+            tool.hasAuthority = hasAuthority;
+
+            tool.gameObject.SetActive(true);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcClearTool(int hand)
+    {
+        if(hand == 0)
+            rightToolO = null;
+        else
+            rightToolO = null;
+    }
 }
 
-[System.Serializable]
-public class DC_Avatar_MoveBeam
-{
-    public int resolution;
-
-    public Vector3[] linePoints;
-    public Vector3[] pN = new Vector3[] 
-    {
-        Vector3.zero,
-        Vector3.zero,
-        Vector3.zero,
-        Vector3.zero,
-        Vector3.zero,
-        Vector3.zero,
-        Vector3.zero,
-    };
-
-    public DC_Avatar_MoveBeam(int resolution = 2)
-    {
-        this.resolution = resolution;
-        linePoints = new Vector3[resolution];
-    }
-
-    // The Double-ups ensures sharp straight lines with the Bezier curves
-    public void UpdateBeam(Vector3 startPos, Vector3 jut, Vector3 vel, Vector3 endPos)
-    {
-        pN[0] = startPos;
-        pN[1] = startPos;
-
-        pN[2] = jut;
-        pN[3] = jut;
-
-        pN[4] = vel;
-
-        pN[5] = endPos;
-        pN[6] = endPos;
-
-    }
-    public Vector3[] UpdateLinePoints()
-    {
-        for(int i = 0; i < resolution; i++)
-            linePoints[i] = BezierNOpt(pN, ( (float) i / (float) resolution ) );
-
-        return linePoints;
-    }
-
-    public void UpdateResolution(int res)
-    {
-        resolution = res;
-        linePoints = new Vector3[res];
-    }
-
-    Vector3 BezierNOpt(Vector3 [] pN, float prog, Vector3 [] wrkCpy = null, int indOff = -1)
-	{
-		if(wrkCpy == null)
-		{
-			indOff = pN.Length;
-			wrkCpy = new Vector3[pN.Length];
-			pN.CopyTo(wrkCpy, 0);	
-		}
-
-		if(indOff == 1)
-			return wrkCpy[0];
-
-		for(int i = 0; i < indOff - 1; i++)
-			wrkCpy[i] = Vector3.Lerp(wrkCpy[i], wrkCpy[i + 1], prog);
-		
-		return BezierNOpt(null, prog, wrkCpy, indOff - 1);
-	}
-}

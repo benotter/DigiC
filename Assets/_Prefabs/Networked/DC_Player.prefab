@@ -21,7 +21,8 @@ GameObject:
   - component: {fileID: 4702065908370460}
   - component: {fileID: 33339230821227102}
   - component: {fileID: 23490894816799976}
-  m_Layer: 0
+  - component: {fileID: 65448938543689542}
+  m_Layer: 11
   m_Name: RemoteDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,6 +113,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1824882452269182}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &65448938543689542
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1824882452269182}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.99999994, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114073761501371486
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -136,6 +149,8 @@ MonoBehaviour:
   avatarSpawnO: {fileID: 0}
   gameGridX: 0
   gameGridY: 0
+  currentScore: 0
+  currentTeam: 0
 --- !u!114 &114173493952723414
 MonoBehaviour:
   m_ObjectHideFlags: 1

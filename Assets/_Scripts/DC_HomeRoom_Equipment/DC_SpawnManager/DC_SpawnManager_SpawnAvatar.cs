@@ -6,9 +6,19 @@ public class DC_SpawnManager_SpawnAvatar : SubToolBase
 {
 	public DC_HomeRoom homeRoom;
 
+
+	private bool requestedAvatar = false;
+
 	public override void OnPress()
 	{
 		if(homeRoom.remotePlayer)
-			homeRoom.remotePlayer.CmdRequestAvatar();
+		{
+			if(!requestedAvatar)
+			{
+				homeRoom.remotePlayer.CmdRequestAvatar();
+				requestedAvatar = true;
+			}
+		}
+			
 	}
 }

@@ -24,12 +24,12 @@ public class DC_HR_Equipment_Base : MonoBehaviour
 
 	}
 
-	public virtual void OnPlayerJoined()
+	public virtual void OnJoinGame()
 	{
 
 	}
 
-	public virtual void OnPlayerLeft()
+	public virtual void OnLeaveGame()
 	{
 
 	}

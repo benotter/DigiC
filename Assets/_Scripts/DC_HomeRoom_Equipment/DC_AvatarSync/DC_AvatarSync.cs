@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public partial class DC_AvatarSync : MonoBehaviour 
+public partial class DC_AvatarSync : DC_HR_Equipment_Base 
 {
 	public DC_LocalPlayer localPlayer;
 	public GameObject hmdTriggerObj;

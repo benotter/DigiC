@@ -119,7 +119,7 @@ public partial class DC_GameGrid : NetworkBehaviour
 		cell.player = playerO;
 		cells[pos] = cell;
 
-		player.RpcSetPosition(cell.cellPos);
+		player.RpcUpdatePosition(cell.cellPos);
 
 		RpcWasGridUpdate();
 

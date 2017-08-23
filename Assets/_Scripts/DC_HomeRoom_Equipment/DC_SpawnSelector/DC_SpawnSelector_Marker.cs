@@ -26,9 +26,14 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 	public Material laserUnlocked;
 	public Material laserLocked;
 
+	[Space(10)]
 
-	[HideInInspector]
 	public bool lockedIn = false;
+
+	[Space(10)]
+
+	public float xPos = 0f;
+	public float zPos = 0f;
 
 
 	private LineRenderer lineR;
@@ -37,17 +42,16 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 	void Start() 
 	{
 		lineR = GetComponent<LineRenderer>();
-
-		startPos = transform.position;
+		startPos = transform.localPosition;
 	}
 
 	void Update()
 	{
-		if(!lockedIn)
+		if(!lockedIn && spawnSelector.avatarSpawn)
 		{
 			var rot = transform.eulerAngles;
 			rot.y += spinRate * Time.deltaTime;
-			transform.rotation = Quaternion.Euler(rot);
+			transform.localRotation = Quaternion.Euler(rot);
 		}
 	}
 
@@ -56,7 +60,10 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 		if(lockedIn)
 			return;
 
-		var newPos = markerPoint.transform.position;
+		if(!spawnSelector.avatarSpawn)
+			return;
+		
+		var newPos = markerPoint.transform.position - transform.parent.position;
 
 		var off = newPos - startPos;
 
@@ -68,7 +75,10 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 
 		newPos.y = startPos.y;
 
-		transform.position = newPos;
+		xPos = (newPos.x / xSize);
+		zPos = (newPos.z / zSize);
+
+		transform.localPosition = newPos;
 	}
 
 	public void Lock()
@@ -78,12 +88,14 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 
 		lockedIn = true;
 
-		var newP = transform.position;
+		var newP = transform.localPosition;
 		newP.y -= lockDownDist;
 
-		transform.position = newP;
+		transform.localPosition = newP;
 
 		lineR.material = laserLocked;
+
+		spawnSelector.LockedIn();
 	}
 
 	public void UnLock()
@@ -93,11 +105,13 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 
 		lockedIn = false;
 
-		var newP = transform.position;
+		var newP = transform.localPosition;
 		newP.y += lockDownDist;
 
-		transform.position = newP;
+		transform.localPosition = newP;
 
 		lineR.material = laserUnlocked;
+
+		spawnSelector.Unlocked();
 	}
 }

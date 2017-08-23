@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DC_GridSelector : MonoBehaviour 
+public class DC_GridSelector : DC_HR_Equipment_Base 
 {
 	public DC_HomeRoom homeRoom;
 	public DC_GameGrid gameGrid;
