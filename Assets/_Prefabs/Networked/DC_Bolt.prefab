@@ -199,7 +199,6 @@ MonoBehaviour:
   bustLayers:
     serializedVersion: 2
     m_Bits: 12289
-  boltLight: {fileID: 0}
   playerO: {fileID: 0}
   avatarO: {fileID: 0}
   instant: 1

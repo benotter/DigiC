@@ -6,22 +6,18 @@ public class DC_Player_Pedestal : DC_HR_Equipment_Base
 {
 	public GameObject point;
 
-	public Vector3 playerPoint;
-
-	public bool playerActive = false;
-
 	void Start () 
 	{
 		TogglePlayerActive();
 	}
 
-	public void TogglePlayerActive(bool yes = false)
+	public void TogglePlayerActive(bool active = false)
 	{
-		point.SetActive(playerActive = yes);
+		point.SetActive(active);
 	}
 	
 
-	public override void OnJoinGame()
+	public override void OnJoinGame(DC_Player p)
 	{
 		TogglePlayerActive(true);
 	}

@@ -36,18 +36,15 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 	
 	void Update () 
 	{
-		LinkUpdate();
+		canLink = (avatar && (rightHandle.inUse && leftHandle.inUse) && !linkReset);
+
 		if(linkReset && Vector3.Distance(localPlayer.HMD.transform.position, transform.position) >= relinkDistance)
 			linkReset = false;		
 
 		if(linked)
 			avatar.SyncAvatarTools(rightHandle, leftHandle);
 	}
-}
 
-// Avatar Link Stuff
-public partial class DC_AvatarSync 
-{
 	public bool canLink = false;
 	public bool linked = false;
 	public bool linkReset = false;
@@ -56,19 +53,6 @@ public partial class DC_AvatarSync
 	private Transform originalPar;
 	private Vector3 originalPos;
 	private Quaternion originalRot;
-
-
-	public void LinkUpdate()
-	{
-		canLink = (avatar && (rightHandle.inUse && leftHandle.inUse) && !linkReset);
-	}
-
-
-	public void SetAvatar(DC_Avatar a = null)
-	{
-		avatar = a;
-		screenCover.SetActive(a == null);
-	}
 
 	public void StartLink()
 	{
@@ -125,40 +109,13 @@ public partial class DC_AvatarSync
 		playerCam.depth = avatarCam.depth;
 		avatarCam.depth = depth;
 
-		var pAl = playerCam.GetComponentInChildren<AudioListener>();
-		var pEars = playerCam.GetComponentInChildren<SteamVR_Ears>();
+		bool playerCamAbove = playerCam.depth > avatarCam.depth;
 
-		var aAl = avatarCam.GetComponent<AudioListener>();
-		var aEars = avatarCam.GetComponent<SteamVR_Ears>();
+		var pAl = playerCam.GetComponentInChildren<AudioListener>().enabled = playerCamAbove;
+		var pEars = playerCam.GetComponentInChildren<SteamVR_Ears>().enabled = playerCamAbove;
 
-		if(playerCam.depth > avatarCam.depth)
-		{
-			if(aAl)
-				aAl.enabled = false;
-
-			if(aEars)
-				aEars.enabled = false;
-
-			if(pAl)
-				pAl.enabled = true;
-
-			if(pEars)
-				pEars.enabled = true;
-		}
-		else 
-		{
-			if(pAl)
-				pAl.enabled = false;
-
-			if(pEars)
-				pEars.enabled = false;
-			
-			if(aAl)
-				aAl.enabled = true;
-
-			if(aEars)
-				aEars.enabled = true;
-		}
+		var aAl = avatarCam.GetComponent<AudioListener>().enabled = !playerCamAbove;
+		var aEars = avatarCam.GetComponent<SteamVR_Ears>().enabled = !playerCamAbove;
 	}
 
 	public void AttackToHMD()
@@ -172,10 +129,21 @@ public partial class DC_AvatarSync
 	{
 		transform.parent = originalPar;
 	}
-}
 
-public partial class DC_AvatarSync 
-{
+	public override void OnGainAvatar(DC_Avatar avatar) 
+	{
+		this.avatar = avatar;
+		screenCover.SetActive(true);
+	}
+
+	public override void OnLoseAvatar()
+	{
+		if(linked)
+			StopLink();
+
+		screenCover.SetActive(false);
+	}
+
 	void OnTriggerEnter(Collider col)
 	{
 		if(col.gameObject == hmdTriggerObj)

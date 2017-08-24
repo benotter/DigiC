@@ -27,7 +27,7 @@ public class DC_SpawnSelector : DC_HR_Equipment_Base
 		{
 			float halfSize = gameGrid.gridCellSize / 2;
 				  
-			var p = homeRoom.remotePlayer.transform.position;
+			var p = homeRoom.transform.position;
 
 			float newX = p.x + ( (halfSize - padding) * marker.xPos );
 			float newZ = p.z + ( (halfSize - padding) * marker.zPos );

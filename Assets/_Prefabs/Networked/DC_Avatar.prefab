@@ -253,7 +253,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1936016119532734}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4.622}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4897218675539540}
@@ -867,6 +867,8 @@ MonoBehaviour:
   leftPaw: {fileID: 1815982558365908}
   rightTool: {fileID: 0}
   leftTool: {fileID: 0}
+  inMove: 0
+  controllersFlipped: 0
   gravity: 9.7
   drag: 0.5
   terminalVelocity: 5
@@ -874,8 +876,6 @@ MonoBehaviour:
   rightToolO: {fileID: 0}
   leftToolO: {fileID: 0}
   linked: 0
-  inMove: 0
-  controllersFlipped: 0
   moveVelocity: {x: 0, y: 0, z: 0}
   currentVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &114966533528757884

@@ -15,6 +15,8 @@ public class DC_HomeRoom : MonoBehaviour
     [Space(10)]
 
     public DC_Player remotePlayer = null;
+    public bool gameJoined = false;
+
 
     [Space(10)]
 
@@ -32,55 +34,53 @@ public class DC_HomeRoom : MonoBehaviour
     public DC_GridSelector gridSelector;
     public DC_SpawnSelector spawnSelector;
 
-
-    void Start()
+    public void RegisterGame(DC_Game game = null, DC_GameGrid grid = null) 
     {
-
+        serverGame = game;
+        gameGrid = grid;
     }
 
     public void SetRemotePlayer(DC_Player player = null)
     {
         remotePlayer = player;
+        gameJoined = !!player;
 
         if(player)
         {
-            player.homeRoom = this;
-
             player.localPlayer = localPlayer;
-            
+
+            player.homeRoom = this;
+            player.serverGame = serverGame;    
             player.gameGrid = gameGrid;
-            player.serverGame = serverGame;
+
+            JoinGame();
         }
-
-        playerPedestal.TogglePlayerActive(!!player);
-
-        (gameManager as DC_HR_Equipment_Base).OnJoinGame();
-        (playerPedestal as DC_HR_Equipment_Base).OnJoinGame();
-        (avatarSync as DC_HR_Equipment_Base).OnJoinGame();
-        (gridSelector as DC_HR_Equipment_Base).OnJoinGame();
-        (spawnSelector as DC_HR_Equipment_Base).OnJoinGame();
+        else 
+            LeaveGame();
     }
 
     public void SetAvatar(DC_Avatar ava = null)
     {
         avatar = ava;
-        avatarSync.SetAvatar(ava);
+        avatarGO = ava ? ava.gameObject : null;
 
         if(ava)
-            avatarGO = ava.gameObject;
+            GainAvatar();
         else
-            avatarGO = null;
+            LoseAvatar();
+
     }
 
     public void SetAvatarSpawn(DC_Avatar_Spawn avaS = null)
     {
         avatarSpawn = avaS;
         spawnSelector.SetAvatarSpawn(avaS);
+        avatarSpawnGO = avaS ? avaS.gameObject : null;
 
         if(avaS)
-            avatarSpawnGO = avaS.gameObject;
+            GainAvatarSpawn();
         else
-            avatarSpawnGO = null;        
+            LoseAvatarSpawn();
     }
 
     public void SetPosition(Vector3 pos)
@@ -88,23 +88,66 @@ public class DC_HomeRoom : MonoBehaviour
         transform.position = pos;
     }
 
-    public void GameStart()
+    DC_HR_Equipment_Base[] equipmentList;
+    public DC_HR_Equipment_Base[] GetEquipmentList()
     {
+        if(equipmentList == null)
+            equipmentList = new DC_HR_Equipment_Base[] 
+            {
+                (gameManager as DC_HR_Equipment_Base),
+                (playerPedestal as DC_HR_Equipment_Base),
+                (avatarSync as DC_HR_Equipment_Base),
+                (gridSelector as DC_HR_Equipment_Base),
+                (spawnSelector as DC_HR_Equipment_Base),
+            };
 
+        return equipmentList;
     }
 
-    public void GameEnd()
+    public void JoinGame() 
     {
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnJoinGame(remotePlayer);
+    }
 
+    public void LeaveGame() 
+    {
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnLeaveGame();
     }
 
     public void RoundStart()
     {
-
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnRoundStart();
     }
 
     public void RoundEnd()
     {
-        
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnRoundEnd();
+    }
+
+    public void GainAvatarSpawn() 
+    {
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnGainAvatarSpawn(avatarSpawn);
+    }
+    public void LoseAvatarSpawn() 
+    {
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnLoseAvatarSpawn();
+    }
+
+    public void GainAvatar() 
+    {
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnGainAvatar(avatar);
+    }
+
+    public void LoseAvatar()
+    {
+        foreach(DC_HR_Equipment_Base equip in GetEquipmentList())
+            equip.OnLoseAvatar();
     }
 }

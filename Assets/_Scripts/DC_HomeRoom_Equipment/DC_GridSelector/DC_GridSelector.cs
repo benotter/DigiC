@@ -13,13 +13,14 @@ public class DC_GridSelector : DC_HR_Equipment_Base
 
 	public void SetPlayerPositionOnGrid(int x, int y)
 	{
-		if(homeRoom.remotePlayer)
+		if(homeRoom.gameJoined)
 			homeRoom.remotePlayer.CmdSetGridPosition(x, y);
 	}
 
 	public void UpdateButtonState()
 	{
-		foreach(DC_GridSelector_Button button in buttons)
-			button.SetToolEnabled(gameGrid.CheckPosition(button.xPos, button.yPos));
+		if(homeRoom.gameJoined)
+			foreach(DC_GridSelector_Button button in buttons)
+				button.SetToolEnabled(gameGrid.CheckPosition(button.xPos, button.yPos));
 	}
 }

@@ -144,15 +144,15 @@ MonoBehaviour:
   serverGame: {fileID: 0}
   avatar: {fileID: 0}
   avatarSpawn: {fileID: 0}
+  serverGameO: {fileID: 0}
+  avatarO: {fileID: 0}
+  avatarSpawnO: {fileID: 0}
   playerName: Player
+  currentTeam: 0
   gameGridX: 0
   gameGridY: 0
   currentScore: 0
   chordStrucked: 0
-  currentTeam: 0
-  serverGameO: {fileID: 0}
-  avatarO: {fileID: 0}
-  avatarSpawnO: {fileID: 0}
 --- !u!114 &114173493952723414
 MonoBehaviour:
   m_ObjectHideFlags: 1

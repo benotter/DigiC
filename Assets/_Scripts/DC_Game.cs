@@ -60,9 +60,23 @@ public partial class DC_Game : NetworkBehaviour
     // Private Client Variables
     private bool setupGameRoomSinceLastRound = false;
 
+    void RegisterWithDirector()
+    {
+        GameObject director = GameObject.Find("DC_Director");
+        DC_Director dc_D;
+
+        if(director && (dc_D = director.GetComponent<DC_Director>()))
+            dc_D.RegisterServerGame(this);
+    }
+
     public override void OnStartServer()
     {
         SetGameSize(gameGridSize);
+    }
+
+    public override void OnStartClient()
+    {
+        RegisterWithDirector();
     }
 
     public void SetGameSize(float size)

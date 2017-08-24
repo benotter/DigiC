@@ -5,47 +5,79 @@ using UnityEngine.Networking;
 
 public partial class DC_Director : NetworkManager 
 {
+    [Space(10)]
+    public string gameName = "Test Game";
+    public int maxPlayers = 8;
+
+    [Space(10)]
+
     public DC_HomeRoom homeRoom;
 
     [Space(10)]
 
-    public DC_Game serverGame;
-    public DC_GameGrid gameGrid;
+    public GameObject serverGamePrefab;
+    public GameObject gameGridPrefab;
 
-    [Space(10)]
-
-    public string gameName = "Test Game";
-    public int maxPlayers = 8;
-
+    [HideInInspector] public DC_Game serverGame;
+    [HideInInspector] public DC_GameGrid gameGrid;
     
-    private GameObject serverGameO;
-    private GameObject gameGridO;
+    [HideInInspector] public GameObject serverGameO;
+    [HideInInspector] public GameObject gameGridO;
+
+    void Start()
+    {
+
+    }
+
+    public void CreateServerGame()
+    {
+        serverGameO = Instantiate(serverGamePrefab);
+        serverGame = serverGameO.GetComponent<DC_Game>();
+
+        serverGame.gameName = gameName;
+        serverGame.gameMaxPlayers = maxPlayers;
+        serverGame.gamePort = networkPort;
+        serverGame.gameAddress = networkAddress;
+    }
+
+    public void RegisterServerGame(DC_Game server)
+    {
+        server.homeRoom = homeRoom;
+        server.gameGrid = gameGrid;
+        server.localPlayer = homeRoom.localPlayer;
+
+        serverGame = server;
+        serverGameO = server.gameObject;
+    }
+
+    public void CreateGameGrid()
+    {
+        gameGridO = Instantiate(gameGridPrefab);
+        gameGrid = gameGridO.GetComponent<DC_GameGrid>();
+    }
+
+    public void RegisterGameGrid(DC_GameGrid grid)
+    {
+        grid.gridSelector = homeRoom.gridSelector;
+
+        gameGrid = grid;
+        gameGridO = grid.gameObject;
+    }
     
-
-	void Start()
-	{
-
-	}
-
-	void Update()
-	{
-        
-	}
 
     // Server-Side Callbacks
-
 	public override void OnStartHost() 
     {
-        
+        RegisterGameGrid(gameGrid);
+        RegisterServerGame(serverGame);
+
+        homeRoom.RegisterGame(serverGame, gameGrid);
     }
 
     public override void OnStartServer()
     {
-        serverGame.gamePort = networkPort;
-        serverGame.gameAddress = networkAddress;
-
-        serverGame.gameName = gameName;
-        serverGame.gameMaxPlayers = maxPlayers;
+        CreateGameGrid();
+        CreateServerGame();
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -99,7 +131,6 @@ public partial class DC_Director : NetworkManager
     }
 
     // Client-Side Callbacks
-
 	public override void OnClientConnect(NetworkConnection conn)
     {
         ClientScene.Ready(conn);
@@ -143,8 +174,6 @@ public partial class DC_Director : NetworkManager
 		networkAddress = address;
 	}
 
-    public void CreateServerGame()
-    {
+    
 
-    }
 }

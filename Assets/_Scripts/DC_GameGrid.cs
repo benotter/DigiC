@@ -18,6 +18,15 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 	// Private Server-Side Variables
 
+	void RegisterWithDirector()
+	{
+		GameObject director = GameObject.Find("DC_Director");
+        DC_Director dc_D;
+
+        if(director && (dc_D = director.GetComponent<DC_Director>()))
+			dc_D.RegisterGameGrid(this);
+	}
+
 	public override void OnStartServer()
     {
         cells.Add(new GameGridCell().SetPos(1, 1)); // 0
