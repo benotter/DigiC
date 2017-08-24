@@ -95,7 +95,7 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 
 		lineR.material = laserLocked;
 
-		spawnSelector.LockedIn();
+		spawnSelector.LockIn();
 	}
 
 	public void UnLock()
@@ -112,6 +112,6 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 
 		lineR.material = laserUnlocked;
 
-		spawnSelector.Unlocked();
+		spawnSelector.Unlock();
 	}
 }

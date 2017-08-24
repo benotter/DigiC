@@ -74,7 +74,6 @@ public class DC_HomeRoom : MonoBehaviour
     public void SetAvatarSpawn(DC_Avatar_Spawn avaS = null)
     {
         avatarSpawn = avaS;
-        spawnSelector.SetAvatarSpawn(avaS);
         avatarSpawnGO = avaS ? avaS.gameObject : null;
 
         if(avaS)

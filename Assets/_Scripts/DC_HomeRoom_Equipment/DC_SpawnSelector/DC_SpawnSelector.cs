@@ -5,7 +5,6 @@ using UnityEngine;
 public class DC_SpawnSelector : DC_HR_Equipment_Base 
 {
 	public DC_HomeRoom homeRoom;
-	public DC_GameGrid gameGrid;
 
 	[Space(10)]
 
@@ -23,24 +22,23 @@ public class DC_SpawnSelector : DC_HR_Equipment_Base
 
 	void Update()
 	{
-		if(!marker.lockedIn)
+		if(homeRoom.gameJoined && !marker.lockedIn)
 		{
-			float halfSize = gameGrid.gridCellSize / 2;
+			float halfSize = homeRoom.gameGrid.gridCellSize / 2;
 				  
 			var p = homeRoom.transform.position;
 
 			float newX = p.x + ( (halfSize - padding) * marker.xPos );
 			float newZ = p.z + ( (halfSize - padding) * marker.zPos );
 
-			spawnPoint = new Vector3(newX, gameGrid.transform.position.y + 0.3f, newZ);
+			spawnPoint = new Vector3(newX, homeRoom.gameGrid.transform.position.y + 0.3f, newZ);
 
 			if(avatarSpawn)
 				avatarSpawn.SetPosition(spawnPoint);
 		}
 	}
 
-
-	public void LockedIn()
+	public void LockIn()
 	{
 		if(avatarSpawn)
 		{
@@ -49,26 +47,23 @@ public class DC_SpawnSelector : DC_HR_Equipment_Base
 		}
 	}
 
-	public void Unlocked()
+	public void Unlock()
 	{
 		if(avatarSpawn)
 			avatarSpawn.Unlock();
 	}
 
-	public void SetAvatarSpawn(DC_Avatar_Spawn avaS = null) 
+	public override void OnGainAvatarSpawn(DC_Avatar_Spawn avatarS) 
 	{
-		avatarSpawn = avaS;
+		avatarSpawn = avatarS;
+		handle.toolEnabled = true;
+	}
 
-		if(!avaS)
-		{
-			if(handle.inUse)
-				handle.StopUse(handle.pTool);
+	public override void OnLoseAvatarSpawn() 
+	{
+		if(handle.inUse)
+			handle.StopUse(handle.pTool);
 
-			handle.toolEnabled = false;
-		}
-		else 
-		{
-			handle.toolEnabled = true;
-		}
+		handle.toolEnabled = false;
 	}
 }

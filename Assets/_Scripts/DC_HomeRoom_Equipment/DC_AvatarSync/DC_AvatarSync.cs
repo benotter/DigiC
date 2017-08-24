@@ -130,6 +130,12 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 		transform.parent = originalPar;
 	}
 
+	void OnTriggerEnter(Collider col)
+	{
+		if(col.gameObject == hmdTriggerObj)
+			StartLink();
+	}
+
 	public override void OnGainAvatar(DC_Avatar avatar) 
 	{
 		this.avatar = avatar;
@@ -142,11 +148,5 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 			StopLink();
 
 		screenCover.SetActive(false);
-	}
-
-	void OnTriggerEnter(Collider col)
-	{
-		if(col.gameObject == hmdTriggerObj)
-			StartLink();
 	}
 }
