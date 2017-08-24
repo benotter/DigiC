@@ -3,8 +3,68 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+// Update Funcs got pretty big, one file got REALLY hard to traverse.
+
 public partial class DC_Avatar
 {
+    void Update()
+    {
+        if(isClient)
+            ClientUpdate();
+        else if(isServer)
+            ServerUpdate();
+    }
+
+    void ServerUpdate()
+    {
+        // UpdateCharacterController();
+
+    }
+
+    void ClientUpdate()
+    {
+        if(hasAuthority)
+        {
+            if(linked)
+            {
+                UpdateBody();
+                UpdateCharacterController();
+
+            } else if(wasLinked)
+            {
+                wasLinked = false;
+
+                if(rightTool && !rightTool.cleared)
+                    rightTool.ClearState();
+
+                if(leftTool && !leftTool.cleared)
+                    leftTool.ClearState();
+            }
+
+            if(inMove)
+            {
+                if(lastPos != transform.position)
+                {
+                    moveVelocity = (transform.position - lastPos) / Time.deltaTime;
+                    lastPos = transform.position;
+                }
+
+                if(currentVelocity != Vector3.zero)
+                    ResetVelocity();
+            }
+            else 
+            {
+                if(moveVelocity != Vector3.zero)
+                {
+                    currentVelocity += moveVelocity;
+                    moveVelocity = Vector3.zero;
+                }
+            }
+
+            UpdatePosition();
+        }   
+    }
+
     public void UpdatePosition()
     {
         if(!inMove && (lastColFlags & CollisionFlags.Below) == 0)

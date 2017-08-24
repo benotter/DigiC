@@ -825,6 +825,7 @@ MonoBehaviour:
   toolList:
   - {fileID: 1208198207106888, guid: 89dafa6a047479742a12914bfa207857, type: 2}
   - {fileID: 1885217396507882, guid: 13a405f65718a1c43801b89fabee432c, type: 2}
+  - {fileID: 1027257511361334, guid: aa61654ba0a22b348ad7216cbf36a8eb, type: 2}
   avatarCam: {fileID: 20154779461201826}
   muzzle: {fileID: 1232707009109900}
   chest: {fileID: 1133850917905156}

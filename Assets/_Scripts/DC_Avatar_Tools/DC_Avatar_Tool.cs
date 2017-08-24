@@ -42,7 +42,6 @@ public class DC_Avatar_Tool : NetworkBehaviour
 
 	// Private Server-Side Variables
 
-
 	public void UpdateState(DC_AvatarSync_Handle handle)
 	{
 		hand = handle.hand;

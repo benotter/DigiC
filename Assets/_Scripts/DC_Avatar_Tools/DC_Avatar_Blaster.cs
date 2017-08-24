@@ -1,16 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class DC_Avatar_Blaster : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
+using UnityEngine.Networking;
+public class DC_Avatar_Blaster : NetworkBehaviour
+{	
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

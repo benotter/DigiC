@@ -5,27 +5,6 @@ using UnityEngine.Networking;
 
 public partial class DC_Avatar : NetworkBehaviour 
 {
-    public enum HitPos
-    {
-        Muzzle,
-        Chest,
-        Paw
-    }
-
-    public enum HitType 
-    {
-        Armor,
-        Chord
-    }
-
-    public enum ChordPos 
-    {
-        None,
-        Top,
-        Right,
-        Left
-    }
-
     // Client-Side Variables
     public DC_LocalPlayer localPlayer;
 
@@ -97,6 +76,13 @@ public partial class DC_Avatar : NetworkBehaviour
     private CollisionFlags lastColFlags;
 
 
+    static private int avatarLocalLayer = 0;
+    static private int avatarPawsLayer;
+    static private int avatarChestLayer;
+    static private int avatarRemoteLayer;
+    static private int avatarServerLayer;
+
+
     void Start()
     {
         NetworkTransform netT = GetComponent<NetworkTransform>();
@@ -108,11 +94,28 @@ public partial class DC_Avatar : NetworkBehaviour
             childT.interpolateRotation = netT.interpolateRotation;
             childT.rotationSyncCompression = netT.rotationSyncCompression;
         }
+
+        if(avatarLocalLayer == 0)
+        {
+            avatarLocalLayer = LayerMask.NameToLayer("Avatar_Local");
+
+            avatarPawsLayer = LayerMask.NameToLayer("Avatar_Paws");
+            avatarChestLayer = LayerMask.NameToLayer("Avatar_Chest");
+
+            avatarRemoteLayer = LayerMask.NameToLayer("Avatar_Remote");
+            avatarServerLayer = LayerMask.NameToLayer("Avatar_Server");
+        }
     }
 
     public override void OnStartServer()
     {
         // coll = GetComponent<CharacterController>();
+
+        muzzle.transform.GetChild(0).gameObject.layer = avatarServerLayer;
+        chest.transform.GetChild(0).gameObject.layer = avatarServerLayer;
+
+        rightPaw.transform.GetChild(0).gameObject.layer = avatarServerLayer;
+        leftPaw.transform.GetChild(0).gameObject.layer = avatarServerLayer;
     }
 
     public override void OnStartClient()
@@ -148,90 +151,50 @@ public partial class DC_Avatar : NetworkBehaviour
 
     }
 
-	void Update()
-    {
-        if(isClient)
-            ClientUpdate();
-        else if(isServer)
-            ServerUpdate();
-    }
-
-    void ServerUpdate()
-    {
-        // UpdateCharacterController();
-
-    }
-
-    void ClientUpdate()
-    {
-        if(hasAuthority)
-        {
-            if(linked)
-            {
-                UpdateBody();
-                UpdateCharacterController();
-
-            } else if(wasLinked)
-            {
-                wasLinked = false;
-
-                if(rightTool && !rightTool.cleared)
-                    rightTool.ClearState();
-
-                if(leftTool && !leftTool.cleared)
-                    leftTool.ClearState();
-            }
-
-            if(inMove)
-            {
-                if(lastPos != transform.position)
-                {
-                    moveVelocity = (transform.position - lastPos) / Time.deltaTime;
-                    lastPos = transform.position;
-                }
-
-                if(currentVelocity != Vector3.zero)
-                    ResetVelocity();
-            }
-            else 
-            {
-                if(moveVelocity != Vector3.zero)
-                {
-                    currentVelocity += moveVelocity;
-                    moveVelocity = Vector3.zero;
-                }
-            }
-
-            UpdatePosition();
-        }   
-    }
-
-    public void BoltStrike(HitPos bodyPos, DC_Bolt bolt)
+    [Server] public void ServerBoltStrike(DC_Bolt bolt, BodyParts bodyPos)
     {
         switch(bodyPos)
         {
-            case HitPos.Chest:
+            case BodyParts.Chest:
             break;
 
-            case HitPos.Muzzle:
+            case BodyParts.Muzzle:
             break;
 
-            case HitPos.Paw:
+            case BodyParts.RightPaw:
+            break;
+
+            case BodyParts.LeftPaw:
+            break;
+
+            case BodyParts.ChestChord:
+            break;
+
+            case BodyParts.MuzzleChord:
             break;
         }
     }
 
-    public void ChordStrike(HitPos bodyPos, ChordPos pos = ChordPos.None)
+    [Client] public void ClientBoltStrike(DC_Bolt bolt, BodyParts bodyPos)
     {
         switch(bodyPos)
         {
-            case HitPos.Chest:
+            case BodyParts.Chest:
             break;
 
-            case HitPos.Muzzle:
+            case BodyParts.Muzzle:
             break;
 
-            case HitPos.Paw:
+            case BodyParts.RightPaw:
+            break;
+
+            case BodyParts.LeftPaw:
+            break;
+
+            case BodyParts.ChestChord:
+            break;
+
+            case BodyParts.MuzzleChord:
             break;
         }
     }
@@ -275,7 +238,10 @@ public partial class DC_Avatar : NetworkBehaviour
         localPlayer = p;
     }
 
+
     // Server-Side Commands    
+
+
     [Command] public void CmdStartLink()
     {
         linked = true;
@@ -323,7 +289,16 @@ public partial class DC_Avatar : NetworkBehaviour
         }
     }
 
+
     // Client-Side Commands
+    
+
+    [ClientRpc] public void RpcBoltStrike(GameObject boltO, BodyParts part)
+    {
+        DC_Bolt bolt = boltO.GetComponent<DC_Bolt>();
+        if(bolt)
+            ClientBoltStrike(bolt, part);
+    }
 
     [ClientRpc] public void RpcSetPosition(Vector3 pos)
     {
@@ -357,3 +332,16 @@ public partial class DC_Avatar : NetworkBehaviour
     }
 }
 
+public partial class DC_Avatar 
+{
+    public enum BodyParts 
+    {
+        None,
+        Muzzle,
+        Chest,
+        RightPaw,
+        LeftPaw,
+        MuzzleChord,
+        ChestChord
+    }
+}

@@ -136,21 +136,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6627b6d1710993444a2172f1b108eaea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aLocalPlayer: 0
   gameGrid: {fileID: 0}
   homeRoom: {fileID: 0}
-  serverGame: {fileID: 0}
   localPlayer: {fileID: 0}
   remoteDisplay: {fileID: 1824882452269182}
+  serverGame: {fileID: 0}
   avatar: {fileID: 0}
   avatarSpawn: {fileID: 0}
-  serverGameObject: {fileID: 0}
   playerName: Player
-  avatarO: {fileID: 0}
-  avatarSpawnO: {fileID: 0}
   gameGridX: 0
   gameGridY: 0
   currentScore: 0
+  chordStrucked: 0
   currentTeam: 0
+  serverGameO: {fileID: 0}
+  avatarO: {fileID: 0}
+  avatarSpawnO: {fileID: 0}
 --- !u!114 &114173493952723414
 MonoBehaviour:
   m_ObjectHideFlags: 1
