@@ -29,52 +29,40 @@ public partial class DC_Game : NetworkBehaviour
     public GameObject avatarPrefab;
     public GameObject avatarSpawnPrefab;
 
-    // Server Variables
-
     [Space(10)]
+
     public HashSet<GameObject> players = new HashSet<GameObject>();
 
+    [HideInInspector] public NetworkClient gameOwner;
+
+    // Server Variables
     [Space(10)]
 
-    public NetworkClient gameOwner;
+    [SyncVar] public GameObject gameOwnerPlayerObj;
+
+    [SyncVar] public string gameName = "";
+    [SyncVar] public string gameAddress = "";
+    [SyncVar] public int gamePort = 0;
 
     [Space(10)]
 
-    [SyncVar]
-	public string gameName = "";
+    [SyncVar] public int gameMaxPlayers = 8;
+    [SyncVar] public float gameGridSize = 20;
+    
+    
+    [Space(10)]
+    [SyncVar] public int gamePlayerCount = 0;
 
-    [SyncVar]
-    public int gameMaxPlayers = 8;
-
-    [SyncVar]
-    public string gameAddress = "";
-
-    [SyncVar]
-    public int gamePort = 0;
-
-    [SyncVar]
-    public int gamePlayerCount = 0;
-
-    [SyncVar]
-    public GameObject gameOwnerPlayerObj;
-
-    [SyncVar]
-    public float gameGridSize = 20;
-
-    [SyncVar]
-    public DC_Game_Round currentRound;
-
-    [SyncVar]
-    public DC_Game_ScoreCard scoreCard;
+    [SyncVar] public DC_Game_Round currentRound;
+    [SyncVar] public DC_Game_ScoreCard scoreCard;
 
 
     // Private Client Variables
     private bool setupGameRoomSinceLastRound = false;
 
-
     public override void OnStartServer()
     {
-        gameGrid.gridCellSize = gameGridSize;
+        SetGameSize(gameGridSize);
     }
 
     public void SetGameSize(float size)
@@ -82,10 +70,87 @@ public partial class DC_Game : NetworkBehaviour
         gameGridSize = size;
         gameGrid.gridCellSize = size;
 
-        gameGrid.UpdateGameGrid();
+        gameGrid.UpdateDynaRoom();
         gameGrid.UpdateCellPositions();
 
         gameGrid.RpcUpdateGameGrid();
+    }
+
+    public void AddPlayer(DC_Player player)
+    {
+        if(player.connectionToClient.address == "localClient")
+            gameOwnerPlayerObj = player.gameObject;
+
+        player.playerName = player.connectionToClient.address;
+
+        // Whhooooh, Lad.
+        bool breaker = false;
+        for(int x = 1; x <= 3; x++)
+            if(!breaker) 
+                for(int y = 1; y <= 3; y++)                
+                    if(gameGrid.CheckPosition(x, y))
+                        breaker = gameGrid.SetPlayerToPosition(player.gameObject, x, y);
+            else
+                break;
+
+        gamePlayerCount++;
+        RpcPlayerJoined(player.gameObject);
+    }
+
+    public void RemPlayer(DC_Player player)
+    {
+        // Player gridCell is auto-cleared by handy - dandy unity null referencing
+        gamePlayerCount--;
+        RpcPlayerLeft(player.gameObject);
+    }
+
+    public void RequestAvatarSpawn(DC_Player player)
+    {
+        Debug.Log("AvatarSpawn Request from " + player.playerName);
+
+        if(!player.avatarSpawnO)
+            return;
+
+        GameObject avatarSpawnO = Instantiate(avatarSpawnPrefab);            
+        DC_Avatar_Spawn avatarSpawn = avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
+
+        avatarSpawn.playerO = player.gameObject;
+        player.avatarSpawnO = avatarSpawnO;
+
+        player.avatarSpawn = avatarSpawn;
+
+        if(NetworkServer.SpawnWithClientAuthority(avatarSpawnO, player.gameObject))
+            player.RpcSetAvatarSpawn(avatarSpawnO);
+        else
+            NetworkServer.Destroy(avatarSpawnO);
+    }
+    
+    public void RequestAvatar(DC_Player player)
+    {
+        Debug.Log("Avatar Request from " + player.playerName);
+
+        if(!player.avatarSpawnO || player.avatarO)
+            return;
+        
+        var aS = player.avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
+
+        if(!aS.lockedIn)
+            return;
+
+        GameObject avatarO = Instantiate(avatarPrefab);
+        DC_Avatar avatar = avatarO.GetComponent<DC_Avatar>();
+
+        avatar.playerO = player.gameObject;
+        aS.PositionAvatar(avatarO);
+
+        if(NetworkServer.SpawnWithClientAuthority(avatarO, player.gameObject))
+        {
+            player.avatarO = avatarO;
+            player.avatar = avatar;
+            player.RpcSetAvatar(avatarO);
+        }
+        else
+            NetworkServer.Destroy(avatarO);
     }
 
     public void RequestPoints(DC_Player player, DC_Game_ScoreCard.PointType type)
@@ -105,131 +170,12 @@ public partial class DC_Game : NetworkBehaviour
         player.currentScore += scoreAdd;
     }
 
-    public void RequestAvatarSpawn(DC_Player player)
-    {
-        Debug.Log("AvatarSpawn Request from " + player.playerName);
-
-        if(player && !player.avatarSpawnO)
-        {
-            GameObject avatarSpawnO = Instantiate(avatarSpawnPrefab);
-            NetworkServer.SpawnWithClientAuthority(avatarSpawnO, player.gameObject);
-            DC_Avatar_Spawn avatarSpawn = avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
-
-            avatarSpawn.playerO = player.gameObject;
-            player.avatarSpawnO = avatarSpawnO;
-
-            player.avatarSpawn = avatarSpawn;
-            
-            player.RpcSetAvatarSpawn(avatarSpawnO);
-        }
-    }
-    
-    public void RequestAvatar(DC_Player player)
-    {
-        Debug.Log("Avatar Request from " + player.playerName);
-
-        if( player.avatarSpawnO && !player.avatarO)
-        {
-            var aS = player.avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
-
-            if(aS && aS.lockedIn)
-            {
-                GameObject avatarO = Instantiate(avatarPrefab);
-
-                if(!avatarO || !player || !player.gameObject)
-                {
-                    Debug.Log("Fucked up Spawn!");
-                    return;
-                }
-                    
-                NetworkServer.SpawnWithClientAuthority(avatarO, player.gameObject);
-
-                if(!avatarO)
-                    return;
-                    
-                DC_Avatar avatar = avatarO.GetComponent<DC_Avatar>();
-
-                avatar.playerO = player.gameObject;
-                player.avatarO = avatarO;
-
-                player.avatar = avatar;
-            
-                aS.PositionAvatar(avatarO);
-                player.RpcSetAvatar(avatarO);
-            }
-        }
-    }
-
-    public void AddPlayer(DC_Player player)
-    {
-        player.serverGameO = gameObject;
-        player.serverGame = this;
-
-        player.gameGrid = gameGrid;
-
-        player.playerName = player.connectionToClient.address;
-
-        if(player.connectionToClient.address == "localClient")
-            gameOwnerPlayerObj = player.gameObject;
-        
-        RpcPlayerJoined(player.gameObject);
-        gamePlayerCount++;
-
-        bool breaker = false;
-
-        for(int x = 1; x <= 3; x++)
-        {
-            for(int y = 1; y <= 3; y++)
-            {
-                if(!gameGrid.CheckPosition(x, y))
-                {
-                    gameGrid.SetPosition(player.gameObject, x, y);
-                    breaker = true;
-                    break;
-                }
-            }
-
-            if(breaker)
-                break;
-        }
-    }
-
-    public void RemPlayer(DC_Player player)
-    {
-        RpcPlayerLeft(player.gameObject);
-        gamePlayerCount--;
-    }
-
-    [ClientRpc]
-    public void RpcSetupGameRoom()
-    {
-        if(!setupGameRoomSinceLastRound)
-        {
-            setupGameRoomSinceLastRound = true;
-            // gameRoom.SetupGameRoom();
-        }
-    }
-    
-    [ClientRpc]
-    public void RpcPlayerJoined(GameObject player)
-    {
-        if(!players.Contains(player))
-            players.Add(player);
-    }
-
-    [ClientRpc]
-    public void RpcPlayerLeft(GameObject player)
-    {
-        if(players.Contains(player))
-            players.Remove(player);
-    }
-
-    [ClientRpc]
-    public void RpcSetClientPlayer(GameObject playerO)
+    // Client-Side Commands
+    [ClientRpc] public void RpcSetClientPlayer(GameObject playerO)
     {
         DC_Player player = playerO.GetComponent<DC_Player>();
 
-        if(player && player.hasAuthority)
+        if(player.hasAuthority)
         {
             remotePlayerO = playerO;
             remotePlayer = player;
@@ -237,6 +183,20 @@ public partial class DC_Game : NetworkBehaviour
             homeRoom.SetRemotePlayer(remotePlayer);
         }
     }
+    
+    [ClientRpc] public void RpcPlayerJoined(GameObject player)
+    {
+        if(!players.Contains(player))
+            players.Add(player);
+    }
+
+    [ClientRpc] public void RpcPlayerLeft(GameObject player)
+    {
+        if(players.Contains(player))
+            players.Remove(player);
+    }
+
+
 }
 
 [System.Serializable]

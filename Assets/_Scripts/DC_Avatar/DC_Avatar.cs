@@ -33,6 +33,10 @@ public partial class DC_Avatar : NetworkBehaviour
 
     [Space(10)]
 
+    [HideInInspector] public bool inMove = false;
+
+    [HideInInspector] public bool controllersFlipped = false;
+
     // Server-Side Variables
 
     [SyncVar] public float gravity = 1f;
@@ -51,14 +55,8 @@ public partial class DC_Avatar : NetworkBehaviour
     [Space(10)]
 
     [SyncVar] public bool linked = false;
-
-    [HideInInspector] public bool inMove = false;
-
-
-    // Public Client-Side Variables
-
-    [HideInInspector] public bool controllersFlipped = false;
     
+
     // Private Client-Side Variables
 
     private CharacterController coll;
@@ -66,15 +64,12 @@ public partial class DC_Avatar : NetworkBehaviour
     private bool wasLinked = false;
     
     private Vector3 targetMove = Vector3.zero;
-    
     private Vector3 lastHmdPos = Vector3.zero;
     private Vector3 lastPos = Vector3.zero;
-
     public Vector3 moveVelocity = Vector3.zero;
     public Vector3 currentVelocity = Vector3.zero;
 
     private CollisionFlags lastColFlags;
-
 
     static private int avatarLocalLayer = 0;
     static private int avatarPawsLayer;
@@ -111,26 +106,29 @@ public partial class DC_Avatar : NetworkBehaviour
     {
         // coll = GetComponent<CharacterController>();
 
-        muzzle.transform.GetChild(0).gameObject.layer = avatarServerLayer;
-        chest.transform.GetChild(0).gameObject.layer = avatarServerLayer;
-
-        rightPaw.transform.GetChild(0).gameObject.layer = avatarServerLayer;
-        leftPaw.transform.GetChild(0).gameObject.layer = avatarServerLayer;
+        muzzle.layer = avatarServerLayer;
+        chest.layer = avatarServerLayer;
+        rightPaw.layer = avatarServerLayer;
+        leftPaw.layer = avatarServerLayer;
     }
 
     public override void OnStartClient()
     {
-
+        muzzle.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        chest.layer = chest.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        rightPaw.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        leftPaw.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
     }
 
     public override void OnStartAuthority()
     {
         avatarCam.enabled = true;
 
-        var layer = LayerMask.NameToLayer("Avatar_Local");
+        muzzle.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarLocalLayer;
+        chest.layer = chest.transform.GetChild(0).gameObject.layer = avatarChestLayer;
 
-        muzzle.transform.GetChild(0).gameObject.layer = layer;
-        chest.transform.GetChild(0).gameObject.layer = layer;
+        rightPaw.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
+        leftPaw.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
 
         coll = GetComponent<CharacterController>();
 
@@ -151,8 +149,10 @@ public partial class DC_Avatar : NetworkBehaviour
 
     }
 
-    [Server] public void ServerBoltStrike(DC_Bolt bolt, BodyParts bodyPos)
+    [Server] public void BoltStrike(DC_Bolt bolt, BodyParts bodyPos)
     {
+        RpcBoltStrike(bolt.gameObject, bodyPos);
+
         switch(bodyPos)
         {
             case BodyParts.Chest:

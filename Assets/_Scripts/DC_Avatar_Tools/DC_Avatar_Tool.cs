@@ -12,8 +12,8 @@ public class DC_Avatar_Tool : NetworkBehaviour
 
 
 	[Space(10)]
-	public DC_Player player;
-	public DC_Avatar avatar;
+	[HideInInspector] public DC_Player player;
+	[HideInInspector] public DC_Avatar avatar;
 
 	[Space(10)]
 
@@ -28,15 +28,10 @@ public class DC_Avatar_Tool : NetworkBehaviour
 	
 
 	// Server-Side Variables
-	[Space(10)]
 
-	[SyncVar] public GameObject playerO;
-
-	[SyncVar] public GameObject avatarO;
-	
-	[Space(10)]
-
-	[SyncVar] public PlayerTool.Hand hand = PlayerTool.Hand.None;
+	[HideInInspector] [SyncVar] public GameObject playerO;
+	[HideInInspector] [SyncVar] public GameObject avatarO;
+	[HideInInspector] [SyncVar] public PlayerTool.Hand hand = PlayerTool.Hand.None;
 	
 	// Private / Protected Client-Side Variables
 

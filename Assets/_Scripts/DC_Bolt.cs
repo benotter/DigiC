@@ -13,10 +13,6 @@ public class DC_Bolt : NetworkBehaviour
 
 	[Space(10)]
 
-	[HideInInspector] public Light boltLight;
-
-	[Space(10)]
-
 	// Server-Side Variables
 	[SyncVar] public GameObject playerO;
 	[SyncVar] public GameObject avatarO;
@@ -34,13 +30,15 @@ public class DC_Bolt : NetworkBehaviour
 	
 	[Space(10)]
 
-	[SyncVar] public bool fired = false;	
+	[HideInInspector] [SyncVar] public bool fired = false;
 
 	//Private Server-Side Variables
-	[SyncVar] private bool inMotion = false;
+
+	// [SyncVar] private bool inMotion = false;
 
 	// Private Client-Side Variables
 
+	private Light boltLight;
 	private Renderer rend;
 	private Collider coll;
 
@@ -53,16 +51,31 @@ public class DC_Bolt : NetworkBehaviour
 
 		if(boltLight)
 		{
-			if(boltLightCount + 1 > maxBoltLights)
-				boltLight.enabled = false;
-			else
-				boltLightCount++;
+			if(!instant)
+			{
+				if(boltLightCount + 1 > maxBoltLights)
+					boltLight.enabled = false;
+				else
+					boltLightCount++;
+			}
+			else 
+			{
+				if(rend) 
+					rend.enabled = false;
+
+				if(coll) 
+					coll.enabled = false;
+
+				if(boltLight) 
+					boltLight.enabled = false;
+
+			}
 		}
 	}
 
 	void OnDestroy()
 	{
-		if(boltLight && boltLight.enabled)
+		if(!instant && boltLight && boltLight.enabled)
 			boltLightCount--;
 	}
 
@@ -71,7 +84,7 @@ public class DC_Bolt : NetworkBehaviour
 		GetComponent<Light>().enabled = false;
 	}
 	
-	[Server] public void Fire()
+	public void Fire()
 	{
 		if(fired)
 			return;
@@ -86,9 +99,6 @@ public class DC_Bolt : NetworkBehaviour
 
 	public void FireInstant()
 	{
-		if(rend) rend.enabled = false;
-		if(coll) coll.enabled = false;
-		if(boltLight) boltLight.enabled = false;
 
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit[] hits;		
@@ -101,7 +111,7 @@ public class DC_Bolt : NetworkBehaviour
 					{
 						part.BoltStrike(this);
 						continue;
-					}	
+					}
 					BustBolt(hit.point);
 				}
 

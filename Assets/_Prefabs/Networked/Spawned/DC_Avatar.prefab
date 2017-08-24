@@ -39,10 +39,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4962312204206676}
   - component: {fileID: 33367322964277548}
-  - component: {fileID: 65716515610962294}
   - component: {fileID: 23827434093257716}
-  m_Layer: 9
-  m_Name: Cube
+  m_Layer: 0
+  m_Name: Paw Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56,6 +55,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4489378368850570}
+  - component: {fileID: 65771931540724292}
+  - component: {fileID: 114784984845432758}
   m_Layer: 0
   m_Name: Chest
   m_TagString: Untagged
@@ -71,6 +72,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4914401672903744}
+  - component: {fileID: 65014493469935472}
+  - component: {fileID: 114788394138209956}
   m_Layer: 0
   m_Name: Muzzle
   m_TagString: Untagged
@@ -86,7 +89,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4360047196577182}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Paws
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,10 +105,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4053138674112738}
   - component: {fileID: 33728787519063752}
-  - component: {fileID: 65962540868855732}
   - component: {fileID: 23216513711546294}
-  m_Layer: 9
-  m_Name: Cube
+  m_Layer: 0
+  m_Name: Paw Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -120,10 +122,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4699930475286604}
   - component: {fileID: 33624586825994362}
-  - component: {fileID: 65448066457954954}
   - component: {fileID: 23632814484720322}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Muzzle Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -154,10 +155,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4918418397023308}
   - component: {fileID: 33641524427955714}
-  - component: {fileID: 65061291730031210}
   - component: {fileID: 23153047085704190}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Chest Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -171,7 +171,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4287226912393292}
-  m_Layer: 9
+  - component: {fileID: 65149327948786886}
+  m_Layer: 0
   m_Name: Paw (Left)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,7 +187,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4714808665290750}
-  m_Layer: 9
+  - component: {fileID: 65560855646948536}
+  m_Layer: 0
   m_Name: Paw (Right)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,7 +253,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1936016119532734}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -4.622}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4897218675539540}
@@ -604,54 +606,54 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1328475897668290}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65061291730031210
+--- !u!65 &65014493469935472
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1769079586305280}
+  m_GameObject: {fileID: 1232707009109900}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65448066457954954
+  m_Size: {x: 0.074119, y: 0.1531318, z: 0.393005}
+  m_Center: {x: 0, y: 0, z: 0.149}
+--- !u!65 &65149327948786886
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1463392775987270}
+  m_GameObject: {fileID: 1815982558365908}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.03, y: 0.085, z: 0.12}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65716515610962294
+--- !u!65 &65560855646948536
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1097770530410264}
+  m_GameObject: {fileID: 1846576182006308}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.03, y: 0.085, z: 0.12}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65962540868855732
+--- !u!65 &65771931540724292
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1328475897668290}
+  m_GameObject: {fileID: 1133850917905156}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.2342371, y: 0.4807901, z: 0.1449288}
+  m_Center: {x: 0, y: -0.368, z: 0}
 --- !u!81 &81185593580659314
 AudioListener:
   m_ObjectHideFlags: 1
@@ -808,6 +810,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vrcam: {fileID: 0}
+--- !u!114 &114784984845432758
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1133850917905156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e8d5a512740b2d44a5ccbda30e4d02c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatar: {fileID: 114814032739173398}
+  broken: 0
+  health: 50
+  playerColor: {r: 0, g: 0, b: 1, a: 1}
+  brokenColor: {r: 1, g: 0, b: 0, a: 0.5}
+--- !u!114 &114788394138209956
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1232707009109900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84f2c7d95c27a09468d0f543f81876f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatar: {fileID: 0}
+  broken: 0
+  health: 50
+  playerColor: {r: 0, g: 0, b: 1, a: 1}
+  brokenColor: {r: 1, g: 0, b: 0, a: 0.5}
 --- !u!114 &114814032739173398
 MonoBehaviour:
   m_ObjectHideFlags: 1

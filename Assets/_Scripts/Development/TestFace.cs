@@ -95,9 +95,6 @@ public class TestFace : MonoBehaviour
 		float xUnit = (float) ( 1f / (float) width );
 		float yUnit = (float) ( 1f / newH );
 
-		float x = (float) ( oX + 1 ) / (float) width;
-		float y = (float) ( oY + 1 ) / newH;
-
 		float xP = ( oX / (float) (width)) - 0.5f;
 		float yP = ( oY  / newH) - ( (height / (float) width) / 2f );
 

@@ -16,7 +16,7 @@ public class DC_Avatar_Part : MonoBehaviour
 
     public virtual bool BoltStrike(DC_Bolt bolt) 
     {
-        avatar.ServerBoltStrike(bolt, GetBodyPart());
+        avatar.BoltStrike(bolt, GetBodyPart());
 		return TakeDamage(bolt.damage);
     }
 

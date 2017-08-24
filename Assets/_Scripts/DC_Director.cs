@@ -5,17 +5,21 @@ using UnityEngine.Networking;
 
 public partial class DC_Director : NetworkManager 
 {
-	public DC_Game game;
+    public DC_HomeRoom homeRoom;
 
-	[Space(10)]
+    [Space(10)]
 
-	public DC_HomeRoom homeRoom;
-	public DC_GameGrid gameGrid;
+    public DC_Game serverGame;
+    public DC_GameGrid gameGrid;
 
     [Space(10)]
 
     public string gameName = "Test Game";
     public int maxPlayers = 8;
+
+    
+    private GameObject serverGameO;
+    private GameObject gameGridO;
     
 
 	void Start()
@@ -37,11 +41,11 @@ public partial class DC_Director : NetworkManager
 
     public override void OnStartServer()
     {
-        game.gamePort = networkPort;
-        game.gameAddress = networkAddress;
+        serverGame.gamePort = networkPort;
+        serverGame.gameAddress = networkAddress;
 
-        game.gameName = gameName;
-        game.gameMaxPlayers = maxPlayers;
+        serverGame.gameName = gameName;
+        serverGame.gameMaxPlayers = maxPlayers;
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -56,7 +60,7 @@ public partial class DC_Director : NetworkManager
         GameObject playerO = conn.playerControllers[0].gameObject;
         DC_Player player = playerO.GetComponent<DC_Player>();
         
-        game.RemPlayer(player);
+        serverGame.RemPlayer(player);
 
         if(player.avatarSpawnO)
             NetworkServer.Destroy(player.avatarSpawnO);
@@ -84,10 +88,8 @@ public partial class DC_Director : NetworkManager
         {
             DC_Player player = playerO.GetComponent<DC_Player>();
 
-            player.RpcSetGame(game.gameObject);
-            game.RpcSetClientPlayer(playerO);
-
-            game.AddPlayer(player);
+            player.RpcGameSetup(serverGame.gameObject);
+            serverGame.AddPlayer(player);
         };
     }
     public override void OnServerRemovePlayer(NetworkConnection conn, PlayerController player)
@@ -130,7 +132,7 @@ public partial class DC_Director : NetworkManager
 
 		if(hostC != null)
 		{
-			game.gameOwner = hostC;
+			serverGame.gameOwner = hostC;
             Debug.Log("Host Client Successfully Started!");
 		}
 	}
@@ -140,4 +142,9 @@ public partial class DC_Director : NetworkManager
 		networkPort = port;
 		networkAddress = address;
 	}
+
+    public void CreateServerGame()
+    {
+
+    }
 }

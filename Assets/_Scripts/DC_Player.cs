@@ -13,12 +13,6 @@ public partial class DC_Player : NetworkBehaviour
 	public DC_GameGrid gameGrid;
 	public DC_HomeRoom homeRoom;
 
-    
-
-	[Space(10)]
-
-	
-
 	[Space(10)]
 
 	public DC_LocalPlayer localPlayer;
@@ -34,7 +28,14 @@ public partial class DC_Player : NetworkBehaviour
 
     // Remote Variables (Set on the Server, Synced to the Clients)
 
+    [SyncVar] public GameObject serverGameO = null;
+	[SyncVar] public GameObject avatarO = null;
+	[SyncVar] public GameObject avatarSpawnO = null;
+
+    [Space(10)]
+
     [SyncVar] public string playerName = "";
+    [SyncVar] public DC_Game.Team currentTeam = DC_Game.Team.None;
     
     [Space(10)]
 
@@ -47,13 +48,8 @@ public partial class DC_Player : NetworkBehaviour
 
     // Basically equilivent to 'Deaths' in any other game
     [SyncVar] public int chordStrucked = 0;
-    [SyncVar] public DC_Game.Team currentTeam = DC_Game.Team.None;
-
-	[Space(10)]
     
-    [SyncVar] public GameObject serverGameO = null;
-	[SyncVar] public GameObject avatarO = null;
-	[SyncVar] public GameObject avatarSpawnO = null;
+
     
 
     // Private Client-Side Variables
@@ -73,55 +69,42 @@ public partial class DC_Player : NetworkBehaviour
 	
 	void Update () 
 	{
-		if(isClient)
-            UpdateClient();
-        else if(isServer)
-            UpdateServer();
+        if(serverGameO && !serverGame)
+            serverGame = serverGameO.GetComponent<DC_Game>();
+
+        if(avatarO && !avatar)
+            avatar = avatarO.GetComponent<DC_Avatar>();
+
+        if(avatarSpawnO && !avatarSpawn)
+            avatarSpawn = avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
+
+        ServerUpdate();
+        ClientUpdate();
 	}
 
-    public void UpdateServer()
+    [Server] public void ServerUpdate()
     {
 
     }
 
-    public void UpdateClient()
+    [Client] public void ClientUpdate() 
     {
 
     }
 
     // Server-Side Commands (Run on Server's Instance of Object)
-    [Command]
-    public void CmdSetPlayerName(string name)
-    {
-        playerName = name;
-    }
-
-    [Command]
-    public void CmdRequestChord()
-    {
-        serverGame.RequestPoints(this, DC_Game_ScoreCard.PointType.Chord);
-    }
-
-    [Command]
-    public void CmdRequestGoal()
-    {
-        serverGame.RequestPoints(this, DC_Game_ScoreCard.PointType.Goal);
-    }
-
-    [Command]
-    public void CmdRequestAvatarSpawn()
+  
+    [Command] public void CmdRequestAvatarSpawn()
     {
         serverGame.RequestAvatarSpawn(this);
     }
 
-    [Command]
-    public void CmdRequestAvatar()
+    [Command] public void CmdRequestAvatar()
     {
         serverGame.RequestAvatar(this);
     }
 
-    [Command]
-    public void CmdSetGridPosition(int x, int y)
+    [Command] public void CmdSetGridPosition(int x, int y)
     {
         if(avatarSpawnO)
         {
@@ -129,30 +112,44 @@ public partial class DC_Player : NetworkBehaviour
             if(aS && aS.lockedIn)
                 return;
         }
-        
-        if(!gameGrid.CheckPosition(x, y))
-            gameGrid.SetPosition(this.gameObject, x, y);
+
+        gameGrid.SetPlayerToPosition(this.gameObject, x, y);            
+    }
+
+    [Command] public void CmdSetPlayerName(string name)
+    {
+        playerName = name;
     }
 
     // Client-Side Commands (Run on Client's Instance of Object)
 
-    [ClientRpc]
-    public void RpcSetGame(GameObject serverGameO)
+    [ClientRpc] public void RpcGameSetup(GameObject serverGO)
     {
-        DC_Game sGame = serverGameO.GetComponent<DC_Game>();
+        DC_Game sGame = serverGO.GetComponent<DC_Game>();
 
-        gameGrid = sGame.gameGrid;
+        serverGameO = serverGO;
         serverGame = sGame;
 
+        gameGrid = sGame.gameGrid;
+        
         if(hasAuthority)
         {
-            homeRoom = sGame.homeRoom;    
             localPlayer = sGame.localPlayer;
+            homeRoom = sGame.homeRoom;
+            
+            homeRoom.SetRemotePlayer(this);
         }
     }
 
-    [ClientRpc]
-    public void RpcSetAvatarSpawn(GameObject aS)
+    [ClientRpc] public void RpcUpdatePosition(Vector3 pos)
+    {
+        transform.position = pos;
+
+        if(hasAuthority)
+            homeRoom.SetPosition(transform.position);
+    }
+
+    [ClientRpc] public void RpcSetAvatarSpawn(GameObject aS)
     {
         var avaS = aS.GetComponent<DC_Avatar_Spawn>();
         avatarSpawn = avaS;
@@ -164,8 +161,7 @@ public partial class DC_Player : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void RpcSetAvatar(GameObject a)
+    [ClientRpc] public void RpcSetAvatar(GameObject a)
     {
         var ava = a.GetComponent<DC_Avatar>();
         avatar = ava;
@@ -175,17 +171,6 @@ public partial class DC_Player : NetworkBehaviour
             ava.SetLocalPlayer(localPlayer);
             homeRoom.SetAvatar(ava);
             ava.UpdateBody();
-        }
-    }
-
-    [ClientRpc]
-    public void RpcUpdatePosition(Vector3 pos)
-    {
-        transform.position = pos;
-
-        if(hasAuthority)
-        {
-            homeRoom.SetPosition(transform.position);
         }
     }
 }

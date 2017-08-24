@@ -18,11 +18,6 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 	// Private Server-Side Variables
 
-	public override void OnStartClient()
-    {
-        UpdateGameGrid();
-    }
-
 	public override void OnStartServer()
     {
         cells.Add(new GameGridCell().SetPos(1, 1)); // 0
@@ -36,19 +31,20 @@ public partial class DC_GameGrid : NetworkBehaviour
         cells.Add(new GameGridCell().SetPos(3, 1)); // 6
         cells.Add(new GameGridCell().SetPos(3, 2)); // 7
         cells.Add(new GameGridCell().SetPos(3, 3)); // 8
-
-        // WHO LOVES SOOO MUCH WASTED MEMORY REWRITES>?
-        UpdateCellPositions();
-		UpdateGameGrid();
     }
 
-	public void UpdateGameGrid()
+	public override void OnStartClient()
+    {
+        UpdateDynaRoom();
+    }
+
+	public void UpdateDynaRoom()
     {
         dynaRoom.width = gridCellSize * 3;
         dynaRoom.length = gridCellSize * 3;
     }
 
-	public void UpdateCellPositions()
+	[Server] public void UpdateCellPositions()
     {
         for(int i = 0; i < cells.Count; i++)
         {
@@ -69,7 +65,7 @@ public partial class DC_GameGrid : NetworkBehaviour
 			cells.Dirty(i);
         }
 
-		RpcWasGridUpdate();
+		RpcUpdateGameGrid();
     }
 
 	public int GetPosInt(int x, int y)
@@ -77,97 +73,59 @@ public partial class DC_GameGrid : NetworkBehaviour
 		return (((x - 1) * 3) + y) - 1;
 	}
 
-	public bool CheckPosition(int x, int y, GameObject go = null)
+	[Server] public bool CheckPosition(int x, int y, GameObject pO = null)
 	{
-		if(x < 1 || x > 3 || y < 1 || y > 3)
+		var pos = GetPosInt(x, y);
+
+		if( pos >= cells.Count || pos < 0)
 			return false;
 
-		if(!go)
-			return (cells[GetPosInt(x, y)].player != null);
-		else
-			return (cells[GetPosInt(x, y)].player == go || cells[GetPosInt(x, y)].player == null);
+		var p = cells[pos].player;
+		return (p == pO);
 	}
 
-	public bool SetPosition(GameObject playerO, int x, int y)
+	[Server] public bool SetPlayerToPosition(GameObject playerO, int x, int y)
 	{
-		if(!CheckPosition(x, y, playerO))
-			return false;
-		
-		int pos = GetPosInt(x, y);
-
-		Debug.Log("Setting X: " + x + ", Y: " + y);
-		Debug.Log("Array Position: " + pos);
-
-		if(pos >= cells.Count || pos < 0)
+		if(CheckPosition(x, y, playerO))
+			return true;
+		else if(!CheckPosition(x, y))
 			return false;
 
 		DC_Player player = playerO.GetComponent<DC_Player>();
-
-		if(CheckPosition(player.gameGridX, player.gameGridY, playerO))
+		
+		if(player.gameGridX > 0)
 		{
 			int oldPos = GetPosInt(player.gameGridX, player.gameGridY);
+			var oldCell = cells[oldPos];
+			oldCell.player = null;
+			cells[oldPos] = oldCell;
 
-			if(oldPos >= 0 && oldPos < cells.Count)
-			{
-				var oldCell = cells[oldPos];
-
-				oldCell.player = null;
-				cells[oldPos] = oldCell;
-
-				cells.Dirty(oldPos);
-			}			
+			cells.Dirty(oldPos);
 		}
 
 		player.gameGridX = x;
 		player.gameGridY = y;
 
-		GameGridCell cell = cells[pos];
-		cell.player = playerO;
-		cells[pos] = cell;
+		int newPos = GetPosInt(x, y);
 
-		cells.Dirty(pos);
+		GameGridCell cell = cells[newPos];
+		cell.player = playerO;
+		cells[newPos] = cell;
+		cells.Dirty(newPos);
 
 		player.RpcUpdatePosition(cell.cellPos);
 
-		RpcWasGridUpdate();
+		RpcUpdateGameGrid();
 
 		return true;
 	}
 
-	public void ClearPosition(int x, int y, GameObject go)
-	{
-		int pos = GetPosInt(x, y);
+	// Client-Side Commands
 
-		if(pos >= cells.Count || pos < 0)
-			return;
-
-		GameGridCell cell = cells[pos];
-
-		if(go)
-		{
-			if(cell.player == go)
-				cell.player = null;	
-		}
-		else
-			cell.player = null;
-
-		cells.Dirty(pos);
-
-		RpcWasGridUpdate();
-	}
-
-	// Client-Side Commands (Run on Client's Instance)
-
-    [ClientRpc]
-    public void RpcUpdateGameGrid()
+    [ClientRpc] public void RpcUpdateGameGrid()
     {
-        UpdateGameGrid();
-    }
-
-    [ClientRpc]
-    public void RpcWasGridUpdate()
-    {
-        gridSelector.UpdateButtonStat();
+        UpdateDynaRoom();
+		gridSelector.UpdateButtonState();
     }
 }
 

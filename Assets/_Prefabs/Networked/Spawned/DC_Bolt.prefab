@@ -198,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bustLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 12289
   boltLight: {fileID: 0}
   playerO: {fileID: 0}
   avatarO: {fileID: 0}

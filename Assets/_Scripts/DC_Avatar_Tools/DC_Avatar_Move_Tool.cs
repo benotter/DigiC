@@ -49,7 +49,6 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool
     // Private Client-Side Variables
     private bool canMove = false;
     private bool seeking = false;
-    private bool retracting = false;
     private bool moveBlock = false;
 
     private float movePointDistance = 0f;

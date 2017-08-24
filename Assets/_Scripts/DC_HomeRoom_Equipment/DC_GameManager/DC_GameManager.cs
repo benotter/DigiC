@@ -6,9 +6,9 @@ public class DC_GameManager : DC_HR_Equipment_Base
 {
 	public DC_Director director;
 
-	public bool gameInstalled = false;
+	[Space(10)]
 
-	private bool newSphereRemoved = false;
+	public bool gameInstalled = false;
 
 	public void OnTriggerStay(Collider col)
 	{

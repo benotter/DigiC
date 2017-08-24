@@ -4,16 +4,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 public class DC_Avatar_Spawn : NetworkBehaviour
 {
-	// Server Variables
+	// Server-Side Variables
 
-	[SyncVar]
-	public GameObject playerO;
+	[SyncVar] public GameObject playerO;
 
-	[SyncVar]
-	public bool lockedIn = false;
+	[SyncVar] public bool lockedIn = false;
 
 
-	// Private Client Variables
+	// Private Client-Side Variables
 	private DC_Player player;
 
 	public void SetPlayer(GameObject p)
@@ -47,24 +45,15 @@ public class DC_Avatar_Spawn : NetworkBehaviour
 	}
 
 	// Server-Side Commands
-
-	[Command]
-	public void CmdLock()
+	[Command] public void CmdLock()
 	{
 		lockedIn = true;
 	}
 
-	[Command]
-	public void CmdUnlock()
+	[Command] public void CmdUnlock()
 	{
 		lockedIn = false;
 	}
 
 	// Client-Side Commands
-
-	[ClientRpc]
-	public void RpcSetPosition(Vector3 pos)
-	{
-		SetPosition(pos);
-	}
 }
