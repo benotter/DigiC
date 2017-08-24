@@ -111,11 +111,11 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 
 		bool playerCamAbove = playerCam.depth > avatarCam.depth;
 
-		var pAl = playerCam.GetComponentInChildren<AudioListener>().enabled = playerCamAbove;
-		var pEars = playerCam.GetComponentInChildren<SteamVR_Ears>().enabled = playerCamAbove;
+		playerCam.GetComponentInChildren<AudioListener>().enabled = playerCamAbove;
+		playerCam.GetComponentInChildren<SteamVR_Ears>().enabled = playerCamAbove;
 
-		var aAl = avatarCam.GetComponent<AudioListener>().enabled = !playerCamAbove;
-		var aEars = avatarCam.GetComponent<SteamVR_Ears>().enabled = !playerCamAbove;
+		avatarCam.GetComponent<AudioListener>().enabled = !playerCamAbove;
+		avatarCam.GetComponent<SteamVR_Ears>().enabled = !playerCamAbove;
 	}
 
 	public void AttackToHMD()

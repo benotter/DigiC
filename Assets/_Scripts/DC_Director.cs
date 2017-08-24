@@ -24,60 +24,47 @@ public partial class DC_Director : NetworkManager
     [HideInInspector] public GameObject serverGameO;
     [HideInInspector] public GameObject gameGridO;
 
-    void Start()
+    private bool gameSpawned = false;
+    private bool gridSpawned = false;
+
+    void Update()
     {
+        if(!gridSpawned && NetworkServer.active)
+        {
+            CreateGameGrid();
+            NetworkServer.Spawn(gameGridO);
+            gridSpawned = true;
+        }   
 
-    }
+        if(!gameSpawned && NetworkServer.active)
+        {
+            CreateServerGame();
+            NetworkServer.Spawn(serverGameO);
+            gameSpawned = true;
+        }
 
-    public void CreateServerGame()
-    {
-        serverGameO = Instantiate(serverGamePrefab);
-        serverGame = serverGameO.GetComponent<DC_Game>();
+        if(serverGame && !homeRoom.serverGame)
+            homeRoom.serverGame = serverGame;
 
-        serverGame.gameName = gameName;
-        serverGame.gameMaxPlayers = maxPlayers;
-        serverGame.gamePort = networkPort;
-        serverGame.gameAddress = networkAddress;
-    }
-
-    public void RegisterServerGame(DC_Game server)
-    {
-        server.homeRoom = homeRoom;
-        server.gameGrid = gameGrid;
-        server.localPlayer = homeRoom.localPlayer;
-
-        serverGame = server;
-        serverGameO = server.gameObject;
-    }
-
-    public void CreateGameGrid()
-    {
-        gameGridO = Instantiate(gameGridPrefab);
-        gameGrid = gameGridO.GetComponent<DC_GameGrid>();
-    }
-
-    public void RegisterGameGrid(DC_GameGrid grid)
-    {
-        grid.gridSelector = homeRoom.gridSelector;
-
-        gameGrid = grid;
-        gameGridO = grid.gameObject;
+        if(gameGrid && !homeRoom.gameGrid)
+            homeRoom.gameGrid = gameGrid;
     }
     
 
     // Server-Side Callbacks
 	public override void OnStartHost() 
     {
-        RegisterGameGrid(gameGrid);
-        RegisterServerGame(serverGame);
 
-        homeRoom.RegisterGame(serverGame, gameGrid);
     }
 
     public override void OnStartServer()
     {
-        CreateGameGrid();
-        CreateServerGame();
+        
+    }
+
+    void OnServerInitialized()
+    {
+        Debug.Log("Teeeessst!");
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -155,8 +142,6 @@ public partial class DC_Director : NetworkManager
 
     }
 
-    // Client Hooks for in-game UI
-
 	public void StartGame()
 	{
 		var hostC = StartHost();
@@ -174,6 +159,39 @@ public partial class DC_Director : NetworkManager
 		networkAddress = address;
 	}
 
-    
+    public void CreateServerGame()
+    {
+        serverGameO = Instantiate(serverGamePrefab);
+        serverGame = serverGameO.GetComponent<DC_Game>();
+
+        serverGame.gameName = gameName;
+        serverGame.gameMaxPlayers = maxPlayers;
+        serverGame.gamePort = networkPort;
+        serverGame.gameAddress = networkAddress;
+    }
+
+    public void RegisterServerGame(DC_Game server)
+    {
+        server.homeRoom = homeRoom;
+        server.gameGrid = gameGrid;
+        server.localPlayer = homeRoom.localPlayer;
+
+        serverGame = server;
+        serverGameO = server.gameObject;
+    }
+
+    public void CreateGameGrid()
+    {
+        gameGridO = Instantiate(gameGridPrefab);
+        gameGrid = gameGridO.GetComponent<DC_GameGrid>();
+    }
+
+    public void RegisterGameGrid(DC_GameGrid grid)
+    {
+        grid.gridSelector = homeRoom.gridSelector;
+
+        gameGrid = grid;
+        gameGridO = grid.gameObject;
+    }
 
 }

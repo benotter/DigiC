@@ -21,11 +21,6 @@ public partial class DC_Game : NetworkBehaviour
 
     [Space(10)]
 
-    public DC_Player remotePlayer;
-    public GameObject remotePlayerO;
-
-    [Space(10)]
-
     public GameObject avatarPrefab;
     public GameObject avatarSpawnPrefab;
 
@@ -71,6 +66,7 @@ public partial class DC_Game : NetworkBehaviour
 
     public override void OnStartServer()
     {
+        RegisterWithDirector();
         SetGameSize(gameGridSize);
     }
 
@@ -185,18 +181,6 @@ public partial class DC_Game : NetworkBehaviour
     }
 
     // Client-Side Commands
-    [ClientRpc] public void RpcSetClientPlayer(GameObject playerO)
-    {
-        DC_Player player = playerO.GetComponent<DC_Player>();
-
-        if(player.hasAuthority)
-        {
-            remotePlayerO = playerO;
-            remotePlayer = player;
-
-            homeRoom.SetRemotePlayer(remotePlayer);
-        }
-    }
     
     [ClientRpc] public void RpcPlayerJoined(GameObject player)
     {
