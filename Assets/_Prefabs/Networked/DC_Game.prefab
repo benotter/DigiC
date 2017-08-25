@@ -52,19 +52,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f22a646180a84cb47af9ecde0acd05a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homeRoom: {fileID: 0}
-  remotePlayer: {fileID: 0}
+  gameRoundPrefab: {fileID: 1763574406751360, guid: 6374676d80813e1478324a4b7c1ee662,
+    type: 2}
+  gameGridPrefab: {fileID: 1305620628798482, guid: 8bb116a6c3297bd4299e8e0be2624eaa,
+    type: 2}
   avatarPrefab: {fileID: 1936016119532734, guid: 0e6361cc41afa2342a3b95c877713504,
     type: 2}
   avatarSpawnPrefab: {fileID: 1264740442302076, guid: 5eef555523f3a4948bbc407f5614a800,
     type: 2}
+  playerCityPrefab: {fileID: 1684877318840596, guid: f87082526c4026a4b990483983158347,
+    type: 2}
+  localPlayer: {fileID: 0}
+  homeRoom: {fileID: 0}
+  gameGrid: {fileID: 0}
+  gameGridO: {fileID: 0}
+  gameOwnerPlayerObj: {fileID: 0}
+  gamePlayerCount: 0
+  currentRound: {fileID: 0}
   gameName: 
-  gameMaxPlayers: 8
   gameAddress: 
   gamePort: 0
-  gamePlayerCount: 0
-  gameOwnerPlayerObj: {fileID: 0}
-  gameGridSize: 20
+  gameMinPlayers: 2
+  gameMaxPlayers: 8
+  gameGridSize: 2
+  gameGridCellSize: 100
 --- !u!114 &114882387226330384
 MonoBehaviour:
   m_ObjectHideFlags: 1

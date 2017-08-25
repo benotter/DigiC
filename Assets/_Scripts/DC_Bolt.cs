@@ -30,7 +30,8 @@ public class DC_Bolt : NetworkBehaviour
 	
 	[Space(10)]
 
-	[HideInInspector] [SyncVar] public bool fired = false;
+	[SyncVar] public bool fired = false;
+	[SyncVar] public bool hit = false;
 
 	//Private Server-Side Variables
 
@@ -52,12 +53,10 @@ public class DC_Bolt : NetworkBehaviour
 		if(boltLight)
 		{
 			if(!instant)
-			{
 				if(boltLightCount + 1 > maxBoltLights)
 					boltLight.enabled = false;
 				else
 					boltLightCount++;
-			}
 			else 
 			{
 				if(rend) 
@@ -88,55 +87,115 @@ public class DC_Bolt : NetworkBehaviour
 	{
 		if(fired)
 			return;
-
-		if(instant)
-			FireInstant();
 		else
-			FireSlow();
-
-		fired = true;
+			fired = true;
+		
+		if(instant)
+		{
+			ServerFireInstant();
+			ClientFireInstant();
+		}
+		else
+		{
+			ServerFireSlow();
+			ClientFireSlow();
+		}
 	}
 
-	public void FireInstant()
+	[Server] public void ServerFireInstant()
 	{
-
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit[] hits;		
 
-		if(((hits = Physics.RaycastAll(ray, range, bustLayers)).Length ) > 0)
+		if(((hits = Physics.RaycastAll(ray, range, bustLayers)).Length ) > 0) 
+		{
 			foreach(RaycastHit hit in hits)
+			{
+				DC_Avatar_Part part;
+				if((part = hit.collider.gameObject.GetComponent<DC_Avatar_Part>()) && !part.broken)	
 				{
-					DC_Avatar_Part part;
-					if((part = hit.collider.gameObject.GetComponent<DC_Avatar_Part>()) && !part.broken)	
-					{
-						part.BoltStrike(this);
-						continue;
-					}
-					BustBolt(hit.point);
+					Debug.Log("Part Hit!");
+					part.BoltStrike(this);
+					continue;
 				}
 
+				BustBolt(hit.point);
+			}
+
+			hit = true;
+		}
+		
 		BustBolt(transform.position + (transform.forward * range));
 	}
 
-	public void FireSlow()
+	[Server] public void ServerFireSlow()
 	{
 
 	}
 
-	[Server] void OnCollisionEnter(Collision col)
+
+	[Client] public void ClientFireInstant() 
+	{
+		Ray ray = new Ray(transform.position, transform.forward);
+		RaycastHit[] hits;		
+
+		if(((hits = Physics.RaycastAll(ray, range, bustLayers)).Length ) > 0) 
+		{
+			foreach(RaycastHit hit in hits)
+			{
+				DC_Avatar_Part part;
+				if((part = hit.collider.gameObject.GetComponent<DC_Avatar_Part>()) && !part.broken)	
+				{
+					Debug.Log("Part Hit!");
+					part.BoltStrike(this);
+					continue;
+				}
+
+				BustBolt(hit.point);
+				break;
+			}
+
+			hit = true;
+		}
+		
+		BustBolt(transform.position + (transform.forward * range));
+	}
+
+	[Client] public void ClientFireSlow() 
+	{
+
+	}
+
+
+	void OnCollisionEnter(Collision col)
 	{
 
 	}
 
 	[Server] public void BustBolt(Vector3 boltPos)
 	{
-		RpcBustBolt(boltPos);
-		NetworkServer.Destroy(gameObject);
+		ServerBustBolt(boltPos);
+		ClientBustBolt(boltPos);
+	}
+
+	[Server] public void ServerBustBolt(Vector3 pos) 
+	{
+
+	}
+
+	[Client] public void ClientBustBolt(Vector3 pos) 
+	{
+
 	}
 
 	// Server-Side Commands
 
 	// Client-Side Commands
+
+	[ClientRpc] public void RpcFire()
+	{
+		Fire();
+	}
 
 	[ClientRpc] public void RpcBustBolt(Vector3 boltPos)
 	{

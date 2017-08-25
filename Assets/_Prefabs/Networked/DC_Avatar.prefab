@@ -172,6 +172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4287226912393292}
   - component: {fileID: 65149327948786886}
+  - component: {fileID: 114998412610843098}
   m_Layer: 0
   m_Name: Paw (Left)
   m_TagString: Untagged
@@ -188,6 +189,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4714808665290750}
   - component: {fileID: 65560855646948536}
+  - component: {fileID: 114641018024542458}
   m_Layer: 0
   m_Name: Paw (Right)
   m_TagString: Untagged
@@ -232,7 +234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4053138674112738
 Transform:
   m_ObjectHideFlags: 1
@@ -257,8 +259,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4897218675539540}
-  - {fileID: 4489378368850570}
   - {fileID: 4914401672903744}
+  - {fileID: 4489378368850570}
   - {fileID: 4360047196577182}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -318,7 +320,7 @@ Transform:
   m_Children:
   - {fileID: 4918418397023308}
   m_Father: {fileID: 4136031663749528}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4663581448764000
 Transform:
@@ -386,7 +388,7 @@ Transform:
   m_Children:
   - {fileID: 4699930475286604}
   m_Father: {fileID: 4136031663749528}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4918418397023308
 Transform:
@@ -438,7 +440,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967039
+    m_Bits: 4294966015
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -463,7 +465,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 446bcfb992c103b43b83ef405a4a4e49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -495,7 +497,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 446bcfb992c103b43b83ef405a4a4e49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -527,7 +529,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 446bcfb992c103b43b83ef405a4a4e49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -559,7 +561,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 446bcfb992c103b43b83ef405a4a4e49, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -681,7 +683,7 @@ MonoBehaviour:
   m_VelocityThreshold: 0.0001
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
-  m_InterpolateMovement: 5
+  m_InterpolateMovement: 1
 --- !u!114 &114045416222610938
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -779,6 +781,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 0
   origin: {fileID: 0}
+--- !u!114 &114641018024542458
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1846576182006308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aca8e4094a577e4bac9e42c17c210b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatar: {fileID: 114814032739173398}
+  broken: 0
+  health: 50
+  pawHand: 0
+  playerColor: {r: 0, g: 0, b: 1, a: 1}
+  brokenColor: {r: 1, g: 0, b: 0, a: 0.5}
 --- !u!114 &114667058403736802
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -837,7 +856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84f2c7d95c27a09468d0f543f81876f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatar: {fileID: 0}
+  avatar: {fileID: 114814032739173398}
   broken: 0
   health: 50
   playerColor: {r: 0, g: 0, b: 1, a: 1}
@@ -854,17 +873,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localPlayer: {fileID: 0}
-  rightStartToolIndex: 0
+  rightStartToolIndex: 2
   leftStartToolIndex: 1
   toolList:
   - {fileID: 1208198207106888, guid: 89dafa6a047479742a12914bfa207857, type: 2}
   - {fileID: 1885217396507882, guid: 13a405f65718a1c43801b89fabee432c, type: 2}
   - {fileID: 1027257511361334, guid: aa61654ba0a22b348ad7216cbf36a8eb, type: 2}
   avatarCam: {fileID: 20154779461201826}
-  muzzle: {fileID: 1232707009109900}
-  chest: {fileID: 1133850917905156}
-  rightPaw: {fileID: 1846576182006308}
-  leftPaw: {fileID: 1815982558365908}
+  muzzle: {fileID: 114788394138209956}
+  chest: {fileID: 114784984845432758}
+  rightPaw: {fileID: 114641018024542458}
+  leftPaw: {fileID: 114998412610843098}
   rightTool: {fileID: 0}
   leftTool: {fileID: 0}
   inMove: 0
@@ -897,6 +916,23 @@ MonoBehaviour:
   m_MovementThreshold: 0.001
   m_InterpolateRotation: 0.5
   m_InterpolateMovement: 0.5
+--- !u!114 &114998412610843098
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1815982558365908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aca8e4094a577e4bac9e42c17c210b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatar: {fileID: 114814032739173398}
+  broken: 0
+  health: 50
+  pawHand: 1
+  playerColor: {r: 0, g: 0, b: 1, a: 1}
+  brokenColor: {r: 1, g: 0, b: 0, a: 0.5}
 --- !u!143 &143857272530147486
 CharacterController:
   m_ObjectHideFlags: 1

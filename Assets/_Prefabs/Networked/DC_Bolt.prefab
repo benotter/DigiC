@@ -198,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bustLayers:
     serializedVersion: 2
-    m_Bits: 12289
+    m_Bits: 15104
   playerO: {fileID: 0}
   avatarO: {fileID: 0}
   instant: 1
@@ -207,6 +207,7 @@ MonoBehaviour:
   speed: 10
   range: 100
   fired: 0
+  hit: 0
 --- !u!114 &114357120375881744
 MonoBehaviour:
   m_ObjectHideFlags: 1

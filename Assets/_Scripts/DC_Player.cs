@@ -35,7 +35,7 @@ public partial class DC_Player : NetworkBehaviour
     [Space(10)]
 
     [SyncVar] public string playerName = "";
-    [SyncVar] public DC_Game.Team currentTeam = DC_Game.Team.None;
+    [SyncVar] public DC_Game.Teams currentTeam = DC_Game.Teams.None;
     
     [Space(10)]
 
@@ -106,14 +106,10 @@ public partial class DC_Player : NetworkBehaviour
 
     [Command] public void CmdSetGridPosition(int x, int y)
     {
-        if(avatarSpawnO)
-        {
-            var aS = avatarSpawnO.GetComponent<DC_Avatar_Spawn>();
-            if(aS && aS.lockedIn)
-                return;
-        }
+        if(avatarSpawn && avatarSpawn.lockedIn)
+            return;
 
-        gameGrid.SetPlayerToPosition(this.gameObject, x, y);            
+        gameGrid.SetPlayerToPosition(this.gameObject, x, y);
     }
 
     [Command] public void CmdSetPlayerName(string name)

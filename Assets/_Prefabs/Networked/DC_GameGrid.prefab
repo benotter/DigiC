@@ -1106,7 +1106,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dynaRoom: {fileID: 114813436589618932}
   gridSelector: {fileID: 0}
-  gridSize: 0
+  gridSelectorDirty: 0
+  gridSize: 2
   gridCellSize: 50
 --- !u!114 &114813436589618932
 MonoBehaviour:

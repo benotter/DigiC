@@ -47,7 +47,7 @@ public class DC_SpawnSelector_Marker : MonoBehaviour
 
 	void Update()
 	{
-		if(!lockedIn && spawnSelector.avatarSpawn)
+		if(spawnSelector.homeRoom.gameJoined && !lockedIn)
 		{
 			var rot = transform.eulerAngles;
 			rot.y += spinRate * Time.deltaTime;

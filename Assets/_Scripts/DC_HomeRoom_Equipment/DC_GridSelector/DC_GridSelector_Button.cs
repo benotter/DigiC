@@ -11,7 +11,6 @@ public class DC_GridSelector_Button : SubToolBase
 
 	public override void OnPress()
 	{
-		if(gridSelector)
-			gridSelector.SetPlayerPositionOnGrid(xPos, yPos);
+		gridSelector.SetPlayerPositionOnGrid(xPos, yPos);
 	}
 }

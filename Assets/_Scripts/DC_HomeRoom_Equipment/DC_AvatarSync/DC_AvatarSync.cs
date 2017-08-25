@@ -139,7 +139,7 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 	public override void OnGainAvatar(DC_Avatar avatar) 
 	{
 		this.avatar = avatar;
-		screenCover.SetActive(true);
+		screenCover.SetActive(false);
 	}
 
 	public override void OnLoseAvatar()
@@ -147,6 +147,6 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 		if(linked)
 			StopLink();
 
-		screenCover.SetActive(false);
+		screenCover.SetActive(true);
 	}
 }

@@ -5,27 +5,37 @@ using UnityEngine.Networking;
 
 public class DC_Player_City : NetworkBehaviour 
 {
+	[Space(10)]
+
+	[HideInInspector] public Vector3 northStreet;
+	[HideInInspector] public Vector3 eastStreet;
+	[HideInInspector]  public Vector3 southStreet;
+	[HideInInspector] public Vector3 westStreet;
 
 	// Server-Side Variables
-	[SyncVar]
-	public float gridWidth;
 
-	[SyncVar]
-	public float gridHeight;
+	[SyncVar] public GameObject playerO;
 
-	public Vector3 northStreet;
-	public Vector3 eastStreet;
-	public Vector3 southStreet;
-	public Vector3 westStreet;
-	
+	// Private Client-Side Variables
 
-	void Start () 
+	private DC_Player player;
+
+	void Update()
 	{
-		
+		ServerUpdate();
+		ClientUpdate();
+
+		if(playerO && !player)
+			player = playerO.GetComponent<DC_Player>();
 	}
-	
-	void Update () 
+
+	[Server] public void ServerUpdate() 
 	{
-		
+
+	}
+
+	[Client] public void ClientUpdate() 
+	{
+
 	}
 }

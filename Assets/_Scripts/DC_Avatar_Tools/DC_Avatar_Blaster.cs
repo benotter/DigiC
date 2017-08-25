@@ -61,22 +61,35 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 			if(lastFireTime > 1 / fireRate)
 				HandleBlasterFire();
 		}
+		else 
+		{
+			if(lastFireTime > 1 / fireRate && fired)
+				fired = false;
+		}
 	}
 
 	[Client] void ClientUpdate()
 	{
-
+		if(trigger == 1)
+		{
+			if(!firing)
+				CmdStartFiring();
+		}
+		else if(firing)
+			CmdStopFiring();
 	}
 
-	void HandleBlasterFire()
+	[Server] void HandleBlasterFire()
 	{
 		switch(blasterType) 
 		{
 			case BlasterType.SingleFire:
-				if(!fired) 
+				if(!fired)
 				{
-
+					Fire();
+					fired = true;
 				}
+					
 			break;
 
 			case BlasterType.SemiAutoFire:
@@ -105,9 +118,11 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 		bolt.avatarO = avatar.gameObject;
 
 		NetworkServer.Spawn(boltO);
+
 		bolt.Fire();
+		bolt.RpcFire();
 	}
-	
+
 	// Server-Side Commands
 
 	[Command] public void CmdStartFiring()
@@ -121,7 +136,6 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 	}
 
 	// Client-Side Commands
-
 }
 
 public partial class DC_Avatar_Blaster 

@@ -16,9 +16,11 @@ public class DC_Avatar_Part : MonoBehaviour
 
     public virtual bool BoltStrike(DC_Bolt bolt) 
     {
-        avatar.BoltStrike(bolt, GetBodyPart());
+        avatar.BoltStrike(this, bolt);
 		return TakeDamage(bolt.damage);
     }
+
+    public virtual void OnServerUpdate() {}
 
     public virtual void OnDamage() {}
     public virtual void OnHeal() {}
@@ -26,33 +28,38 @@ public class DC_Avatar_Part : MonoBehaviour
     public virtual void OnBreak() {}
     public virtual void OnFix () {}
 
-    public bool TakeDamage(int damage)
+    public virtual bool CheckHealth() 
     {
-        if((health -= damage) < 0)
+        if(health < 0)
         {
             broken = true;
             this.OnBreak();
 
+            return false;
+        }
+        else
+        {
+            broken = false;
+            this.OnFix();
             return true;
         }
+    }
+
+    public bool TakeDamage(int damage)
+    {
+        health -= damage;
+        CheckHealth();
 
         this.OnDamage();
-        
         return false;
     }
 
     public bool Heal(int negDamage)
     {
-        if((health += negDamage) > 0)
-        {
-            broken = false;
-            this.OnFix();
-
-            return true;
-        }
+        health += negDamage;
+        CheckHealth();
 
         this.OnHeal();
-
         return false;
     }
 }

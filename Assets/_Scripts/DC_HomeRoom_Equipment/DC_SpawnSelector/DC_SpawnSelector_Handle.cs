@@ -30,10 +30,11 @@ public class DC_SpawnSelector_Handle : SubToolBase
 		if(inUse && !used)
 			used = true;
 
-		if(inUse && spawnSelector.homeRoom.remotePlayer && !spawnSelector.avatarSpawn && !avatarRequested)
+		if(inUse && spawnSelector.homeRoom.gameJoined && !spawnSelector.avatarSpawn && !avatarRequested)
 		{
 			avatarRequested = true;
 			spawnSelector.homeRoom.remotePlayer.CmdRequestAvatarSpawn();
+			Debug.Log("Local Requesting avatar");
 		}
 
 		if(avatarRequested && spawnSelector.avatarSpawn)

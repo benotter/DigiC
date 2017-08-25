@@ -19,18 +19,24 @@ public class DC_Avatar_Paw : DC_Avatar_Part
 
 	private MeshRenderer rend;
 
+	public override DC_Avatar.BodyParts GetBodyPart()
+	{
+		if(pawHand == Paw.RightPaw)
+			return DC_Avatar.BodyParts.RightPaw;
+		else
+			return DC_Avatar.BodyParts.LeftPaw;
+	}
+
 	void Start () 
 	{
 		rend = GetComponent<MeshRenderer>();
+		
+		if(!rend)
+			rend = GetComponentInChildren<MeshRenderer>();
+
 		UpdateColor();
 	}
 	
-	// Update is called once per frame
-	void Update () 
-	{
-
-	}
-
 	void UpdateColor()
 	{
 		Color c;
@@ -46,12 +52,10 @@ public class DC_Avatar_Paw : DC_Avatar_Part
 			rend.material.color = c;
 	}
 
-	public override DC_Avatar.BodyParts GetBodyPart()
+	public override void OnServerUpdate() 
 	{
-		if(pawHand == Paw.RightPaw)
-			return DC_Avatar.BodyParts.RightPaw;
-		else
-			return DC_Avatar.BodyParts.LeftPaw;
+		CheckHealth();
+		UpdateColor();
 	}
 
 	public override void OnBreak()

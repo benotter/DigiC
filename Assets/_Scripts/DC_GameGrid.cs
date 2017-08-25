@@ -9,38 +9,17 @@ public partial class DC_GameGrid : NetworkBehaviour
 	public DynaRoom dynaRoom;
 	public DC_GridSelector gridSelector;
 
-	// Server-Side Variables
-	[SyncVar] public GridSize gridSize = GridSize.One;
-	[SyncVar] public float gridCellSize = 20;
-	[HideInInspector] public SyncListGridCell cells = new SyncListGridCell();
+	[HideInInspector] public bool gridSelectorDirty = false;
 
-	// Private Client-Side Variables
+	// Server-Side Variables
+	[SyncVar] public GridSize gridSize = GridSize.Three;
+	[SyncVar] public float gridCellSize = 20;
+
+	public SyncListGCell cells = new SyncListGCell();
 
 	// Private Server-Side Variables
 
-	void RegisterWithDirector()
-	{
-		GameObject director = GameObject.Find("DC_Director");
-        DC_Director dc_D;
-
-        if(director && (dc_D = director.GetComponent<DC_Director>()))
-			dc_D.RegisterGameGrid(this);
-	}
-
-	public override void OnStartServer()
-    {
-        cells.Add(new GameGridCell().SetPos(1, 1)); // 0
-        cells.Add(new GameGridCell().SetPos(1, 2)); // 1
-        cells.Add(new GameGridCell().SetPos(1, 3)); // 2
-
-        cells.Add(new GameGridCell().SetPos(2, 1)); // 3
-        cells.Add(new GameGridCell().SetPos(2, 2)); // 4
-        cells.Add(new GameGridCell().SetPos(2, 3)); // 5
-
-        cells.Add(new GameGridCell().SetPos(3, 1)); // 6
-        cells.Add(new GameGridCell().SetPos(3, 2)); // 7
-        cells.Add(new GameGridCell().SetPos(3, 3)); // 8
-    }
+	// Private Client-Side Variables
 
 	public override void OnStartClient()
     {
@@ -53,51 +32,24 @@ public partial class DC_GameGrid : NetworkBehaviour
         dynaRoom.length = gridCellSize * 3;
     }
 
-	[Server] public void UpdateCellPositions()
-    {
-        for(int i = 0; i < cells.Count; i++)
-        {
-            GameGridCell cell = cells[i];
-            GameGridCell newCell = cell;
-
-            float halfGrid = (gridCellSize / 2f);
-
-            float x = ((cell.x) * gridCellSize) - halfGrid;
-            float y = ((cell.y) * gridCellSize) - halfGrid;
-
-            float offset = (gridCellSize * 3f) / 2f;
-
-            newCell.cellPos = new Vector3( y - offset, 0f, -(x - offset ));
-
-            cells[i] = newCell;
-
-			cells.Dirty(i);
-        }
-
-		RpcUpdateGameGrid();
-    }
-
-	public int GetPosInt(int x, int y)
-	{
-		return (((x - 1) * 3) + y) - 1;
-	}
-
-	[Server] public bool CheckPosition(int x, int y, GameObject pO = null)
+	public bool CheckPosition(int x, int y, GameObject pO = null)
 	{
 		var pos = GetPosInt(x, y);
 
-		if( pos >= cells.Count || pos < 0)
+		if( pos >= cells.Count)
+		{
+			Debug.Log("Bad Grid Pos X: " + x);
+			Debug.Log("Bad Grid Pos Y: " + y);
 			return false;
-
+		}
+			
 		var p = cells[pos].player;
 		return (p == pO);
 	}
 
 	[Server] public bool SetPlayerToPosition(GameObject playerO, int x, int y)
 	{
-		if(CheckPosition(x, y, playerO))
-			return true;
-		else if(!CheckPosition(x, y))
+		if(!CheckPosition(x, y))
 			return false;
 
 		DC_Player player = playerO.GetComponent<DC_Player>();
@@ -117,9 +69,10 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 		int newPos = GetPosInt(x, y);
 
-		GameGridCell cell = cells[newPos];
+		GCell cell = cells[newPos];
 		cell.player = playerO;
 		cells[newPos] = cell;
+
 		cells.Dirty(newPos);
 
 		player.RpcUpdatePosition(cell.cellPos);
@@ -129,25 +82,97 @@ public partial class DC_GameGrid : NetworkBehaviour
 		return true;
 	}
 
-	// Client-Side Commands
+	[Server] public void SetGridSize(GridSize sizeType, float cellSize)
+	{
+		gridSize = sizeType;
 
+		UpdateCells();
+		SetGridCellSize(cellSize);
+	}
+
+	[Server] public void SetGridCellSize(float size)
+	{
+		gridCellSize = size;
+
+		UpdateCellPositions();
+		UpdateDynaRoom();
+	}
+
+	[Server] public void UpdateCellPositions()
+    {
+        for(int i = 0; i < cells.Count; i++)
+        {
+            GCell cell = cells[i];
+            GCell newCell = cell;
+
+            float halfGrid = (gridCellSize / 2f);
+
+            float x = ((cell.x) * gridCellSize) - halfGrid;
+            float y = ((cell.y) * gridCellSize) - halfGrid;
+
+            float offset = (gridCellSize * 3f) / 2f;
+
+            newCell.cellPos = new Vector3( y - offset, 0f, -(x - offset ));
+
+            cells[i] = newCell;
+
+			cells.Dirty(i);
+        }
+    }
+
+	[Server] public void UpdateCells()
+	{
+		cells.Clear();
+
+		cells.Add(new GCell().SetPos(1, 1)); // 0
+        cells.Add(new GCell().SetPos(1, 2)); // 1
+        cells.Add(new GCell().SetPos(1, 3)); // 2
+		
+		if(gridSize == GridSize.One)
+			return;
+
+        cells.Add(new GCell().SetPos(2, 1)); // 3
+        cells.Add(new GCell().SetPos(2, 2)); // 4
+        cells.Add(new GCell().SetPos(2, 3)); // 5
+
+		if(gridSize == GridSize.Two)
+			return;
+
+        cells.Add(new GCell().SetPos(3, 1)); // 6
+        cells.Add(new GCell().SetPos(3, 2)); // 7
+        cells.Add(new GCell().SetPos(3, 3)); // 8
+	}
+
+	public int GetPosInt(int x, int y)
+	{
+		return (((x - 1) * 3) + y) - 1;
+	}
+
+	// Client-Side Commands
     [ClientRpc] public void RpcUpdateGameGrid()
     {
         UpdateDynaRoom();
-		gridSelector.UpdateButtonState();
+
+		gridSelectorDirty = true;
     }
 }
 
 public partial class DC_GameGrid 
 {
-	[System.Serializable]
-	public struct GameGridCell 
+	[System.Serializable] public enum GridSize 
+	{
+		One,
+		Two,
+		Three
+	}
+
+	[System.Serializable] public struct GCell 
 	{
 		public GameObject player;
 		public Vector3 cellPos;
 		public int x;
 		public int y;
-		public GameGridCell SetPos(int x, int y)
+		public GCell SetPos(int x, int y)
 		{
 			this.x = x;
 			this.y = y;
@@ -156,14 +181,5 @@ public partial class DC_GameGrid
 		}
 	}
 
-	[System.Serializable]
-	public class SyncListGridCell : SyncListStruct<GameGridCell>{}
-
-	[System.Serializable]
-	public enum GridSize 
-	{
-		One,
-		Two,
-		Three
-	}
+	[System.Serializable] public class SyncListGCell : SyncListStruct<GCell>{}
 }

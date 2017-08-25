@@ -11,24 +11,6 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1614976993943478}
   m_IsPrefabParent: 1
---- !u!1 &1062389398996474
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4609783831091134}
-  - component: {fileID: 33181085673818264}
-  - component: {fileID: 65284580954628954}
-  - component: {fileID: 23125848777756652}
-  m_Layer: 11
-  m_Name: Cube
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &1614976993943478
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,7 +73,6 @@ Transform:
   m_Children:
   - {fileID: 4384513503506018}
   - {fileID: 4510134339377962}
-  - {fileID: 4609783831091134}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -121,70 +102,6 @@ Transform:
   m_Father: {fileID: 4135879476172404}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4609783831091134
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1062389398996474}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 11.52, z: 8.53}
-  m_LocalScale: {x: 1, y: 20, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4135879476172404}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23125848777756652
-MeshRenderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1062389398996474}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!33 &33181085673818264
-MeshFilter:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1062389398996474}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65284580954628954
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1062389398996474}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114039858198281070
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -243,14 +160,16 @@ MonoBehaviour:
   m_OnlineScene: 
   m_SpawnPrefabs:
   - {fileID: 1497273469723836, guid: fa60994d8a3a6e2439435171c81dcaf8, type: 2}
+  - {fileID: 1763574406751360, guid: 6374676d80813e1478324a4b7c1ee662, type: 2}
   - {fileID: 1305620628798482, guid: 8bb116a6c3297bd4299e8e0be2624eaa, type: 2}
   - {fileID: 1974543538082220, guid: f6fa74cf0b3719547b9ff6a82af3da67, type: 2}
+  - {fileID: 1684877318840596, guid: f87082526c4026a4b990483983158347, type: 2}
   - {fileID: 1936016119532734, guid: 0e6361cc41afa2342a3b95c877713504, type: 2}
   - {fileID: 1264740442302076, guid: 5eef555523f3a4948bbc407f5614a800, type: 2}
-  - {fileID: 1220429457656818, guid: ff196800a4a9000428bc08d96ec3eb29, type: 2}
   - {fileID: 1208198207106888, guid: 89dafa6a047479742a12914bfa207857, type: 2}
   - {fileID: 1885217396507882, guid: 13a405f65718a1c43801b89fabee432c, type: 2}
   - {fileID: 1027257511361334, guid: aa61654ba0a22b348ad7216cbf36a8eb, type: 2}
+  - {fileID: 1220429457656818, guid: ff196800a4a9000428bc08d96ec3eb29, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 8
   m_ConnectionConfig:
@@ -311,12 +230,8 @@ MonoBehaviour:
   homeRoom: {fileID: 0}
   serverGamePrefab: {fileID: 1497273469723836, guid: fa60994d8a3a6e2439435171c81dcaf8,
     type: 2}
-  gameGridPrefab: {fileID: 1305620628798482, guid: 8bb116a6c3297bd4299e8e0be2624eaa,
-    type: 2}
   serverGame: {fileID: 0}
-  gameGrid: {fileID: 114427334417311590, guid: 8bb116a6c3297bd4299e8e0be2624eaa, type: 2}
   serverGameO: {fileID: 0}
-  gameGridO: {fileID: 0}
 --- !u!114 &114842963254295896
 MonoBehaviour:
   m_ObjectHideFlags: 1

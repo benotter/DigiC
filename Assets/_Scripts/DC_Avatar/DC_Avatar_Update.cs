@@ -9,19 +9,17 @@ public partial class DC_Avatar
 {
     void Update()
     {
-        if(isClient)
-            ClientUpdate();
-        else if(isServer)
-            ServerUpdate();
+        ClientUpdate();
+        ServerUpdate();
     }
 
-    void ServerUpdate()
+    [Server] void ServerUpdate()
     {
-        // UpdateCharacterController();
+        
 
     }
 
-    void ClientUpdate()
+    [Client] void ClientUpdate()
     {
         if(hasAuthority)
         {
@@ -67,7 +65,7 @@ public partial class DC_Avatar
 
     public void UpdatePosition()
     {
-        if(!inMove && (lastColFlags & CollisionFlags.Below) == 0)
+        if(!inMove)
             currentVelocity.y -= gravity * Time.deltaTime;
 
         var move = targetMove + currentVelocity * Time.deltaTime;
@@ -102,6 +100,7 @@ public partial class DC_Avatar
         mT.localRotation = localPlayer.hmdRot;
 
         cT.localPosition = mT.localPosition;
+        cT.localEulerAngles = new Vector3(0f, mT.localEulerAngles.y, 0f);
         
         bool right = true, 
              left = false;

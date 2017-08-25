@@ -9,9 +9,18 @@ public class DC_Avatar_Chest : DC_Avatar_Part
 
 	private MeshRenderer rend;
 
+	public override DC_Avatar.BodyParts GetBodyPart()
+	{
+		return DC_Avatar.BodyParts.Chest;
+	}
+
 	void Start () 
 	{
 		rend = GetComponent<MeshRenderer>();
+		
+		if(!rend)
+			rend = GetComponentInChildren<MeshRenderer>();
+
 		UpdateColor();
 	}
 
@@ -30,9 +39,10 @@ public class DC_Avatar_Chest : DC_Avatar_Part
 			rend.material.color = c;
 	}
 
-	public override DC_Avatar.BodyParts GetBodyPart()
+	public override void OnServerUpdate() 
 	{
-		return DC_Avatar.BodyParts.Chest;
+		CheckHealth();
+		UpdateColor();
 	}
 
 	public override void OnBreak()

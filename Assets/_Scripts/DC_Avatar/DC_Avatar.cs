@@ -21,10 +21,10 @@ public partial class DC_Avatar : NetworkBehaviour
 
     [Space(10)]
 
-    public GameObject muzzle;
-    public GameObject chest;
-    public GameObject rightPaw;
-    public GameObject leftPaw;
+    public DC_Avatar_Muzzle muzzle;
+    public DC_Avatar_Chest chest;
+    public DC_Avatar_Paw rightPaw;
+    public DC_Avatar_Paw leftPaw;
 
     [Space(10)]
 
@@ -106,29 +106,29 @@ public partial class DC_Avatar : NetworkBehaviour
     {
         // coll = GetComponent<CharacterController>();
 
-        muzzle.layer = avatarServerLayer;
-        chest.layer = avatarServerLayer;
-        rightPaw.layer = avatarServerLayer;
-        leftPaw.layer = avatarServerLayer;
+        muzzle.gameObject.layer = avatarServerLayer;
+        chest.gameObject.layer = avatarServerLayer;
+        rightPaw.gameObject.layer = avatarServerLayer;
+        leftPaw.gameObject.layer = avatarServerLayer;
     }
 
     public override void OnStartClient()
     {
-        muzzle.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
-        chest.layer = chest.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
-        rightPaw.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
-        leftPaw.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        muzzle.gameObject.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        chest.gameObject.layer = chest.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        rightPaw.gameObject.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+        leftPaw.gameObject.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
     }
 
     public override void OnStartAuthority()
     {
         avatarCam.enabled = true;
 
-        muzzle.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarLocalLayer;
-        chest.layer = chest.transform.GetChild(0).gameObject.layer = avatarChestLayer;
+        muzzle.gameObject.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarLocalLayer;
+        chest.gameObject.layer = chest.transform.GetChild(0).gameObject.layer = avatarChestLayer;
 
-        rightPaw.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
-        leftPaw.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
+        rightPaw.gameObject.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
+        leftPaw.gameObject.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
 
         coll = GetComponent<CharacterController>();
 
@@ -149,11 +149,11 @@ public partial class DC_Avatar : NetworkBehaviour
 
     }
 
-    [Server] public void BoltStrike(DC_Bolt bolt, BodyParts bodyPos)
+    [Server] public void BoltStrike(DC_Avatar_Part bodyP, DC_Bolt bolt)
     {
-        RpcBoltStrike(bolt.gameObject, bodyPos);
+        BodyParts part = bodyP.GetBodyPart();
 
-        switch(bodyPos)
+        switch(bodyP.GetBodyPart())
         {
             case BodyParts.Chest:
             break;
@@ -166,6 +166,7 @@ public partial class DC_Avatar : NetworkBehaviour
 
             case BodyParts.LeftPaw:
             break;
+            
 
             case BodyParts.ChestChord:
             break;
@@ -173,30 +174,9 @@ public partial class DC_Avatar : NetworkBehaviour
             case BodyParts.MuzzleChord:
             break;
         }
-    }
 
-    [Client] public void ClientBoltStrike(DC_Bolt bolt, BodyParts bodyPos)
-    {
-        switch(bodyPos)
-        {
-            case BodyParts.Chest:
-            break;
-
-            case BodyParts.Muzzle:
-            break;
-
-            case BodyParts.RightPaw:
-            break;
-
-            case BodyParts.LeftPaw:
-            break;
-
-            case BodyParts.ChestChord:
-            break;
-
-            case BodyParts.MuzzleChord:
-            break;
-        }
+        if(part != BodyParts.ChestChord || part != BodyParts.MuzzleChord)
+            RpcSetPartHealth(part, bodyP.health);
     }
 
     public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
@@ -291,13 +271,31 @@ public partial class DC_Avatar : NetworkBehaviour
 
 
     // Client-Side Commands
-    
-
-    [ClientRpc] public void RpcBoltStrike(GameObject boltO, BodyParts part)
+    [ClientRpc] public void RpcSetPartHealth(BodyParts part, int health) 
     {
-        DC_Bolt bolt = boltO.GetComponent<DC_Bolt>();
-        if(bolt)
-            ClientBoltStrike(bolt, part);
+        DC_Avatar_Part p = chest;
+
+        switch(part)
+        {
+            case BodyParts.Chest:
+                p = chest;
+            break;
+
+            case BodyParts.Muzzle:
+                p = muzzle;
+            break;
+
+            case BodyParts.RightPaw:
+                p = rightPaw;
+            break;
+
+            case BodyParts.LeftPaw:
+                p = leftPaw;
+            break;
+        }
+
+        p.health = health;
+        p.OnServerUpdate();
     }
 
     [ClientRpc] public void RpcSetPosition(Vector3 pos)

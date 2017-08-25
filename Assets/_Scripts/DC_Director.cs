@@ -16,55 +16,69 @@ public partial class DC_Director : NetworkManager
     [Space(10)]
 
     public GameObject serverGamePrefab;
-    public GameObject gameGridPrefab;
 
-    [HideInInspector] public DC_Game serverGame;
-    [HideInInspector] public DC_GameGrid gameGrid;
-    
+    [Space(10)]
+
+    public DC_Game serverGame;
+
     [HideInInspector] public GameObject serverGameO;
-    [HideInInspector] public GameObject gameGridO;
 
     private bool gameSpawned = false;
-    private bool gridSpawned = false;
 
-    void Update()
+    void Update() 
     {
-        if(!gridSpawned && NetworkServer.active)
+        if(NetworkServer.active && !gameSpawned) 
         {
-            CreateGameGrid();
-            NetworkServer.Spawn(gameGridO);
-            gridSpawned = true;
-        }   
-
-        if(!gameSpawned && NetworkServer.active)
-        {
-            CreateServerGame();
             NetworkServer.Spawn(serverGameO);
             gameSpawned = true;
         }
-
-        if(serverGame && !homeRoom.serverGame)
-            homeRoom.serverGame = serverGame;
-
-        if(gameGrid && !homeRoom.gameGrid)
-            homeRoom.gameGrid = gameGrid;
     }
-    
 
-    // Server-Side Callbacks
-	public override void OnStartHost() 
+    public void RegisterServerGame(DC_Game server)
     {
+        if(!serverGame)
+        {
+            serverGame = server;
+            serverGameO = server.gameObject;
+        }
+    
+        server.homeRoom = homeRoom;
+        homeRoom.serverGame = server;
 
+        server.localPlayer = homeRoom.localPlayer;
+        
+        if(server.gameGridO && !server.gameGrid)
+            server.gameGrid = server.gameGridO.GetComponent<DC_GameGrid>();
+            
+        homeRoom.gameGrid = server.gameGrid;
     }
 
-    public override void OnStartServer()
+    public void CreateServerGame()
+    {
+        serverGameO = Instantiate(serverGamePrefab);
+        serverGame = serverGameO.GetComponent<DC_Game>();
+
+        serverGame.gameName = gameName;
+        serverGame.gameMaxPlayers = maxPlayers;
+        serverGame.gamePort = networkPort;
+        serverGame.gameAddress = networkAddress;
+    }
+
+    void Start() 
     {
         
     }
 
-    void OnServerInitialized()
+    // Server-Side Callbacks
+	public override void OnStartHost() 
     {
-        Debug.Log("Teeeessst!");
+        CreateServerGame();
+    }
+
+    public override void OnStartServer()
+    {
+        if(!serverGameO)
+            CreateServerGame();
     }
 
     public override void OnServerConnect(NetworkConnection conn)
@@ -93,7 +107,6 @@ public partial class DC_Director : NetworkManager
     public override void OnServerReady(NetworkConnection conn)
     {
         Debug.Log("Client Ready On: " + conn.address);
-
         NetworkServer.SetClientReady(conn);
     }
 
@@ -104,12 +117,7 @@ public partial class DC_Director : NetworkManager
         GameObject playerO = Instantiate(playerPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero));
 
         if( NetworkServer.AddPlayerForConnection(conn, playerO, playerControllerId) )
-        {
-            DC_Player player = playerO.GetComponent<DC_Player>();
-
-            player.RpcGameSetup(serverGame.gameObject);
-            serverGame.AddPlayer(player);
-        };
+            serverGame.AddPlayer(playerO);
     }
     public override void OnServerRemovePlayer(NetworkConnection conn, PlayerController player)
     {
@@ -158,40 +166,4 @@ public partial class DC_Director : NetworkManager
 		networkPort = port;
 		networkAddress = address;
 	}
-
-    public void CreateServerGame()
-    {
-        serverGameO = Instantiate(serverGamePrefab);
-        serverGame = serverGameO.GetComponent<DC_Game>();
-
-        serverGame.gameName = gameName;
-        serverGame.gameMaxPlayers = maxPlayers;
-        serverGame.gamePort = networkPort;
-        serverGame.gameAddress = networkAddress;
-    }
-
-    public void RegisterServerGame(DC_Game server)
-    {
-        server.homeRoom = homeRoom;
-        server.gameGrid = gameGrid;
-        server.localPlayer = homeRoom.localPlayer;
-
-        serverGame = server;
-        serverGameO = server.gameObject;
-    }
-
-    public void CreateGameGrid()
-    {
-        gameGridO = Instantiate(gameGridPrefab);
-        gameGrid = gameGridO.GetComponent<DC_GameGrid>();
-    }
-
-    public void RegisterGameGrid(DC_GameGrid grid)
-    {
-        grid.gridSelector = homeRoom.gridSelector;
-
-        gameGrid = grid;
-        gameGridO = grid.gameObject;
-    }
-
 }

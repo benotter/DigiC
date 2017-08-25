@@ -9,18 +9,21 @@ public class DC_Avatar_Muzzle : DC_Avatar_Part
 
 	private MeshRenderer rend;
 
+	public override DC_Avatar.BodyParts GetBodyPart()
+	{
+		return DC_Avatar.BodyParts.Muzzle;
+	}
+
 	void Start () 
 	{
 		rend = GetComponent<MeshRenderer>();
+		
+		if(!rend)
+			rend = GetComponentInChildren<MeshRenderer>();
+
 		UpdateColor();
 	}
 	
-	// Update is called once per frame
-	void Update () 
-	{
-
-	}
-
 	void UpdateColor()
 	{
 		Color c;
@@ -36,9 +39,10 @@ public class DC_Avatar_Muzzle : DC_Avatar_Part
 			rend.material.color = c;
 	}
 
-	public override DC_Avatar.BodyParts GetBodyPart()
+	public override void OnServerUpdate() 
 	{
-		return DC_Avatar.BodyParts.Muzzle;
+		CheckHealth();
+		UpdateColor();
 	}
 
 	public override void OnBreak()

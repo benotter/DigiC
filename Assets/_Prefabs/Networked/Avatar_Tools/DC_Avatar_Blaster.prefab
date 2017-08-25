@@ -19,8 +19,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4788058217028144}
-  - component: {fileID: 114541054390029280}
   - component: {fileID: 114654975953974070}
+  - component: {fileID: 114541054390029280}
   m_Layer: 0
   m_Name: DC_Avatar_Blaster
   m_TagString: Untagged
@@ -101,7 +101,7 @@ MonoBehaviour:
     i14: 168
     i15: 235
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!114 &114654975953974070
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -130,6 +130,10 @@ MonoBehaviour:
   firePoint: {fileID: 4813944853424474}
   boltPrefab: {fileID: 1220429457656818, guid: ff196800a4a9000428bc08d96ec3eb29, type: 2}
   blasterType: 0
+  bulletStyleBolt: 1
+  boltHeals: 0
+  damage: 10
+  range: 100
   energyMax: 100
   energyChargeRate: 10
   fireRate: 1
