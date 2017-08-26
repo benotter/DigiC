@@ -11,15 +11,29 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 	[HideInInspector] public bool gridSelectorDirty = false;
 
+	[Space(10)]
+
+	public GCell[] gridCells = new GCell[9];
+
+	[Space(10)]
+
 	// Server-Side Variables
 	[SyncVar] public GridSize gridSize = GridSize.Three;
 	[SyncVar] public float gridCellSize = 20;
 
-	public SyncListGCell cells = new SyncListGCell();
+	// Why the f**k to SyncLists act Sooooo funky? I don't get them, will replace ASAP until I get them.
+	public class SyncListGCell : SyncListStruct<GCell>{};
+	public SyncListGCell cells;
 
 	// Private Server-Side Variables
 
 	// Private Client-Side Variables
+
+	public override void OnStartServer()
+	{
+		cells = new SyncListGCell();
+		gridCells = new GCell[9];
+	}
 
 	public override void OnStartClient()
     {
@@ -47,6 +61,21 @@ public partial class DC_GameGrid : NetworkBehaviour
 		return (p == pO);
 	}
 
+	public bool LocalCheckPosition(int x, int y, GameObject pO = null)
+	{
+		var pos = GetPosInt(x, y);
+
+		if( pos >= cells.Count)
+		{
+			Debug.Log("Bad Grid Pos X: " + x);
+			Debug.Log("Bad Grid Pos Y: " + y);
+			return false;
+		}
+			
+		var p = gridCells[pos].player;
+		return (p == pO);
+	}
+
 	[Server] public bool SetPlayerToPosition(GameObject playerO, int x, int y)
 	{
 		if(!CheckPosition(x, y))
@@ -59,8 +88,11 @@ public partial class DC_GameGrid : NetworkBehaviour
 			int oldPos = GetPosInt(player.gameGridX, player.gameGridY);
 			var oldCell = cells[oldPos];
 			oldCell.player = null;
-			cells[oldPos] = oldCell;
 
+
+			gridCells[oldPos] = oldCell;
+
+			cells[oldPos] = oldCell;
 			cells.Dirty(oldPos);
 		}
 
@@ -71,12 +103,17 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 		GCell cell = cells[newPos];
 		cell.player = playerO;
-		cells[newPos] = cell;
 
+
+		gridCells[newPos] = cell;
+
+		cells[newPos] = cell;
 		cells.Dirty(newPos);
+
 
 		player.RpcUpdatePosition(cell.cellPos);
 
+		RpcSetCell(newPos, cell);
 		RpcUpdateGameGrid();
 
 		return true;
@@ -114,8 +151,10 @@ public partial class DC_GameGrid : NetworkBehaviour
 
             newCell.cellPos = new Vector3( y - offset, 0f, -(x - offset ));
 
-            cells[i] = newCell;
 
+			gridCells[i] = newCell;
+
+            cells[i] = newCell;
 			cells.Dirty(i);
         }
     }
@@ -123,10 +162,15 @@ public partial class DC_GameGrid : NetworkBehaviour
 	[Server] public void UpdateCells()
 	{
 		cells.Clear();
+		// cells = new GCell[9];
 
 		cells.Add(new GCell().SetPos(1, 1)); // 0
         cells.Add(new GCell().SetPos(1, 2)); // 1
         cells.Add(new GCell().SetPos(1, 3)); // 2
+
+		gridCells[0] = (new GCell().SetPos(1, 1)); // 0
+        gridCells[1] = (new GCell().SetPos(1, 2)); // 1
+        gridCells[2] = (new GCell().SetPos(1, 3)); // 2
 		
 		if(gridSize == GridSize.One)
 			return;
@@ -135,17 +179,31 @@ public partial class DC_GameGrid : NetworkBehaviour
         cells.Add(new GCell().SetPos(2, 2)); // 4
         cells.Add(new GCell().SetPos(2, 3)); // 5
 
+		gridCells[3] = (new GCell().SetPos(2, 1)); // 3
+        gridCells[4] = (new GCell().SetPos(2, 2)); // 4
+        gridCells[5] = (new GCell().SetPos(2, 3)); // 5
+
 		if(gridSize == GridSize.Two)
 			return;
 
         cells.Add(new GCell().SetPos(3, 1)); // 6
         cells.Add(new GCell().SetPos(3, 2)); // 7
         cells.Add(new GCell().SetPos(3, 3)); // 8
+
+		gridCells[6] = (new GCell().SetPos(3, 1)); // 6
+        gridCells[7] = (new GCell().SetPos(3, 2)); // 7
+        gridCells[8] = (new GCell().SetPos(3, 3)); // 8
 	}
 
 	public int GetPosInt(int x, int y)
 	{
 		return (((x - 1) * 3) + y) - 1;
+	}
+
+	[Server] public void UpdateAllClients() 
+	{
+		for(int i = 0; i < gridCells.Length; i++)
+			RpcSetCell(i, gridCells[i]);
 	}
 
 	// Client-Side Commands
@@ -155,6 +213,11 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 		gridSelectorDirty = true;
     }
+
+	[ClientRpc] public void RpcSetCell(int index, GCell cell) 
+	{
+		gridCells[index] = cell;
+	}
 }
 
 public partial class DC_GameGrid 
@@ -180,6 +243,4 @@ public partial class DC_GameGrid
 			return this;
 		}
 	}
-
-	[System.Serializable] public class SyncListGCell : SyncListStruct<GCell>{}
 }

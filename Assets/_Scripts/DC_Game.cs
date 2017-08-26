@@ -157,6 +157,8 @@ public partial class DC_Game : NetworkBehaviour
 
         gamePlayerCount++;
         RpcPlayerJoined(player.gameObject);
+
+        gameGrid.UpdateAllClients();
     }
 
     [Server] public void RemPlayer(DC_Player player)
@@ -164,6 +166,8 @@ public partial class DC_Game : NetworkBehaviour
         // Player gridCell is auto-cleared by handy - dandy unity null referencing
         gamePlayerCount--;
         RpcPlayerLeft(player.gameObject);
+
+        gameGrid.UpdateAllClients();
     }
 
     [Server] public void RequestAvatarSpawn(DC_Player player)

@@ -35,18 +35,25 @@ public class DC_Bolt : NetworkBehaviour
 
 	//Private Server-Side Variables
 
-	// [SyncVar] private bool inMotion = false;
+	[SyncVar] private bool inMotion = false;
 
 	// Private Client-Side Variables
 
-	private Light boltLight;
+	
 	private Renderer rend;
 	private Collider coll;
+	private Rigidbody rigid;
+	private Light boltLight;
+
+	private Vector3 startPos;
+	
+	private float bustTime = 0f;
+	
+
 
 	void Start()
 	{
 		rend = GetComponentInChildren<Renderer>();
-
 		coll = GetComponent<Collider>();
 		boltLight = GetComponent<Light>();
 
@@ -72,6 +79,33 @@ public class DC_Bolt : NetworkBehaviour
 		}
 	}
 
+	void Update() 
+	{
+		if(isServer)
+			ServerUpdate();
+		else if(isClient)
+			ClientUpdate();
+
+		if(fired && !instant && inMotion)
+			UpdateMotion();
+	}
+
+	void ServerUpdate() 
+	{
+		if(fired && !instant && inMotion && !hit && Vector3.Distance(startPos, transform.position) >= range)
+			BustBolt(transform.position);
+	}
+
+	void ClientUpdate() 
+	{
+	
+	}
+
+	void UpdateMotion() 
+	{
+		rigid.position = rigid.position + transform.forward * (speed * Time.deltaTime);
+	}
+
 	void OnDestroy()
 	{
 		if(!instant && boltLight && boltLight.enabled)
@@ -89,16 +123,22 @@ public class DC_Bolt : NetworkBehaviour
 			return;
 		else
 			fired = true;
+
+		startPos = transform.position;
 		
 		if(instant)
 		{
-			ServerFireInstant();
-			ClientFireInstant();
+			if(isServer) 
+				ServerFireInstant();
+			else if(isClient)
+				ClientFireInstant();
 		}
 		else
 		{
-			ServerFireSlow();
-			ClientFireSlow();
+			if(isServer)
+				ServerFireSlow();
+			else if(isClient)
+				ClientFireSlow();
 		}
 	}
 
@@ -130,7 +170,7 @@ public class DC_Bolt : NetworkBehaviour
 
 	[Server] public void ServerFireSlow()
 	{
-
+		inMotion = true;
 	}
 
 
