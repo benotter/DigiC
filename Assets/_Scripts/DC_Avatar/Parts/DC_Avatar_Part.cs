@@ -4,10 +4,70 @@ using UnityEngine;
 
 public class DC_Avatar_Part : MonoBehaviour 
 {
+    public Color playerColor = Color.blue;
+	public Color brokenColor = Color.red * new Color(1f,1f,1f,0.5f);
+
+    [Range(0f,1f)] public float fadeOut = 0f;
+
+    [Space(10)]
+
     public DC_Avatar avatar;
-    public bool broken = false;
+    public GameObject avatarO;
+
+    private bool _broken = false;
+    public bool broken { get { return (health <= 0); } }
 
     public int health = 50;
+
+    private MeshRenderer rend;
+
+    void Start () 
+	{
+        avatarO = gameObject;
+
+		rend = GetComponent<MeshRenderer>();
+		
+		if(!rend)
+			rend = GetComponentInChildren<MeshRenderer>();
+
+		UpdateColor();
+	}
+
+    public void UpdateColor()
+	{
+		Color c;
+
+		if(!broken)
+			c = playerColor;
+		else
+			c = brokenColor;
+
+		Color curC = rend.material.color;
+
+        if(fadeOut > 0f)
+            c.a = fadeOut;
+
+		if(curC != c)
+			rend.material.color = c;
+	}
+
+    public void SetHealth(int h)
+    {
+        health = h;
+        CheckHealth();
+    }
+
+    public bool CheckHealth() 
+    {
+        if(!_broken && health <= 0)
+            this.OnBreak();
+        else if(_broken && health > 0)
+            this.OnFix();
+
+        _broken = (health <= 0);
+
+        return (health >= 0);
+    }
 
     public virtual DC_Avatar.BodyParts GetBodyPart()
     {
@@ -16,50 +76,56 @@ public class DC_Avatar_Part : MonoBehaviour
 
     public virtual bool BoltStrike(DC_Bolt bolt) 
     {
+        var ret = TakeDamage(bolt.damage);
         avatar.BoltStrike(this, bolt);
-		return TakeDamage(bolt.damage);
+        
+		return ret;
     }
 
-    public virtual void OnServerUpdate() {}
-
-    public virtual void OnDamage() {}
-    public virtual void OnHeal() {}
-
-    public virtual void OnBreak() {}
-    public virtual void OnFix () {}
-
-    public virtual bool CheckHealth() 
+    public virtual bool ClientBoltStrike(DC_LocalBolt lBolt)
     {
-        if(health < 0)
-        {
-            broken = true;
-            this.OnBreak();
+        return TakeDamage(lBolt.damage);
+    }
 
-            return false;
-        }
-        else
-        {
-            broken = false;
-            this.OnFix();
-            return true;
-        }
+    public virtual void OnServerUpdate() 
+    {
+		UpdateColor();
+    }
+
+    public virtual void OnDamage() 
+    {
+        UpdateColor();
+    }
+    public virtual void OnHeal() 
+    {
+        UpdateColor();
+    }
+
+    public virtual void OnBreak() 
+    {
+        UpdateColor();
+    }
+
+    public virtual void OnFix () 
+    {
+        UpdateColor();
     }
 
     public bool TakeDamage(int damage)
     {
         health -= damage;
-        CheckHealth();
-
+        var res = CheckHealth();
+        
         this.OnDamage();
-        return false;
+        return res;
     }
 
     public bool Heal(int negDamage)
     {
         health += negDamage;
-        CheckHealth();
+        var res = CheckHealth();
 
         this.OnHeal();
-        return false;
+        return res;
     }
 }

@@ -1,46 +1,46 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class DC_Bolt : NetworkBehaviour
+public class DC_LocalBolt : MonoBehaviour 
 {
+	public static int maxBoltLights = 20;
+	public static int boltLightCount = 0;
+
 	public LayerMask bustLayers;
 
 	[Space(10)]
 
-	[SyncVar] public GameObject playerO;
-	[SyncVar] public GameObject avatarO;
+	public float preDamageTime = 0.1f;
+	public float maxLifeTime = 10f;
 
-	[Space(10)]
-
-	[SyncVar] public bool instant = true;
-	[SyncVar] public bool healthShot = false;
-
-	[Space(10)]
-
-	[SyncVar] public float preDamageTime = 0.1f;
-	[SyncVar] public float maxLifeTime = 10f;
-
-	[SyncVar] public int damage = 10;
-	[SyncVar] public float speed = 10f;
-	[SyncVar] public float range = 100f;
+	public int damage = 0;
+	public float range = 0f;
+	public float speed = 0f;
 	
+	public bool instant = false;
+	public bool healthShot = false;
+
 	[Space(10)]
 
-	[SyncVar] public bool fired = false;
-	[SyncVar] public bool hit = false;
+	public GameObject playerO;
+	public GameObject avatarO;
 
-	//Private Server-Side Variables
+	[HideInInspector] public bool fired = false;
+	[HideInInspector] public bool inMotion = false;
 
-	[SyncVar] private bool inMotion = false;
+	[HideInInspector] public bool hit;
 
-	// Private Client-Side Variables
-	private CapsuleCollider coll;
+	private Light boltLight;
+	private MeshRenderer rend;
 	private Rigidbody rigid;
 
+	private CapsuleCollider coll;
+
 	private Vector3 startPos;
-	private float bustTime = 0f;
+
+	private bool lightEnabled = false;
+	private bool lightAdded = false;
 
 	private float liveTime = 0f;
 
@@ -48,34 +48,66 @@ public class DC_Bolt : NetworkBehaviour
 
 	void Start()
 	{
-		coll = GetComponent<CapsuleCollider>();
+		boltLight = GetComponent<Light>();
+		rend = GetComponentInChildren<MeshRenderer>();
+
 		rigid = GetComponent<Rigidbody>();
+
+		coll = GetComponent<CapsuleCollider>();
 	}
 
-	public override void OnStartServer()
+	public void AddLight() 
 	{
-		
+		lightAdded = true;
+
+		if(!boltLight)
+			boltLight = GetComponent<Light>();
+
+		if(boltLightCount + 1 > maxBoltLights)
+			return;
+
+		lightEnabled = true;
+
+		if(boltLight)
+			boltLight.enabled = true;
+
+		boltLightCount++;
 	}
 
-	void Update() 
+	public void RemLight()
+	{
+		lightAdded = false;
+
+		if(!boltLight)
+			boltLight = GetComponent<Light>();
+
+		if(boltLightCount - 1 < 0)
+			return;
+
+		lightEnabled = false;
+
+		if(boltLight)
+			boltLight.enabled = false;
+
+		boltLightCount--;
+	}
+
+	void Update()
 	{
 		if(fired)
 			liveTime += Time.deltaTime;
 
 		if(fired && !instant && inMotion)
-		{
-			UpdateIgnoreColliders();
-			UpdateMovement();
-		}
+			UpdationMovement();
 
-		if(fired && !instant && inMotion && !hit && Vector3.Distance(startPos, transform.position) >= range)
+		if(fired && !instant && inMotion && Vector3.Distance(transform.position, startPos) > range)
 			BustBolt(transform.position);
 
 		if(fired && liveTime >= maxLifeTime)
-			BustBolt(transform.position);			
+			BustBolt(transform.position);
 	}
 
-	void UpdateMovement() 
+	void UpdationMovement()
 	{
 		rigid.position = rigid.position + transform.forward * (speed * Time.deltaTime);
 	}
@@ -104,7 +136,7 @@ public class DC_Bolt : NetworkBehaviour
 			}
 	}
 
-	public void Fire()
+	public void Fire() 
 	{
 		if(fired)
 			return;
@@ -112,16 +144,20 @@ public class DC_Bolt : NetworkBehaviour
 			fired = true;
 
 		startPos = transform.position;
-		
+
 		if(instant)
 			FireInstant();
-		
 		else
 			FireSlow();
 	}
 
-	[Server] public void FireInstant()
+	public void FireInstant()
 	{
+		rend.enabled = false;
+		
+		if(lightAdded)
+			RemLight();
+
 		Ray ray = new Ray(transform.position, transform.forward);
 		RaycastHit[] hits;		
 
@@ -134,7 +170,10 @@ public class DC_Bolt : NetworkBehaviour
 				if(part && part.broken)	
 					continue;
 				else if(part)
-					part.BoltStrike(this);
+				{
+					Debug.Log("Part Hit!");
+					part.ClientBoltStrike(this);
+				}
 		
 				BustBolt(hit.point);
 				break;
@@ -146,8 +185,11 @@ public class DC_Bolt : NetworkBehaviour
 		BustBolt(transform.position + (transform.forward * range));
 	}
 
-	public void FireSlow()
+	public void FireSlow() 
 	{
+		if(!lightAdded)
+			AddLight();
+
 		inMotion = true;
 	}
 
@@ -164,22 +206,26 @@ public class DC_Bolt : NetworkBehaviour
 			if(part)
 			{
 				if(!part.broken)
-					part.BoltStrike(this);
-				else 
+					part.ClientBoltStrike(this); 
+				else
 				{
 					Debug.Log("Skpping Part: " + col.gameObject.name);
 					return;
 				}
-			}
-			
+			} 
+
 			hit = true;
-				
+
 			BustBolt(transform.position);
+			
 		}
 	}
 
 	public void BustBolt(Vector3 pos) 
 	{
-		NetworkServer.Destroy(gameObject);
+		if(lightAdded)
+			RemLight();
+
+		Destroy(gameObject);
 	}
 }

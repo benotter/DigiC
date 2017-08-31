@@ -13,13 +13,13 @@ TagManager:
   - UI
   - 
   - 
-  - Avatar_Local
-  - Avatar_Paws
-  - Avatar_Chest
-  - MoveEnabled
-  - Avatar_Remote
-  - Avatar_Server
-  - Avatar_Tool
+  - GameGrid
+  - HomeRoom
+  - Player
+  - Avatar
+  - Bolts
+  - Avatar Local
+  - 
   - 
   - 
   - 

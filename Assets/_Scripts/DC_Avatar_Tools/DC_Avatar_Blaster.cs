@@ -11,6 +11,7 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 	public Transform firePoint;
 
 	public GameObject boltPrefab;
+	public GameObject localBoltPrefab;
 
 	[Space(10)]
 
@@ -22,8 +23,12 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 	[SyncVar] public bool bulletStyleBolt = true;
 	[SyncVar] public bool boltHeals = false;
 
+	[SyncVar] public float preDamageTime = 0.1f;
+	[SyncVar] public float maxLifeTime = 10f;
+
 	[SyncVar] public int damage = 10;
 	[SyncVar] public float range = 100f;
+	[SyncVar] public float speed = 10f;
 	
 	[Space(10)]
 
@@ -32,7 +37,7 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 
 	[Space(10)]
 
-	[SyncVar] public float fireRate = 1f;
+	[SyncVar] public int fireRate = 1;
 
 	[Space(10)]
 
@@ -43,27 +48,32 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 	// Private Client-Side Variables
 
 	private bool fired = false;
-
 	private float lastFireTime = 0f;
+	
 
 	void Update() 
 	{
-		ServerUpdate();
-		ClientUpdate();
+		if(isServer) 
+			ServerUpdate();
+
+		if(isClient)
+			ClientUpdate();
 	}
 
 	[Server] void ServerUpdate() 
 	{
 		lastFireTime += Time.deltaTime;
 
+		bool canFire = lastFireTime >= 1f / (float) fireRate;
+
 		if(firing) 
 		{	
-			if(lastFireTime > 1 / fireRate)
+			if(canFire)
 				HandleBlasterFire();
 		}
 		else 
 		{
-			if(lastFireTime > 1 / fireRate && fired)
+			if(fired && canFire)
 				fired = false;
 		}
 	}
@@ -84,18 +94,13 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 		switch(blasterType) 
 		{
 			case BlasterType.SingleFire:
-				if(!fired)
-				{
-					Fire();
-					fired = true;
-				}
-					
-			break;
-
 			case BlasterType.SemiAutoFire:
+				if(!fired)
+					Fire();
 			break;
 
 			case BlasterType.AutoFire:
+				Fire();
 			break;
 
 			case BlasterType.ChargeFire:
@@ -105,11 +110,16 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 
 	[Server] public void Fire()
 	{
+		RpcCreateClientBolt();
+
 		GameObject boltO = Instantiate(boltPrefab, firePoint.position, firePoint.rotation);
 		DC_Bolt bolt = boltO.GetComponent<DC_Bolt>();
 
+		bolt.preDamageTime = preDamageTime;
+
 		bolt.damage = damage;
 		bolt.range = range;
+		bolt.speed = speed;
 
 		bolt.instant = bulletStyleBolt;
 		bolt.healthShot = boltHeals;
@@ -118,9 +128,10 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 		bolt.avatarO = avatar.gameObject;
 
 		NetworkServer.Spawn(boltO);
-
 		bolt.Fire();
-		bolt.RpcFire();
+
+		lastFireTime = 0f;
+		fired = true;
 	}
 
 	// Server-Side Commands
@@ -136,6 +147,26 @@ public partial class DC_Avatar_Blaster : DC_Avatar_Tool
 	}
 
 	// Client-Side Commands
+
+	[ClientRpc] public void RpcCreateClientBolt()
+	{
+		GameObject newLocalB = Instantiate(localBoltPrefab, firePoint.position, firePoint.rotation);
+		DC_LocalBolt lBolt = newLocalB.GetComponent<DC_LocalBolt>();
+
+		lBolt.preDamageTime = preDamageTime;
+
+		lBolt.damage = damage;
+		lBolt.range = range;
+		lBolt.speed = speed;
+
+		lBolt.instant = bulletStyleBolt;
+		lBolt.healthShot = boltHeals;
+
+		lBolt.playerO = playerO;
+		lBolt.avatarO = avatarO;
+
+		lBolt.Fire();
+	}
 }
 
 public partial class DC_Avatar_Blaster 
@@ -148,5 +179,23 @@ public partial class DC_Avatar_Blaster
 		AutoFire,
 
 		ChargeFire,
+	}
+
+	[System.Serializable] public struct LocalBolt
+	{
+		public float damage;
+		public float range;
+		public bool instant;
+		public bool healthShot;
+
+		public LocalBolt Setup(float d, float r, bool inst, bool heal)
+		{
+			damage = d;
+			range = r;
+			instant = inst;
+			healthShot = heal;
+
+			return this;
+		}
 	}
 }

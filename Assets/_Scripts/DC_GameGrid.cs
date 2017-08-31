@@ -22,8 +22,8 @@ public partial class DC_GameGrid : NetworkBehaviour
 	[SyncVar] public float gridCellSize = 20;
 
 	// Why the f**k to SyncLists act Sooooo funky? I don't get them, will replace ASAP until I get them.
-	public class SyncListGCell : SyncListStruct<GCell>{};
-	public SyncListGCell cells;
+	// public class SyncListGCell : SyncListStruct<GCell>{};
+	// public SyncListGCell cells;
 
 	// Private Server-Side Variables
 
@@ -31,7 +31,7 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 	public override void OnStartServer()
 	{
-		cells = new SyncListGCell();
+		// cells = new SyncListGCell();
 		gridCells = new GCell[9];
 	}
 
@@ -50,22 +50,7 @@ public partial class DC_GameGrid : NetworkBehaviour
 	{
 		var pos = GetPosInt(x, y);
 
-		if( pos >= cells.Count)
-		{
-			Debug.Log("Bad Grid Pos X: " + x);
-			Debug.Log("Bad Grid Pos Y: " + y);
-			return false;
-		}
-			
-		var p = cells[pos].player;
-		return (p == pO);
-	}
-
-	public bool LocalCheckPosition(int x, int y, GameObject pO = null)
-	{
-		var pos = GetPosInt(x, y);
-
-		if( pos >= cells.Count)
+		if( pos >= gridCells.Length)
 		{
 			Debug.Log("Bad Grid Pos X: " + x);
 			Debug.Log("Bad Grid Pos Y: " + y);
@@ -86,14 +71,18 @@ public partial class DC_GameGrid : NetworkBehaviour
 		if(player.gameGridX > 0)
 		{
 			int oldPos = GetPosInt(player.gameGridX, player.gameGridY);
-			var oldCell = cells[oldPos];
+
+			// var oldCell = cells[oldPos];
+			var oldCell = gridCells[oldPos];
+
 			oldCell.player = null;
 
+			// cells[oldPos] = oldCell;
+			// cells.Dirty(oldPos);
 
 			gridCells[oldPos] = oldCell;
 
-			cells[oldPos] = oldCell;
-			cells.Dirty(oldPos);
+			RpcSetCell(oldPos, oldCell);
 		}
 
 		player.gameGridX = x;
@@ -101,20 +90,18 @@ public partial class DC_GameGrid : NetworkBehaviour
 
 		int newPos = GetPosInt(x, y);
 
-		GCell cell = cells[newPos];
+		// GCell cell = cells[newPos];
+		GCell cell = gridCells[newPos];
+
 		cell.player = playerO;
 
+		// cells[newPos] = cell;
+		// cells.Dirty(newPos);
 
 		gridCells[newPos] = cell;
 
-		cells[newPos] = cell;
-		cells.Dirty(newPos);
-
-
 		player.RpcUpdatePosition(cell.cellPos);
-
 		RpcSetCell(newPos, cell);
-		RpcUpdateGameGrid();
 
 		return true;
 	}
@@ -132,14 +119,16 @@ public partial class DC_GameGrid : NetworkBehaviour
 		gridCellSize = size;
 
 		UpdateCellPositions();
+
 		UpdateDynaRoom();
+		RpcUpdateDynaRoom();
 	}
 
 	[Server] public void UpdateCellPositions()
     {
-        for(int i = 0; i < cells.Count; i++)
+        for(int i = 0; i < gridCells.Length; i++)
         {
-            GCell cell = cells[i];
+            GCell cell = gridCells[i];
             GCell newCell = cell;
 
             float halfGrid = (gridCellSize / 2f);
@@ -151,22 +140,21 @@ public partial class DC_GameGrid : NetworkBehaviour
 
             newCell.cellPos = new Vector3( y - offset, 0f, -(x - offset ));
 
-
 			gridCells[i] = newCell;
 
-            cells[i] = newCell;
-			cells.Dirty(i);
+            // cells[i] = newCell;
+			// cells.Dirty(i);
         }
     }
 
 	[Server] public void UpdateCells()
 	{
-		cells.Clear();
-		// cells = new GCell[9];
+		// cells.Clear();
+		gridCells = new GCell[9];
 
-		cells.Add(new GCell().SetPos(1, 1)); // 0
-        cells.Add(new GCell().SetPos(1, 2)); // 1
-        cells.Add(new GCell().SetPos(1, 3)); // 2
+		// cells.Add(new GCell().SetPos(1, 1)); // 0
+        // cells.Add(new GCell().SetPos(1, 2)); // 1
+        // cells.Add(new GCell().SetPos(1, 3)); // 2
 
 		gridCells[0] = (new GCell().SetPos(1, 1)); // 0
         gridCells[1] = (new GCell().SetPos(1, 2)); // 1
@@ -175,9 +163,9 @@ public partial class DC_GameGrid : NetworkBehaviour
 		if(gridSize == GridSize.One)
 			return;
 
-        cells.Add(new GCell().SetPos(2, 1)); // 3
-        cells.Add(new GCell().SetPos(2, 2)); // 4
-        cells.Add(new GCell().SetPos(2, 3)); // 5
+        // cells.Add(new GCell().SetPos(2, 1)); // 3
+        // cells.Add(new GCell().SetPos(2, 2)); // 4
+        // cells.Add(new GCell().SetPos(2, 3)); // 5
 
 		gridCells[3] = (new GCell().SetPos(2, 1)); // 3
         gridCells[4] = (new GCell().SetPos(2, 2)); // 4
@@ -186,9 +174,9 @@ public partial class DC_GameGrid : NetworkBehaviour
 		if(gridSize == GridSize.Two)
 			return;
 
-        cells.Add(new GCell().SetPos(3, 1)); // 6
-        cells.Add(new GCell().SetPos(3, 2)); // 7
-        cells.Add(new GCell().SetPos(3, 3)); // 8
+        // cells.Add(new GCell().SetPos(3, 1)); // 6
+        // cells.Add(new GCell().SetPos(3, 2)); // 7
+        // cells.Add(new GCell().SetPos(3, 3)); // 8
 
 		gridCells[6] = (new GCell().SetPos(3, 1)); // 6
         gridCells[7] = (new GCell().SetPos(3, 2)); // 7
@@ -207,16 +195,15 @@ public partial class DC_GameGrid : NetworkBehaviour
 	}
 
 	// Client-Side Commands
-    [ClientRpc] public void RpcUpdateGameGrid()
+    [ClientRpc] public void RpcUpdateDynaRoom()
     {
         UpdateDynaRoom();
-
-		gridSelectorDirty = true;
     }
 
 	[ClientRpc] public void RpcSetCell(int index, GCell cell) 
 	{
 		gridCells[index] = cell;
+		gridSelectorDirty = true;
 	}
 }
 

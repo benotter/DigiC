@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4318615637580154}
   - component: {fileID: 114942157145338380}
   - component: {fileID: 114884720700846140}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DC_Avatar_Test_Tool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,8 +52,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89dfde06e94390b4bab49741b5974dac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerMinPull: 0.15
-  triggerMinClick: 1
   player: {fileID: 0}
   avatar: {fileID: 0}
   cleared: 1
@@ -66,8 +64,6 @@ MonoBehaviour:
   playerO: {fileID: 0}
   avatarO: {fileID: 0}
   hand: 0
-  triggerPull: 0
-  triggerClick: 0
   laserOne: {r: 0, g: 0, b: 1, a: 1}
   laserTwo: {r: 1, g: 0, b: 0, a: 1}
   maxLaserDistance: 1000

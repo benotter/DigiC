@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114151724366843404}
   - component: {fileID: 114454123060976712}
   - component: {fileID: 114129626897888350}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DC_Avatar_Spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 33278282990169138}
   - component: {fileID: 136589498905281360}
   - component: {fileID: 23893795031161614}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}

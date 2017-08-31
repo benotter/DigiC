@@ -37,7 +37,7 @@ public class DC_GridSelector : DC_HR_Equipment_Base
 			{
 				bool en = homeRoom.gameGrid.CheckPosition(button.xPos, button.yPos);
 
-				Debug.Log(homeRoom.gameGrid.cells[homeRoom.gameGrid.GetPosInt(button.xPos, button.yPos)].player);
+				Debug.Log(homeRoom.gameGrid.gridCells[homeRoom.gameGrid.GetPosInt(button.xPos, button.yPos)].player);
 
 				if(!en)
 				{

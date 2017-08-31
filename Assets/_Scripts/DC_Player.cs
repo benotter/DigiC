@@ -92,6 +92,16 @@ public partial class DC_Player : NetworkBehaviour
 
     }
 
+    [Server] public void ClearAvatar() 
+    {
+        Debug.Log("Clearing Avatar!");
+        
+        RpcClearAvatar();
+
+        if(avatarO)
+            NetworkServer.Destroy(avatarO);
+    }
+
     // Server-Side Commands (Run on Server's Instance of Object)
   
     [Command] public void CmdRequestAvatarSpawn()
@@ -168,5 +178,14 @@ public partial class DC_Player : NetworkBehaviour
             homeRoom.SetAvatar(ava);
             ava.UpdateBody();
         }
+    }
+
+    [ClientRpc] public void RpcClearAvatar() 
+    {
+        GameObject.Destroy(avatarO);
+
+        homeRoom.SetAvatar(null);
+        avatar = null;
+        avatarO = null;
     }
 }

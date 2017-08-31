@@ -247,18 +247,22 @@ public class DC_Avatar_Move_Tool : DC_Avatar_Tool
         var at = avatar.transform;
 
         spacePoint = movePoint - (ht.forward * movePointDistance);
-        spacePoint -= ht.localPosition;
+        spacePoint -= ht.localPosition;        
+
+        var h = spacePoint - at.position;
+        var dir = h / h.magnitude;
 
         var dist = Vector3.Distance(spacePoint, at.position);
 
-        var h = spacePoint - at.position;
-        var d = h.magnitude;
-        var dir = h / d;
-
         if(dist > cushionSize)
             dist = cushionSize;
-        
-        targetPoint = dir * ( (dist / cushionSize) * maxMoveSpeed);
+
+        Vector3 res = dir * ( ( maxMoveSpeed * Time.deltaTime ) * ((dist / cushionSize)));
+
+        if(dist < deadZone)
+            res = Vector3.zero;
+            
+        targetPoint = res;
     }
 
     void UpdateLaser()

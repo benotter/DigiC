@@ -6,11 +6,6 @@ using UnityEngine.Networking;
 public class DC_Avatar_Tool : NetworkBehaviour
 {
 	// Client-Side Variables
-
-	public float triggerMinPull = 0.15f;
-	public float triggerMinClick = 1f;
-
-
 	[Space(10)]
 	[HideInInspector] public DC_Player player;
 	[HideInInspector] public DC_Avatar avatar;

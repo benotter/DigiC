@@ -9,14 +9,21 @@ public partial class DC_Avatar
 {
     void Update()
     {
-        ClientUpdate();
-        ServerUpdate();
+        if(isServer)
+            ServerUpdate();
+        
+        if(isClient)
+            ClientUpdate();
     }
 
     [Server] void ServerUpdate()
     {
-        
-
+        if(DestroyNextUpdate)
+        {
+            NetworkServer.UnSpawn(gameObject);
+            NetworkServer.Destroy(gameObject);
+            return;
+        }
     }
 
     [Client] void ClientUpdate()

@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114600615580840442}
   - component: {fileID: 114623065516466982}
   - component: {fileID: 114536203510568182}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DC_Player_City
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -22,7 +22,11 @@ public partial class DC_Avatar : NetworkBehaviour
     [Space(10)]
 
     public DC_Avatar_Muzzle muzzle;
+    public DC_Avatar_Muzzle_Chord muzzleChord;
+
     public DC_Avatar_Chest chest;
+    public DC_Avatar_Chest_Chord chestChord;
+
     public DC_Avatar_Paw rightPaw;
     public DC_Avatar_Paw leftPaw;
 
@@ -71,17 +75,12 @@ public partial class DC_Avatar : NetworkBehaviour
 
     private CollisionFlags lastColFlags;
 
-    static private int avatarLocalLayer = 0;
-    static private int avatarPawsLayer;
-    static private int avatarChestLayer;
-    static private int avatarRemoteLayer;
-    static private int avatarServerLayer;
+    private bool DestroyNextUpdate = false;
 
 
     void Start()
     {
         NetworkTransform netT = GetComponent<NetworkTransform>();
-
         foreach(NetworkTransformChild childT in GetComponents<NetworkTransformChild>())
         {
             childT.sendInterval = netT.sendInterval;
@@ -89,47 +88,21 @@ public partial class DC_Avatar : NetworkBehaviour
             childT.interpolateRotation = netT.interpolateRotation;
             childT.rotationSyncCompression = netT.rotationSyncCompression;
         }
-
-        if(avatarLocalLayer == 0)
-        {
-            avatarLocalLayer = LayerMask.NameToLayer("Avatar_Local");
-
-            avatarPawsLayer = LayerMask.NameToLayer("Avatar_Paws");
-            avatarChestLayer = LayerMask.NameToLayer("Avatar_Chest");
-
-            avatarRemoteLayer = LayerMask.NameToLayer("Avatar_Remote");
-            avatarServerLayer = LayerMask.NameToLayer("Avatar_Server");
-        }
     }
 
     public override void OnStartServer()
     {
-        // coll = GetComponent<CharacterController>();
-
-        muzzle.gameObject.layer = avatarServerLayer;
-        chest.gameObject.layer = avatarServerLayer;
-        rightPaw.gameObject.layer = avatarServerLayer;
-        leftPaw.gameObject.layer = avatarServerLayer;
+        coll = GetComponent<CharacterController>();
     }
 
     public override void OnStartClient()
     {
-        muzzle.gameObject.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
-        chest.gameObject.layer = chest.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
-        rightPaw.gameObject.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
-        leftPaw.gameObject.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarRemoteLayer;
+
     }
 
     public override void OnStartAuthority()
     {
         avatarCam.enabled = true;
-
-        muzzle.gameObject.layer = muzzle.transform.GetChild(0).gameObject.layer = avatarLocalLayer;
-        chest.gameObject.layer = chest.transform.GetChild(0).gameObject.layer = avatarChestLayer;
-
-        rightPaw.gameObject.layer = rightPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
-        leftPaw.gameObject.layer = leftPaw.transform.GetChild(0).gameObject.layer = avatarPawsLayer;
-
         coll = GetComponent<CharacterController>();
 
         if(rightStartToolIndex > -1)
@@ -137,6 +110,8 @@ public partial class DC_Avatar : NetworkBehaviour
 
         if(leftStartToolIndex > -1)
             CmdRequestTool(leftStartToolIndex, 1);
+
+        SetupClientLayers();
     }
 
     public override void OnStopAuthority()
@@ -144,16 +119,40 @@ public partial class DC_Avatar : NetworkBehaviour
         avatarCam.enabled = false;
     }
 
-    public override void OnNetworkDestroy() 
+    [Client] public void SetupClientLayers()
     {
+        var mD = muzzle.transform.GetChild(0);
+        var mcD = muzzleChord.transform.GetChild(0);
 
+        var cD = chest.transform.GetChild(0);
+        var ccD = chestChord.transform.GetChild(0);
+        
+        int avaLocalLayer = LayerMask.NameToLayer("Avatar Local");
+
+        if(mD)
+            mD.gameObject.layer = avaLocalLayer;
+
+        if(mcD)
+            mcD.gameObject.layer = avaLocalLayer;
+
+        if(cD)
+            cD.gameObject.layer = avaLocalLayer;
+
+        if(ccD)
+            ccD.gameObject.layer = avaLocalLayer;
+    }
+
+    [Server] public void BustAvatar() 
+    {
+        Debug.Log("Avatar Busted!");
+        playerO.GetComponent<DC_Player>().ClearAvatar();
     }
 
     [Server] public void BoltStrike(DC_Avatar_Part bodyP, DC_Bolt bolt)
     {
         BodyParts part = bodyP.GetBodyPart();
 
-        switch(bodyP.GetBodyPart())
+        switch(part)
         {
             case BodyParts.Chest:
             break;
@@ -169,17 +168,21 @@ public partial class DC_Avatar : NetworkBehaviour
             
 
             case BodyParts.ChestChord:
+                BustAvatar();
             break;
 
             case BodyParts.MuzzleChord:
+                BustAvatar();
             break;
         }
 
-        if(part != BodyParts.ChestChord || part != BodyParts.MuzzleChord)
+        Debug.Log("Body Part Hit!: " +bodyP.gameObject.name + " : " + bodyP.health);
+
+        if(part != BodyParts.ChestChord && part != BodyParts.MuzzleChord)
             RpcSetPartHealth(part, bodyP.health);
     }
 
-    public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
+    [Client] public void SyncAvatarTools(DC_AvatarSync_Handle rightHandle, DC_AvatarSync_Handle leftHandle)
     {
         if(rightTool)
             rightTool.UpdateState(rightHandle);
@@ -188,40 +191,38 @@ public partial class DC_Avatar : NetworkBehaviour
             leftTool.UpdateState(leftHandle);
     }
 
-    public void StartMove()
+    [Client] public void StartMove()
     {
         inMove = true;
     }
 
-    public void StopMove()
+    [Client] public void StopMove()
     {
         inMove = false;
     }
 
-    public void MoveTo(Vector3 worldPoint)
-    {
-        targetMove += worldPoint;
-    }
-
-    public void MoveTo(Vector3 worldPoint, Vector3 moveTarget)
+    [Client] public void MoveTo(Vector3 worldPoint, Vector3 moveTarget)
     {
         MoveTo(worldPoint);
     }
 
-    public void ResetVelocity()
+    [Client] public void MoveTo(Vector3 worldPoint)
+    {
+        targetMove += worldPoint;
+    }
+
+    [Client] public void ResetVelocity()
     {
         currentVelocity = Vector3.zero;
     }
 
-    public void SetLocalPlayer(DC_LocalPlayer p = null)
+    [Client] public void SetLocalPlayer(DC_LocalPlayer p = null)
     {
         localPlayer = p;
     }
 
 
     // Server-Side Commands    
-
-
     [Command] public void CmdStartLink()
     {
         linked = true;
@@ -294,7 +295,7 @@ public partial class DC_Avatar : NetworkBehaviour
             break;
         }
 
-        p.health = health;
+        p.SetHealth(health);
         p.OnServerUpdate();
     }
 
@@ -327,6 +328,11 @@ public partial class DC_Avatar : NetworkBehaviour
             rightToolO = null;
         else
             leftToolO = null;
+    }
+
+    [ClientRpc] public void RpcAvatarBust() 
+    {
+        DestroyNextUpdate = true;
     }
 }
 

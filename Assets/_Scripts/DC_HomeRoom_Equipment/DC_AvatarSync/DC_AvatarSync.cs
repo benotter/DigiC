@@ -30,8 +30,8 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 	void Start () 
 	{
 		originalPar = transform.parent;
-		originalPos = transform.position;
-		originalRot = transform.rotation;
+		originalPos = transform.localPosition;
+		originalRot = transform.localRotation;
 	}
 	
 	void Update () 
@@ -93,6 +93,13 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 		}
 	}
 
+	public void ReturnHome() 
+	{
+		transform.parent = originalPar;
+		transform.localPosition = originalPos;
+		transform.localRotation = originalRot;
+	}
+
 	public void SwapPlayerAvatarCams()
 	{
 		if(!avatar)
@@ -148,5 +155,8 @@ public partial class DC_AvatarSync : DC_HR_Equipment_Base
 			StopLink();
 
 		screenCover.SetActive(true);
+
+
+		ReturnHome();
 	}
 }
